@@ -1,0 +1,17 @@
+{
+	"0.00.00": {
+		"exclude": true,
+		"logics": {
+			"IS": "intro"
+		}
+	},
+	"0.02.00": {
+		"exclude": false,
+		"logics": {
+			"AND": {
+				"IS": "mirror",
+				"IS": "focus"
+			}
+		}
+	}
+}

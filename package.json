@@ -1,0 +1,11 @@
+{
+     "name": "beth",
+     "description": "a pro-active chatbot based on eliza",
+     "version": "0.0.0",
+     "dependencies": {
+        "express": "3.1.0",
+        "socket.io": "0.9.13",
+		"socket.io-client": "0.9.11",
+		"prompt": 
+     }
+}

@@ -1,0 +1,47 @@
+{
+	"questions": [
+		"What's your name?",
+		"What can I call you?",
+		"Can we agree on something I can call you for now?",
+		"If you type your name clearly with nothing else now, I will hopefully understand it!"
+	],
+
+	"expects": [
+		{
+			"pattern": "my name is *",
+			"hash": {
+				"#name": "(1)"
+			},
+			"results": [
+				{
+					"respond": "Your name is (1)",
+					"affirm": true
+				}
+			]
+		},
+		{
+			"pattern": "you can call me *",
+			"hash": {
+				"#name": "(1)"
+			},
+			"results": [
+				{
+					"respond": "Okay, from now on, I'll call you (1).",
+					"affirm": true
+				}
+			]
+		},
+		{
+			"pattern": "*",
+			"hash": {
+				"#name": "(1)"
+			},
+			"results": [
+				{
+					"respond": "Your name is (1)?",
+					"affirm": true
+				}
+			]
+		}
+	]
+}

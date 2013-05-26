@@ -1,0 +1,3097 @@
+{
+	"data": {
+		"gambits": [
+			"How do you do.  Please tell me your problem.",
+			"Please tell me what's been bothering you.",
+			"Is something troubling you ?"
+		],
+
+		"farewells": [
+			"Goodbye.  It was nice talking to you.",
+			"Goodbye.  This was really a nice talk.",
+			"Goodbye.  I'm looking forward to our next session.",
+			"This was a good session, wasn't it -- but time is over now.   Goodbye.",
+			"Maybe we could discuss this moreover in our next session ?   Goodbye."
+		],
+
+		"quits": [
+			"bye",
+			"goodbye",
+			"done",
+			"exit",
+			"quit"
+		],
+
+		"substitutions": {
+			"dont": "don't",
+			"cant": "can't",
+			"wont": "won't",
+			"recollect": "remember",
+			"recall": "remember",
+			"dreamt": "dreamed",
+			"dreams": "dream",
+			"maybe": "perhaps",
+			"certainly": "yes",
+			"machine": "computer",
+			"machines": "computer",
+			"computers": "computer",
+			"were": "was",
+			"you're": "you are",
+			"i'm": "i am",
+			"same": "alike",
+			"identical": "alike",
+			"equivalent": "alike"
+		},
+
+		"posttrans": [
+			"am", "are",
+			"your", "my",
+			"me", "you",
+			"myself", "yourself",
+			"yourself", "myself",
+			"i", "you",
+			"you", "I",
+			"my", "your",
+			"i'm", "you are"
+		],
+
+		"synonyms": {
+			"be": ["am", "is", "are", "was"],
+			"belief": ["feel", "think", "believe", "wish"],
+			"cannot": ["can't"],
+			"desire": ["want", "need"],
+			"everyone": ["everybody", "nobody", "noone"],
+			"family": ["mother", "mom", "father", "dad", "sister", "brother", "wife", "children", "child"],
+			"happy": ["elated", "glad", "better"],
+			"sad": ["unhappy", "depressed", "sick"]
+		},
+
+		"ruleset": {
+			"*": {
+				"pattern": "*",
+				"ranking": 0,
+				"comment": "Top-level. Will match anything the user inputs.",
+				"results": [
+					{
+						"respond": "I'm not sure I understand you fully.",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					},
+					{
+						"respond": "Please go on.",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					},
+					{
+						"respond": "What does that suggest to you ?",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					},
+					{
+						"respond": "Do you feel strongly about discussing such things ?",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					},
+					{
+						"respond": "That is interesting.  Please continue.",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					},
+					{
+						"respond": "Tell me more about that.",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					},
+					{
+						"respond": "Does talking about this bother you ?",
+						"ranking": 0,
+						"tagging": [
+							"generic"
+						],
+						"comment": "",
+						"storage": ""
+					}
+				],
+				"ruleset": {
+					"different": {
+						"pattern": "different",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "How is it different ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What differences do you see ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What does that difference suggest to you ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What other distinctions do you see ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What do you suppose that disparity means ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Could there be some connection, do you suppose ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "How ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"like": {
+						"pattern": "like",
+						"ruleset": {
+							"* @be *like *": {
+								"pattern": " * @be *like * ",
+								"results": [
+									{
+										"respond": "goto alike",
+										"ranking": 10,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"alike": {
+						"pattern": "alike",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "In what way ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What resemblence do you see ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What does that similarity suggest to you ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What other connections do you see ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What do you suppose that resemblence means ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What is the connection, do you suppose ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Could there really be some connection ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "How ?",
+								"ranking": 10,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"always": {
+						"pattern": "always",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "Can you think of a specific example ?",
+								"ranking": 1,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "When ?",
+								"ranking": 1,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What incident are you thinking of ?",
+								"ranking": 1,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Really, always ?",
+								"ranking": 1,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"noone": {
+						"pattern": "noone",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto everyone",
+								"ranking": 2,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"nobody": {
+						"pattern": "nobody",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto everyone",
+								"ranking": 2,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"everybody": {
+						"pattern": "everybody",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto everyone",
+								"ranking": 2,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"everyone": {
+						"pattern": "everyone",
+						"ruleset": {
+							"* @everyone *": {
+								"pattern": " * @everyone * ",
+								"results": [
+									{
+										"respond": "Really, (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Surely not (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Can you think of anyone in particular ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Who, for example?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are you thinking of a very special person ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Who, may I ask ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Someone special perhaps ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You have a particular person in mind, don't you ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Who do you think you're talking about ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"why": {
+						"pattern": "why",
+						"ruleset": {
+							"* why can't i *": {
+								"pattern": " * why can't i * ",
+								"results": [
+									{
+										"respond": "Do you think you should be able to (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you want to be able to (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you believe this will help you to (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Have you any idea why you can't (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* why don't you *": {
+								"pattern": " * why don't you * ",
+								"results": [
+									{
+										"respond": "Do you believe I don't (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps I will (2) in good time.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Should you (2) yourself ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You want me to (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						},
+						"results": [
+							{
+								"respond": "goto what",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"because": {
+						"pattern": "because",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "Is that the real reason ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Don't any other reasons come to mind ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Does that reason seem to explain anything else ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What other reasons might there be ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"how": {
+						"pattern": "how",
+						"ruleset": {
+							"how *": {
+								"pattern": " how * ",
+								"results": [
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"where": {
+						"pattern": "where",
+						"ruleset": {
+							"where *": {
+								"pattern": " where * ",
+								"results": [
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"when": {
+						"pattern": "when",
+						"ruleset": {
+							"when *": {
+								"pattern": " when * ",
+								"results": [
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"who": {
+						"pattern": "who",
+						"ruleset": {
+							"who *": {
+								"pattern": " who * ",
+								"results": [
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"what": {
+						"pattern": "what",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "Why do you ask ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Does that question interest you ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What is it you really want to know ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Are such questions much on your mind ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What answer would please you most ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What do you think ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What comes to mind when you ask that ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Have you asked such questions before ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Have you asked anyone else ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"can": {
+						"pattern": "can",
+						"ruleset": {
+							"* can i *": {
+								"pattern": " * can i * ",
+								"results": [
+									{
+										"respond": "Whether or not you can (2) depends on you more than on me.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you want to be able to (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps you don't want to (2).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* can you *": {
+								"pattern": " * can you * ",
+								"results": [
+									{
+										"respond": "You believe I can (2) don't you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You want me to be able to (2).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps you would like to be able to (2) yourself.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"my": {
+						"pattern": "my",
+						"ruleset": {
+							"* my *": {
+								"pattern": " * my * ",
+								"results": [
+									{
+										"respond": "Your (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why do you say your (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Does that suggest anything else which belongs to you ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Is it important to you that your (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* my* @family *": {
+								"pattern": " * my* @family * ",
+								"results": [
+									{
+										"respond": "Tell me more about your family.",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Who else in your family (4) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Your (3) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What else comes to your mind when you think of your (3) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"$ * my *": {
+								"pattern": " $ * my * ",
+								"results": [
+									{
+										"respond": "Does that have anything to do with the fact that your (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Lets discuss further why your (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Earlier you said your (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "But your (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"no": {
+						"pattern": "no",
+						"ruleset": {
+							"* no one *": {
+								"pattern": " * no one * ",
+								"results": [
+									{
+										"respond": "Are you sure, no one (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Surely someone (2) .",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Can you think of anyone at all ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are you thinking of a very special person ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Who, may I ask ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You have a particular person in mind, don't you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Who do you think you are talking about ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						},
+						"results": [
+							{
+								"respond": "Are you saying no just to be negative?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "You are being a bit negative.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Why not ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Why 'no' ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"yes": {
+						"pattern": "yes",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "You seem to be quite positive.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "You are sure.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I see.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I understand.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"you": {
+						"pattern": "you",
+						"ruleset": {
+							"* you *": {
+								"pattern": " * you * ",
+								"results": [
+									{
+										"respond": "We were discussing you -- not me.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Oh, I (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You're not really talking about me -- are you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What are your feelings now ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* you* me *": {
+								"pattern": " * you* me * ",
+								"results": [
+									{
+										"respond": "Why do you think I (2) you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You like to think I (2) you -- don't you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What makes you think I (2) you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Really, I (2) you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you wish to believe I (2) you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Suppose I did (2) you -- what would that mean ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Does someone else believe I (2) you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* you are *": {
+								"pattern": " * you are * ",
+								"results": [
+									{
+										"respond": "What makes you think I am (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Does it please you to believe I am (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you sometimes wish you were (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps you would like to be (2).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* you remind me of *": {
+								"pattern": " * you remind me of * ",
+								"results": [
+									{
+										"respond": "goto alike",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"i": {
+						"pattern": "i",
+						"ruleset": {
+							"* i * you *": {
+								"pattern": " * i * you * ",
+								"results": [
+									{
+										"respond": "Perhaps in your fantasies we (2) each other.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you wish to (2) me ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You seem to need to (2) me.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you (2) anyone else ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i feel *": {
+								"pattern": " * i feel * ",
+								"results": [
+									{
+										"respond": "Tell me more about such feelings.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you often feel (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you enjoy feeling (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Of what does feeling (2) remind you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i don't *": {
+								"pattern": " * i don't * ",
+								"results": [
+									{
+										"respond": "Don't you really (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why don't you (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you wish to be able to (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Does that trouble you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i @cannot *": {
+								"pattern": " * i @cannot * ",
+								"results": [
+									{
+										"respond": "How do you know that you can't (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Have you tried ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps you could (3) now.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you really want to be able to (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What if you could (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i am *": {
+								"pattern": " * i am * ",
+								"results": [
+									{
+										"respond": "Is it because you are (2) that you came to me ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "How long have you been (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you believe it is normal to be (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you enjoy being (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you know anyone else who is (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i* @belief *you *": {
+								"pattern": " * i* @belief *you * ",
+								"results": [
+									{
+										"respond": "goto you",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i @belief i *": {
+								"pattern": " * i @belief i * ",
+								"results": [
+									{
+										"respond": "Do you really think so ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "But you are not sure you (3).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you really doubt you (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i was *": {
+								"pattern": " * i was * ",
+								"results": [
+									{
+										"respond": "goto was",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i am* @happy *": {
+								"pattern": " * i am* @happy * ",
+								"results": [
+									{
+										"respond": "How have I helped you to be (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Has your treatment made you (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What makes you (3) just now ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Can you explain why you are suddenly (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i am* @sad *": {
+								"pattern": " * i am* @sad * ",
+								"results": [
+									{
+										"respond": "I am sorry to hear that you are (3).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you think coming here will help you not to be (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "I'm sure it's not pleasant to be (3).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Can you explain what made you (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i @desire *": {
+								"pattern": " * i @desire * ",
+								"results": [
+									{
+										"respond": "What would it mean to you if you got (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why do you want (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Suppose you got (3) soon.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What if you never got (3) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What would getting (3) mean to you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What does wanting (3) have to do with this discussion ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						},
+						"results": [
+							{
+								"respond": "You say (1) ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Can you elaborate on that ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Do you say (1) for some special reason ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "That's quite interesting.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"was": {
+						"pattern": "was",
+						"ruleset": {
+							"* was you *": {
+								"pattern": " * was you * ",
+								"results": [
+									{
+										"respond": "Would you like to believe I was (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What suggests that I was (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What do you think ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps I was (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What if I had been (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i was *": {
+								"pattern": " * i was * ",
+								"results": [
+									{
+										"respond": "Were you really ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why do you tell me you were (2) now ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps I already know you were (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* was i *": {
+								"pattern": " * was i * ",
+								"results": [
+									{
+										"respond": "What if you were (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you think you were (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Were you (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What would it mean if you were (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What does ' (2) ' suggest to you ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"your": {
+						"pattern": "your",
+						"ruleset": {
+							"* your *": {
+								"pattern": " * your * ",
+								"results": [
+									{
+										"respond": "Why are you concerned over my (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What about your own (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are you worried about someone else's (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Really, my (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What makes you think of my (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you want my (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"are": {
+						"pattern": "are",
+						"ruleset": {
+							"* are *": {
+								"pattern": " * are * ",
+								"results": [
+									{
+										"respond": "Did you think they might not be (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Would you like it if they were not (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What if they were not (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are they always (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Possibly they are (2).",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are you positive they are (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* you are *": {
+								"pattern": " * you are * ",
+								"results": [
+									{
+										"respond": "goto you",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* are you *": {
+								"pattern": " * are you * ",
+								"results": [
+									{
+										"respond": "Why are you interested in whether I am (2) or not ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Would you prefer if I weren't (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Perhaps I am (2) in your fantasies.",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you sometimes think I am (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Would it matter to you ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What if I were (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"am": {
+						"pattern": "am",
+						"ruleset": {
+							"* i am *": {
+								"pattern": " * i am * ",
+								"results": [
+									{
+										"respond": "goto i",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* am i *": {
+								"pattern": " * am i * ",
+								"results": [
+									{
+										"respond": "Do you believe you are (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Would you want to be (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you wish I would tell you you are (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What would it mean if you were (2) ?",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 0,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						},
+						"results": [
+							{
+								"respond": "Why do you say 'am' ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I don't understand that.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"computer": {
+						"pattern": "computer",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "Do computers worry you ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Why do you mention computers ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What do you think machines have to do with your problem ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Don't you think computers can help people ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What about machines worries you ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What do you think about machines ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "You don't think I am a computer program, do you ?",
+								"ranking": 50,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"hello": {
+						"pattern": "hello",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "How do you do.  Please state your problem.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Hi.  What seems to be your problem ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"xforeign": {
+						"pattern": "xforeign",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "I speak only English.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"espanol": {
+						"pattern": "espanol",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto xforeign",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I told you before, I don't understand Spanish.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"italiano": {
+						"pattern": "italiano",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto xforeign",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I told you before, I don't understand Italian.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"francais": {
+						"pattern": "francais",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto xforeign",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I told you before, I don't understand French.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"deutsch": {
+						"pattern": "deutsch",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto xforeign",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I told you before, I don't understand German.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"name": {
+						"pattern": "name",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "I am not interested in names.",
+								"ranking": 15,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I've told you before, I don't care about names -- please continue.",
+								"ranking": 15,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"perhaps": {
+						"pattern": "perhaps",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "You don't seem quite certain.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Why the uncertain tone ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Can't you be more positive ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "You aren't sure ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Don't you know ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "How likely, would you estimate ?",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"dream": {
+						"pattern": "dream",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "What does that dream suggest to you ?",
+								"ranking": 3,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Do you dream often ?",
+								"ranking": 3,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "What persons appear in your dreams ?",
+								"ranking": 3,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Do you believe that dreams have something to do with your problem ?",
+								"ranking": 3,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"dreamed": {
+						"pattern": "dreamed",
+						"ruleset": {
+							"* i dreamed *": {
+								"pattern": " * i dreamed * ",
+								"results": [
+									{
+										"respond": "Really, (2) ?",
+										"ranking": 4,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Have you ever fantasized (2) while you were awake ?",
+										"ranking": 4,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Have you ever dreamed (2) before ?",
+										"ranking": 4,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto dream",
+										"ranking": 4,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"if": {
+						"pattern": "if",
+						"ruleset": {
+							"* if *": {
+								"pattern": " * if * ",
+								"results": [
+									{
+										"respond": "Do you think it's likely that (2) ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you wish that (2) ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What do you know about (2) ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Really, if (2) ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What would you do if (2) ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "But what are the chances that (2) ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What does this speculation lead to ?",
+										"ranking": 3,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"forget": {
+						"pattern": "forget",
+						"ruleset": {
+							"* did you forget *": {
+								"pattern": " * did you forget * ",
+								"results": [
+									{
+										"respond": "Why do you ask ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are you sure you told me ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Would it bother you if I forgot (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why should I recall (2) just now ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Tell me more about (2).",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i forget *": {
+								"pattern": " * i forget * ",
+								"results": [
+									{
+										"respond": "Can you think of why you might forget (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why can't you remember (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "How often do you think of (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Does it bother you to forget that ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Could it be a mental block ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Are you generally forgetful ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Do you think you are suppressing (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"remember": {
+						"pattern": "remember",
+						"ruleset": {
+							"* you remember *": {
+								"pattern": " * you remember * ",
+								"results": [
+									{
+										"respond": "How could I forget (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What about (2) should I remember ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto you",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* do you remember *": {
+								"pattern": " * do you remember * ",
+								"results": [
+									{
+										"respond": "Did you think I would forget (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why do you think I should recall (2) now ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What about (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "goto what",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "You mentioned (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							},
+							"* i remember *": {
+								"pattern": " * i remember * ",
+								"results": [
+									{
+										"respond": "Do you often think of (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Does thinking of (2) bring anything else to mind ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What else do you recollect ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "Why do you remember (2) just now ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What in the present situation reminds you of (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What is the connection between me and (2) ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									},
+									{
+										"respond": "What else does (2) remind you of ?",
+										"ranking": 5,
+										"tagging": [
+											"generic"
+										],
+										"comment": "",
+										"storage": ""
+									}
+								],
+								"comment": ""
+							}
+						}
+					},
+					"apologise": {
+						"pattern": "apologise",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "goto sorry",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					},
+					"sorry": {
+						"pattern": "sorry",
+						"ruleset": {},
+						"results": [
+							{
+								"respond": "Please don't apologise.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "Apologies are not necessary.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "I've told you that apologies are not required.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							},
+							{
+								"respond": "It did not bother me.  Please continue.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"comment": "",
+								"storage": ""
+							}
+						]
+					}
+				}
+			}
+		}
+
+	}
+}

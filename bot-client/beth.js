@@ -225,18 +225,18 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		}
 		; //eof variable declarations
 		
-		// Ruleset needs to be parsed, checked and amended before anything else can happen.
-		parseRuleset(libraryData.ruleset);
-		
-		console.log("debug:", debugFn);
-		debugFunc(libraryData.ruleset);
-		
-		// Finally, expose private variables to public API.
-		this.getInitial = getInitial;
-		this.transform = loginput;
-		
-		// Set interval to check agenda and log every 2 seconds.
-		setInterval(timedcheck, 2000);
+	// Ruleset needs to be parsed, checked and amended before anything else can happen.
+	parseRuleset(libraryData.ruleset);
+	
+	console.log("debug:", debugFn);
+	debugFunc(libraryData.ruleset);
+	
+	// Finally, expose private variables to public API.
+	this.getInitial = getInitial;
+	this.transform = loginput;
+	
+	// Set interval to check agenda and log every 2 seconds.
+	setInterval(timedcheck, 2000);
 	
 };
 

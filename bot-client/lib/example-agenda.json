@@ -1,35 +1,56 @@
-{
-	"conditions": {
-		"time": "",
-		"iterate": ""
-	},
-	"criteria": {
-		"proactive": {
-			"HAS": [],
-			"NOT": []
+[
+	{
+		"conditions": {
+			"time": "0:01:00",
+			"iterate": "5"
 		},
-		"reactive": {
-			"HAS": [],
-			"NOT": []
-		},
-		"alternate": {
-			"conditions": {
-					"time": "",
-					"iterate": ""
+		"criteria": {
+			"proactive": {
+				"HAS": ["intro"],
+				"NOT": ["generic"]
+			},
+			"reactive": {
+				"HAS": ["intro"],
+				"NOT": ["generic"]
+			},
+			"alternate": [
+				{
+					"conditions": {
+						"time": "",
+						"iterate": ""
+					},
+					"criteria": {
+						"proactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"reactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"alternate": {
+						}
+					}
 				},
-				"criteria": {
-					"proactive": {
-						"HAS": [],
-						"NOT": []
+				{
+					"conditions": {
+						"time": "",
+						"iterate": ""
 					},
-					"reactive": {
-						"HAS": [],
-						"NOT": []
-					},
-					"alternate": {
+					"criteria": {
+						"proactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"reactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"alternate": {
+						}
 					}
 				}
-			}
+			]
 		}
 	}
-}
+]

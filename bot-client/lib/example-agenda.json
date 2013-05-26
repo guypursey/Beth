@@ -1,16 +1,34 @@
 {
-	"0.00.00": {
-		"exclude": true,
-		"logics": {
-			"IS": "intro"
-		}
+	"conditions": {
+		"time": "",
+		"iterate": ""
 	},
-	"0.02.00": {
-		"exclude": false,
-		"logics": {
-			"AND": {
-				"IS": "mirror",
-				"IS": "focus"
+	"criteria": {
+		"proactive": {
+			"HAS": [],
+			"NOT": []
+		},
+		"reactive": {
+			"HAS": [],
+			"NOT": []
+		},
+		"alternate": {
+			"conditions": {
+					"time": "",
+					"iterate": ""
+				},
+				"criteria": {
+					"proactive": {
+						"HAS": [],
+						"NOT": []
+					},
+					"reactive": {
+						"HAS": [],
+						"NOT": []
+					},
+					"alternate": {
+					}
+				}
 			}
 		}
 	}

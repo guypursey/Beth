@@ -1,0 +1,56 @@
+[
+	{
+		"conditions": {
+			"endure": "",
+			"iterate": ""
+		},
+		"criteria": {
+			"proactive": {
+				"HAS": [],
+				"NOT": []
+			},
+			"reactive": {
+				"HAS": [],
+				"NOT": []
+			},
+			"alternate": [
+				{
+					"conditions": {
+						"endure": "",
+						"iterate": ""
+					},
+					"criteria": {
+						"proactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"reactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"alternate": {
+						}
+					}
+				},
+				{
+					"conditions": {
+						"endure": "",
+						"iterate": ""
+					},
+					"criteria": {
+						"proactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"reactive": {
+							"HAS": [],
+							"NOT": []
+						},
+						"alternate": {
+						}
+					}
+				}
+			]
+		}
+	}
+]

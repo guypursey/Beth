@@ -238,36 +238,54 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		agendaTimer = new Date().getTime(),
 		
 		agendaManager = (function (agendas) {
-			var agendaItem,
+			var agendaItem = agendas[0],
 				agendaStatus = {
 					agendaItemNum: 0,
-					agendaIteration: 0,
+					agendaIteration: 1,
 					agendaTimeStarted: new Date().getTime()
+				},
+				resetStatus = function (itemNum) {
+					agendaStatus = {
+						agendaItemNum: itemNum,
+						agendaIteration: 1,
+						agendaTimeStarted: new Date().getTime()
+					};
 				},
 				convertTime = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
 					var timeArr = itemTime.split(":"),
-						timeSec = 0,
+						timeMsc = 0,
 						timeUnits = [3600, 60, 1];
 					while (timeArr.length) {
-						timeSec += timeUnits.pop() * +time.pop();
+						timeMsc += timeUnits.pop() * +timeArr.pop() * 1000;
 					}
-					// returns argument provided as number of seconds
-					return timeSec;
+					// returns argument provided as number of milliseconds
+					return timeMsc;
 				},
 				isComplete = function () {
-					var rtn = false;
-					if (agendaStatus.agendaIteration > agendaItem.dountil.iterate ||
-						new Date().getTime() > agendaStatus.agendaTimePassed + convertTime(agendaItem.dountil.endured)) {
+					var rtn = false,
+						itr = agendaItem.dountil.iterate || 0,
+						edr = agendaItem.dountil.endured || "0";
+						
+					debugFunc("current:  " + new Date().getTime());
+					debugFunc(agendaStatus.agendaTimeStarted + convertTime(edr));
+					debugFunc("current itr:  " + agendaStatus.agendaIteration);
+					debugFunc("deadline itr: " + itr);
+					if (agendaStatus.agendaIteration >= itr ||
+						new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr)) {
+						debugFunc("agenda item " + agendaStatus.agendaItemNum + " complete");
 						return true;
 					}
 					return rtn;
 				},
 				getCurrentItem = function () {
 					if (isComplete()) {
-						agendaStatus.agendaItemNum += 1;
+						resetStatus(agendaStatus.agendaItemNum + 1);
 						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
+						debugFunc("updated agenda item");
 					}
+					debugFunc("returning agenda item " + agendaStatus.agendaItemNum);
+					debugFunc(agendaItem);
 					return agendaItem;
 				},
 				updateIteration = function () {
@@ -292,11 +310,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			}
 			
 			// Create reference to agenda item; setting up for recursive possibility?
-			agendaItem = libraryData.agendas[agendaItemNum];
-			if (agendaIteration > agendaItem.dountil.iterate ||
-				agendaTimer > agendaItem.dountil.endured) {
-				// complete / reset agenda properties like Iteration and Timer
-			}
+			agendaItem = agendaManager.getCurrentItem();
 			
 			if (agendaItem.filters.reactive) {
 				// Check if the user has said anything recently and process it. [REACTIVE]

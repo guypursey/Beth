@@ -99,7 +99,22 @@
 			"happy": ["elated", "glad", "better"],
 			"sad": ["unhappy", "depressed", "sick"]
 		},
-
+		
+		"moveset": [
+			{	
+				"forward": "Hello world!",
+				"tagging": [
+					"initial"
+				],
+			},
+			{
+				"forward": "Bye!",
+				"tagging": [
+					"farewell"
+				]
+			}
+		],
+		
 		"ruleset": {
 			"*": {
 				"pattern": "*",
@@ -3120,6 +3135,20 @@
 								],
 								"comment": "",
 								"storage": ""
+							}
+						]
+					},
+					"bye": {
+						"pattern": "bye",
+						"results": [
+							{
+								"respond": "I guess that brings this conversation to a close then.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"setflag": "quit",
+								"comment": "Quits the conversation.",
 							}
 						]
 					}

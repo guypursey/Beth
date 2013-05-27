@@ -242,7 +242,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				agendaStatus = {
 					agendaItemNum: 0,
 					agendaIteration: 0,
-					agendaTimePassed: new Date().getTime()
+					agendaTimeStarted: new Date().getTime()
 				},
 				convertTime = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
@@ -256,22 +256,32 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					return timeSec;
 				},
 				isComplete = function () {
-					var rtn = false;// complete / reset agenda properties like Iteration and Timer
-					if (agendaIteration > agendaItem.dountil.iterate ||
-						agendaTimePassed > convertTime(agendaItem.dountil.endured)) {
+					var rtn = false;
+					if (agendaStatus.agendaIteration > agendaItem.dountil.iterate ||
+						new Date().getTime() > agendaStatus.agendaTimePassed + convertTime(agendaItem.dountil.endured)) {
 						return true;
 					}
 					return rtn;
 				},
 				getCurrentItem = function () {
-					return libraryData.agendas[agendaStatus.agendaItemNum];
+					if (isComplete()) {
+						agendaStatus.agendaItemNum += 1;
+						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
+					}
+					return agendaItem;
 				},
-				incrementIteration = function () {
+				updateIteration = function () {
 					agendaStatus.agendaIteration += 1;
 				},
 				updateTimer = function () {
 					agendaStatus.agendaTimePassed = new Date().getTime()
 				};
+			// update time every second	
+			//setInterval(updateTimer, 1000);
+			return {
+				getCurrentItem: getCurrentItem,
+				updateIteration: updateIteration
+			};
 		})(libraryData.agendas);
 		
 		timedcheck = function () {

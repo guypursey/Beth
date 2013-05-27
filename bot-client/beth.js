@@ -311,53 +311,56 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			
 			// Create reference to agenda item; setting up for recursive possibility?
 			agendaItem = agendaManager.getCurrentItem();
-			
-			if (agendaItem.filters.reactive) {
-				// Check if the user has said anything recently and process it. [REACTIVE]
-				var input = readlog(),
-				
-					// Create filter to pass to process() as callback to prevent duplication of loops.
-					filterCallback = function(tagging) {
-						var has = agendaItem.filters.reactive.HAS || [],
-							not = agendaItem.filters.reactive.NOT || [],
-							h = has.length,
-							n = not.length,
-							t,
-							r = false;
-						while (h && !r) {
-							h -= 1;
-							t = tagging.length;
-							debugFunc("filtering for has " + has[h]);
-							while (t) {
-								t -= 1;
-								if (tagging[t] === has[h]) {
-									debugFunc("tag " + has[h] + " found!");
-									r = true;
+			if (agendaItem) {
+				if (agendaItem.filters.reactive) {
+					// Check if the user has said anything recently and process it. [REACTIVE]
+					var input = readlog(),
+					
+						// Create filter to pass to process() as callback to prevent duplication of loops.
+						filterCallback = function(tagging) {
+							var has = agendaItem.filters.reactive.HAS || [],
+								not = agendaItem.filters.reactive.NOT || [],
+								h = has.length,
+								n = not.length,
+								t,
+								r = false;
+							while (h && !r) {
+								h -= 1;
+								t = tagging.length;
+								debugFunc("filtering for has " + has[h]);
+								while (t) {
+									t -= 1;
+									if (tagging[t] === has[h]) {
+										debugFunc("tag " + has[h] + " found!");
+										r = true;
+									}
 								}
 							}
-						}
-						while (n && r) {
-							n -= 1;
-							t = tagging.length;
-							debugFunc("filtering for not " + not[h]);
-							while (t) {
-								t -= 1;
-								if (tagging[t] === not[h]) {
-									r = false;
+							while (n && r) {
+								n -= 1;
+								t = tagging.length;
+								debugFunc("filtering for not " + not[h]);
+								while (t) {
+									t -= 1;
+									if (tagging[t] === not[h]) {
+										r = false;
+									}
 								}
 							}
-						}
-						return r;
-					},
-					
-					responses;
-					
-				// Sort responses to deliver to user via mediator [if staggered, then add to queue].
-				if (input) {
-					responses = process(input, libraryData.ruleset, 0, filterCallback);
-					debugFunc(responses);
-					postMsg(responses[0].respond);
+							return r;
+						},
+						
+						responses;
+						
+					// Sort responses to deliver to user via mediator [if staggered, then add to queue].
+					if (input) {
+						responses = process(input, libraryData.ruleset, 0, filterCallback);
+						debugFunc(responses);
+						postMsg(responses[0].respond);
+					}
 				}
+			} else {
+				debugFunc("disconnecting...");
 			}
 		}
 		; //eof variable declarations

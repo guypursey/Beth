@@ -14,7 +14,7 @@
 			},
 			{
 				"dountil": {
-					"endured": "00:30:00",
+					"endured": "00:00:10",
 					"iterate": 5
 				},
 				"filters": {

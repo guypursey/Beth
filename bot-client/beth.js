@@ -131,6 +131,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			debugFunc('received rules', rules);
 		    var input = input,
 				rules = rules,
+				filter = (typeof filter === "function")
+					? filter
+					: function () { console.log("No filter found."); return true },
 				i,
 				j,
 			    rex,	// for storing regular expression
@@ -139,8 +142,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			    m,		// matching string
 			    ki,		// for goto
 			    order = order || 0,
-			    tabbing = '';	// for debugging
-			
+			    tabbing = '';	// for debugging	
+				
 			for (i = 0; i < order; i += 1) {
 				tabbing += '\t';
 			}
@@ -148,48 +151,62 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			tabbing += order + ':';
 			
 			for (i in rules) {
-				debugFunc("looping through rules");
 			    rex = new RegExp(rules[i].pattern, 'i');
 			    m = (rex).exec(input);
+				
+				// If a match is found.
 			    if (m) {
 					(tabbing, "Examined:", rex);
 					console.log(tabbing, "Found:", m[0]);
 					if (rules[i].hasOwnProperty('ruleset')) {
 						console.log(tabbing, "Exploring further...");
-						rst = rst.concat(process(input, rules[i].ruleset, order + 1));
+						// Recursively call this function for nested rulesets.
+						rst = rst.concat(process(input, rules[i].ruleset, order + 1, filter));
 					}
 					if (typeof rules[i].results === 'object') {
+						// Take a copy of all the results in the array.
 						results = rules[i].results.slice(0);
-						console.log(tabbing, "Obtaining results...");
-						if (results.length) {
-							console.log(tabbing, "Results found.");
-						}
+						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < results.length; j += 1) {
+							debugFunc(rules[i].pattern);
+							debugFunc("loop: " + j);
+							debugFunc(results);
 							
 							if (results[j].respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
 								ki = this._getRuleIndexByKey(results[j].respond.substring(5));     // get the key we should go to,
 								if (ki >= 0) {										// and assuming the key exists in the keyword array,
 									console.log(tabbing, 'Going to ruleset ' + ki + ':', results[j].respond.substring(5));
-									rst = rst.concat(process(input, libraryData[ki].ruleset, order + 1));
+									rst = rst.concat(process(input, libraryData[ki].ruleset, order + 1, filter));
 								}
-								results.splice(j);
+								
+								// Remove object.
+								results.splice(j, 1);
+								// Set the marker back now that the result has been spliced.
+								j -= 1;
 								
 							} else {
-								results[j].refined = order;
-							
-								results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
-									return function (a0, a1) {
-										var rtn = m[parseInt(a1, 10)];
-										results[j].respond = results[j].respond.replace(context.postExp, function () {
-											return context.posts[a1];
-										});
-										return rtn;
-									};
-								})(this)); // iife temporary fix for use of `this` within lambda function
-								
+								// Check that the results conform to the filter.
+								if (filter(results[j].tagging)) {
+									// If the tags in this result match the ones specified, use it.									results[j].refined = order;
+									results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
+										return function (a0, a1) {
+											var rtn = m[parseInt(a1, 10)];
+											results[j].respond = results[j].respond.replace(context.postExp, function () {
+												return context.posts[a1];
+											});
+											return rtn;
+										};
+									})(this)); // iife temporary fix for use of `this` within lambda function
+								} else {
+									// If the result does not survive the filter, get rid of it.
+									results.splice(j, 1);
+									debugFunc("spliced result due to filter");
+									debugFunc(results);
+									// Set the marker back now that the result has been spliced.
+									j -= 1;
+								}
 							}
-							
 						}
 						rst = rst.concat(results);
 					}
@@ -210,18 +227,65 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			}
 			return rtn;
 		},
+				
+		
+		
 		timedcheck = function () {
-		// Check if anything on the agenda needs doing. [PROACTIVE]
-		// Check if any responses are waiting to go out.
-		// Check if the user has said anything recently and process it. [REACTIVE]
-			var input = readlog(),
-				responses;
-		// Sort responses to deliver to user via mediator [if staggered, then add to queue].
-			if (input) { 
-				responses = process(input, libraryData.ruleset, 0);
-				debugFunc(responses);
-				postMsg(responses[0].respond)
+			
+			// Check if any responses are waiting to go out.
+			if (postRoom.length) {
+				postMsg(postRoom.shift());
 			}
+			
+			if (libraryData.agendas[1].filters.reactive) {
+				// Check if the user has said anything recently and process it. [REACTIVE]
+				var input = readlog(),
+				
+					// Create filter to pass to process as callback to prevent duplication of loops.
+					filterCallback = function(tagging) {
+						var has = libraryData.agendas[1].filters.reactive.HAS || [],
+							not = libraryData.agendas[1].filters.reactive.NOT || [],
+							h = has.length,
+							n = not.length,
+							t,
+							r = false;
+						while (h && !r) {
+							h -= 1;
+							t = tagging.length;
+							debugFunc("filtering for has " + has[h]);
+							while (t) {
+								t -= 1;
+								if (tagging[t] === has[h]) {
+									debugFunc("tag " + has[h] + " found!");
+									r = true;
+								}
+							}
+						}
+						while (n && r) {
+							n -= 1;
+							t = tagging.length;
+							debugFunc("filtering for not " + not[h]);
+							while (t) {
+								t -= 1;
+								if (tagging[t] === not[h]) {
+									r = false;
+								}
+							}
+						}
+						return r;
+					},
+					
+					responses;
+					
+				// Sort responses to deliver to user via mediator [if staggered, then add to queue].
+				if (input) { 
+					responses = process(input, libraryData.ruleset, 0, filterCallback);
+					debugFunc(responses);
+					postMsg(responses[0].respond);
+				}
+				
+			}
+			
 		}
 		; //eof variable declarations
 		

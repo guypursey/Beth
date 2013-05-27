@@ -105,7 +105,7 @@
 				"forward": "Hello world!",
 				"tagging": [
 					"initial"
-				],
+				]
 			},
 			{
 				"forward": "Bye!",
@@ -2415,7 +2415,7 @@
 								"respond": "How do you do.  Please state your problem.",
 								"ranking": 0,
 								"tagging": [
-									"generic"
+									"not-generic"
 								],
 								"comment": "",
 								"storage": ""
@@ -3148,7 +3148,7 @@
 									"generic"
 								],
 								"setflag": "quit",
-								"comment": "Quits the conversation.",
+								"comment": "Quits the conversation."
 							}
 						]
 					}

@@ -1,10 +1,10 @@
 [
 	{
-		"conditions": {
-			"endure": "",
+		"dountil": {
+			"endured": "",
 			"iterate": ""
 		},
-		"criteria": {
+		"filters": {
 			"proactive": {
 				"HAS": [],
 				"NOT": []
@@ -12,45 +12,47 @@
 			"reactive": {
 				"HAS": [],
 				"NOT": []
-			},
-			"alternate": [
-				{
-					"conditions": {
-						"endure": "",
-						"iterate": ""
-					},
-					"criteria": {
-						"proactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"reactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"alternate": {
-						}
-					}
-				},
-				{
-					"conditions": {
-						"endure": "",
-						"iterate": ""
-					},
-					"criteria": {
-						"proactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"reactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"alternate": {
-						}
-					}
-				}
-			]
+			}
 		}
+	},
+	{
+		"dountil": {
+			"endured": "",
+			"iterate": ""
+		},
+		"agendas": [
+			{
+				"dountil": {
+					"endured": "",
+					"iterate": ""
+				},
+				"filters": {
+					"proactive": {
+						"HAS": [],
+						"NOT": []
+					},
+					"reactive": {
+						"HAS": [],
+						"NOT": []
+					},
+				}
+			},
+			{
+				"dountil": {
+					"endured": "",
+					"iterate": ""
+				},
+				"filters": {
+					"proactive": {
+						"HAS": [],
+						"NOT": []
+					},
+					"reactive": {
+						"HAS": [],
+						"NOT": []
+					},
+				}
+			}
+		]
 	}
 ]

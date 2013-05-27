@@ -1,56 +1,58 @@
 [
 	{
-		"conditions": {
-			"time": "0:01:00",
-			"iterate": "5"
+		"dountil": {
+			"endured": "0:01:00",
+			"iterate": "1"
 		},
-		"criteria": {
+		"filters": {
 			"proactive": {
 				"HAS": ["intro"],
-				"NOT": ["generic"]
+				"NOT": []
 			},
 			"reactive": {
-				"HAS": ["intro"],
-				"NOT": ["generic"]
-			},
-			"alternate": [
-				{
-					"conditions": {
-						"time": "",
-						"iterate": ""
-					},
-					"criteria": {
-						"proactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"reactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"alternate": {
-						}
-					}
-				},
-				{
-					"conditions": {
-						"time": "",
-						"iterate": ""
-					},
-					"criteria": {
-						"proactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"reactive": {
-							"HAS": [],
-							"NOT": []
-						},
-						"alternate": {
-						}
-					}
-				}
-			]
+				"HAS": [],
+				"NOT": []
+			}
 		}
+	},
+	{
+		"dountil": {
+			"endured": "",
+			"iterate": "5"
+		},
+		"agendas": [
+			{
+				"dountil": {
+					"endured": "",
+					"iterate": "1"
+				},
+				"filters": {
+					"proactive": {
+						"HAS": [],
+						"NOT": []
+					},
+					"reactive": {
+						"HAS": ["mirror"],
+						"NOT": []
+					},
+				}
+			},
+			{
+				"dountil": {
+					"endured": "",
+					"iterate": "1"
+				},
+				"filters": {
+					"proactive": {
+						"HAS": [],
+						"NOT": []
+					},
+					"reactive": {
+						"HAS": ["focus"],
+						"NOT": []
+					},
+				}
+			}
+		]
 	}
 ]

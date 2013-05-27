@@ -1,0 +1,22 @@
+[
+	{
+		"dountil": {
+			"iterate": "1"
+		},
+		"filters": {
+			"proactive": {
+				"HAS": ["initial"]
+			}
+		}
+	}
+	{
+		"dountil": {
+			"iterate": "1"
+		},
+		"filters": {
+			"proactive": {
+				"HAS": ["farewell"]
+			}
+		}
+	}
+]

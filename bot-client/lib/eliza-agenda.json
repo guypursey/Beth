@@ -8,7 +8,17 @@
 				"HAS": ["initial"]
 			}
 		}
-	}
+	},
+	{
+		"dountil": {
+			"endured": "00:30:00"
+		},
+		"filters": {
+			"reactive": {
+				"HAS": ["generic"]
+			}
+		}
+	},			
 	{
 		"dountil": {
 			"iterate": "1"

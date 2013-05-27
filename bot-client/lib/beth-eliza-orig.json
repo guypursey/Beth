@@ -1,5 +1,39 @@
 {
 	"data": {
+	
+		"agendas": [
+			{
+				"dountil": {
+					"iterate": "1"
+				},
+				"filters": {
+					"proactive": {
+						"HAS": ["initial"]
+					}
+				}
+			},
+			{
+				"dountil": {
+					"endured": "00:30:00"
+				},
+				"filters": {
+					"reactive": {
+						"HAS": ["generic"]
+					}
+				}
+			},			
+			{
+				"dountil": {
+					"iterate": "1"
+				},
+				"filters": {
+					"proactive": {
+						"HAS": ["farewell"]
+					}
+				}
+			}
+		],
+		
 		"gambits": [
 			"How do you do.  Please tell me your problem.",
 			"Please tell me what's been bothering you.",

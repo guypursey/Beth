@@ -227,8 +227,52 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			}
 			return rtn;
 		},
-				
 		
+		// Declaration for current agenda item.
+		agendaItem,
+		// Declaration of pointer for agenda item, beginning with first in agendas array.
+		agendaItemNum = 1,
+		// Iteration of agenda item (number of times it has been gone over).
+		agendaIteration = 0,
+		// Returns the number of milliseconds since midnight Jan 1, 1970, for comparsion with agenda item time.
+		agendaTimer = new Date().getTime(),
+		
+		agendaManager = (function (agendas) {
+			var agendaItem,
+				agendaStatus = {
+					agendaItemNum: 0,
+					agendaIteration: 0,
+					agendaTimePassed: new Date().getTime()
+				},
+				convertTime = function (itemTime) {
+					// expects one string argument "hh:mm:ss"
+					var timeArr = itemTime.split(":"),
+						timeSec = 0,
+						timeUnits = [3600, 60, 1];
+					while (timeArr.length) {
+						timeSec += timeUnits.pop() * +time.pop();
+					}
+					// returns argument provided as number of seconds
+					return timeSec;
+				},
+				isComplete = function () {
+					var rtn = false;// complete / reset agenda properties like Iteration and Timer
+					if (agendaIteration > agendaItem.dountil.iterate ||
+						agendaTimePassed > convertTime(agendaItem.dountil.endured)) {
+						return true;
+					}
+					return rtn;
+				},
+				getCurrentItem = function () {
+					return libraryData.agendas[agendaStatus.agendaItemNum];
+				},
+				incrementIteration = function () {
+					agendaStatus.agendaIteration += 1;
+				},
+				updateTimer = function () {
+					agendaStatus.agendaTimePassed = new Date().getTime()
+				};
+		})(libraryData.agendas);
 		
 		timedcheck = function () {
 			
@@ -237,14 +281,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				postMsg(postRoom.shift());
 			}
 			
-			if (libraryData.agendas[1].filters.reactive) {
+			// Create reference to agenda item; setting up for recursive possibility?
+			agendaItem = libraryData.agendas[agendaItemNum];
+			if (agendaIteration > agendaItem.dountil.iterate ||
+				agendaTimer > agendaItem.dountil.endured) {
+				// complete / reset agenda properties like Iteration and Timer
+			}
+			
+			if (agendaItem.filters.reactive) {
 				// Check if the user has said anything recently and process it. [REACTIVE]
 				var input = readlog(),
 				
-					// Create filter to pass to process as callback to prevent duplication of loops.
+					// Create filter to pass to process() as callback to prevent duplication of loops.
 					filterCallback = function(tagging) {
-						var has = libraryData.agendas[1].filters.reactive.HAS || [],
-							not = libraryData.agendas[1].filters.reactive.NOT || [],
+						var has = agendaItem.filters.reactive.HAS || [],
+							not = agendaItem.filters.reactive.NOT || [],
 							h = has.length,
 							n = not.length,
 							t,
@@ -278,14 +329,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					responses;
 					
 				// Sort responses to deliver to user via mediator [if staggered, then add to queue].
-				if (input) { 
+				if (input) {
 					responses = process(input, libraryData.ruleset, 0, filterCallback);
 					debugFunc(responses);
 					postMsg(responses[0].respond);
 				}
-				
 			}
-			
 		}
 		; //eof variable declarations
 		

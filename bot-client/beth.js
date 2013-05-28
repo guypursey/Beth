@@ -116,6 +116,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		// Accepts user's input, puts it on a stack which is then regularly checked.
 		// Do we here check who the input is from and whether it needs responding to?
 			logData.toprocess.push(input);
+			
+		// Update number of items received from user in sessionStats.
+		// TODO: There may be a more efficient/elegant way to do this than just calling the stats method directly.
+			sessionStats.updateUsrSent();
 		},
 		preprocess = function (input) {
 		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
@@ -228,26 +232,58 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			return rtn;
 		},
 		
-		// Declaration for current agenda item.
-		agendaItem,
-		// Declaration of pointer for agenda item, beginning with first in agendas array.
-		agendaItemNum = 1,
-		// Iteration of agenda item (number of times it has been gone over).
-		agendaIteration = 0,
-		// Returns the number of milliseconds since midnight Jan 1, 1970, for comparsion with agenda item time.
-		agendaTimer = new Date().getTime(),
+		sessionStats = (function () {
+			var sessionStatus = {
+					usrsent: 0,
+					botsent: 0,
+					totsent: 0
+				},
+				updateUsrSent = function () {
+					sessionStatus.usrsent += 1;
+				},
+				updateBotSent = function () {
+					sessionStatus.botsent += 1;
+				},
+				updateTotSent = function () {
+					sessionStatus.totsent += 1;
+				},
+				getUsrSent = function (){
+					return sessionStatus.usrsent;
+				},
+				getBotSent = function (){
+					return sessionStatus.botsent;
+				},
+				getTotSent = function (){
+					return sessionStatus.totsent;
+				};
+				
+			return {
+				updateUsrSent: updateUsrSent,
+				updateBotSent: updateBotSent,
+				updateTotSent: updateTotSent,
+				getUsrSent: getUsrSent,
+				getBotSent: getBotSent,
+				getTotSent: getTotSent
+			};
+			
+		})();
+
 		
 		agendaManager = (function (agendas) {
-			var agendaItem = agendas[0],
+			var agendaItem = agendas[1],
+				// TODO: this object's name should be prefixed atStart
+				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
 				agendaStatus = {
-					agendaItemNum: 0,
-					agendaIteration: 1,
+					agendaItemNum: 1,
+					agendaUsrSent: sessionStats.getUsrSent(),
+					agendaBotSent: sessionStats.getBotSent(),
 					agendaTimeStarted: new Date().getTime()
 				},
 				resetStatus = function (itemNum) {
 					agendaStatus = {
 						agendaItemNum: itemNum,
-						agendaIteration: 1,
+						agendaUsrSent: sessionStats.getUsrSent(),
+						agendaBotSent: sessionStats.getBotSent(),
 						agendaTimeStarted: new Date().getTime()
 					};
 				},
@@ -264,15 +300,30 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				},
 				isComplete = function () {
 					var rtn = false,
-						itr = agendaItem.dountil.iterate || 0,
-						edr = agendaItem.dountil.endured || "0";
+						usr = agendaItem.dountil.usrsent || 0,
+						bot = agendaItem.dountil.botsent || 0,
+						edr = agendaItem.dountil.endured || "0",
+				   
+						// if properties are on the agenda, check if conditions are met
+						usrComp = (agendaItem.dountil.hasOwnProperty('usrsent'))
+							? (sessionStats.getUsrSent() >= agendaStatus.agendaUsrSent + usr)
+							: false,
+						botComp = (agendaItem.dountil.hasOwnProperty('botsent'))
+							? (sessionStats.getBotSent() >= agendaStatus.agendaBotSent + bot)
+							: false,
+						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
+							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr))
+							: false
+						;
 						
 					debugFunc("current:  " + new Date().getTime());
-					debugFunc(agendaStatus.agendaTimeStarted + convertTime(edr));
-					debugFunc("current itr:  " + agendaStatus.agendaIteration);
-					debugFunc("deadline itr: " + itr);
-					if (agendaStatus.agendaIteration >= itr ||
-						new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr)) {
+					debugFunc("deadline: " + (agendaStatus.agendaTimeStarted + convertTime(edr)));
+					debugFunc("current usr:  " + sessionStats.getUsrSent());
+					debugFunc("deadline usr: " + (agendaStatus.agendaUsrSent + usr));
+					debugFunc("current bot:  " + sessionStats.getBotSent());
+					debugFunc("deadline bot: " + (agendaStatus.agendaBotSent + bot));
+					
+					if (usrComp || botComp || edrComp) {
 						debugFunc("agenda item " + agendaStatus.agendaItemNum + " complete");
 						return true;
 					}
@@ -287,18 +338,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					debugFunc("returning agenda item " + agendaStatus.agendaItemNum);
 					debugFunc(agendaItem);
 					return agendaItem;
-				},
-				updateIteration = function () {
-					agendaStatus.agendaIteration += 1;
-				},
-				updateTimer = function () {
-					agendaStatus.agendaTimePassed = new Date().getTime()
 				};
 			// update time every second	
 			//setInterval(updateTimer, 1000);
 			return {
-				getCurrentItem: getCurrentItem,
-				updateIteration: updateIteration
+				getCurrentItem: getCurrentItem
 			};
 		})(libraryData.agendas);
 		
@@ -356,7 +400,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					if (input) {
 						responses = process(input, libraryData.ruleset, 0, filterCallback);
 						debugFunc(responses);
+						
+						// Send only first response (selection will be more varied in future versions).
 						postMsg(responses[0].respond);
+						
+						// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
+						sessionStats.updateBotSent();
 					}
 				}
 			} else {

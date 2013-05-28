@@ -4,7 +4,7 @@
 		"agendas": [
 			{
 				"dountil": {
-					"iterate": 1
+					"botsent": 1
 				},
 				"filters": {
 					"proactive": {
@@ -14,8 +14,8 @@
 			},
 			{
 				"dountil": {
-					"endured": "00:00:10",
-					"iterate": 5
+					"endured": "00:10:00",
+					"usrsent": 5
 				},
 				"filters": {
 					"reactive": {

@@ -298,6 +298,40 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					// returns argument provided as number of milliseconds
 					return timeMsc;
 				},
+				getCurrentFilter = function () {
+					return function(tagging) {
+						var has = agendaItem.filters.reactive.HAS || [],
+							not = agendaItem.filters.reactive.NOT || [],
+							h = has.length,
+							n = not.length,
+							t,
+							r = false;
+						while (h && !r) {
+							h -= 1;
+							t = tagging.length;
+							debugFunc("filtering for has " + has[h]);
+							while (t) {
+								t -= 1;
+								if (tagging[t] === has[h]) {
+									debugFunc("tag " + has[h] + " found!");
+									r = true;
+								}
+							}
+						}
+						while (n && r) {
+							n -= 1;
+							t = tagging.length;
+							debugFunc("filtering for not " + not[h]);
+							while (t) {
+								t -= 1;
+								if (tagging[t] === not[h]) {
+									r = false;
+								}
+							}
+						}
+						return r;
+					}
+				},
 				isComplete = function () {
 					var rtn = false,
 						usr = agendaItem.dountil.usrsent || 0,
@@ -329,6 +363,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					}
 					return rtn;
 				},
+				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
 					if (isComplete()) {
 						resetStatus(agendaStatus.agendaItemNum + 1);
@@ -342,75 +377,38 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			// update time every second	
 			//setInterval(updateTimer, 1000);
 			return {
-				getCurrentItem: getCurrentItem
+				getCurrentItem: getCurrentItem, // TODO: may not need to expose this anymore
+				getCurrentFilter: getCurrentFilter
 			};
 		})(libraryData.agendas);
 		
 		timedcheck = function () {
 			
+			// Check if the user has said anything recently and process it. [REACTIVE]
+			var input = readlog(),
+				// Get filter to pass to process() as callback to prevent duplication of loops.
+				filterCallback = agendaItem.getCurrentFilter(),
+				responses;
+				
+			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
+			if (input) {
+				responses = process(input, libraryData.ruleset, 0, filterCallback);
+				debugFunc(responses);
+				
+				// Send only first response (selection will be more varied in future versions).
+				postRoom.push(responses[0].respond);
+				
+				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
+				sessionStats.updateBotSent();
+				
+			}
+				
 			// Check if any responses are waiting to go out.
 			if (postRoom.length) {
 				postMsg(postRoom.shift());
 			}
+				
 			
-			// Create reference to agenda item; setting up for recursive possibility?
-			agendaItem = agendaManager.getCurrentItem();
-			if (agendaItem) {
-				if (agendaItem.filters.reactive) {
-					// Check if the user has said anything recently and process it. [REACTIVE]
-					var input = readlog(),
-					
-						// Create filter to pass to process() as callback to prevent duplication of loops.
-						filterCallback = function(tagging) {
-							var has = agendaItem.filters.reactive.HAS || [],
-								not = agendaItem.filters.reactive.NOT || [],
-								h = has.length,
-								n = not.length,
-								t,
-								r = false;
-							while (h && !r) {
-								h -= 1;
-								t = tagging.length;
-								debugFunc("filtering for has " + has[h]);
-								while (t) {
-									t -= 1;
-									if (tagging[t] === has[h]) {
-										debugFunc("tag " + has[h] + " found!");
-										r = true;
-									}
-								}
-							}
-							while (n && r) {
-								n -= 1;
-								t = tagging.length;
-								debugFunc("filtering for not " + not[h]);
-								while (t) {
-									t -= 1;
-									if (tagging[t] === not[h]) {
-										r = false;
-									}
-								}
-							}
-							return r;
-						},
-						
-						responses;
-						
-					// Sort responses to deliver to user via mediator [if staggered, then add to queue].
-					if (input) {
-						responses = process(input, libraryData.ruleset, 0, filterCallback);
-						debugFunc(responses);
-						
-						// Send only first response (selection will be more varied in future versions).
-						postMsg(responses[0].respond);
-						
-						// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
-						sessionStats.updateBotSent();
-					}
-				}
-			} else {
-				debugFunc("disconnecting...");
-			}
 		}
 		; //eof variable declarations
 		

@@ -298,39 +298,47 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					// returns argument provided as number of milliseconds
 					return timeMsc;
 				},
-				getCurrentFilter = function () {
-					return function(tagging) {
-						var has = agendaItem.reactive.filters.HAS || [],
-							not = agendaItem.reactive.filters.NOT || [],
-							h = has.length,
-							n = not.length,
-							t,
-							r = false;
-						while (h && !r) {
-							h -= 1;
-							t = tagging.length;
-							debugFunc("filtering for has " + has[h]);
-							while (t) {
-								t -= 1;
-								if (tagging[t] === has[h]) {
-									debugFunc("tag " + has[h] + " found!");
-									r = true;
+				getCurrentFilter = function (whichMode) {
+					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
+					var whichMode = whichMode,
+						mode = agendaItem[whichMode];
+						rtn = (mode)
+							? function(tagging) {
+									var	has = mode.filters.HAS || [],
+										not = mode.filters.NOT || [],
+										h = has.length,
+										n = not.length,
+										t,
+										r = false;
+									while (h && !r) {
+										h -= 1;
+										t = tagging.length;
+										debugFunc("filtering for has " + has[h]);
+										while (t) {
+											t -= 1;
+											if (tagging[t] === has[h]) {
+												debugFunc("tag " + has[h] + " found!");
+												r = true;
+											}
+										}
+									}
+									while (n && r) {
+										n -= 1;
+										t = tagging.length;
+										debugFunc("filtering for not " + not[h]);
+										while (t) {
+											t -= 1;
+											if (tagging[t] === not[h]) {
+												r = false;
+											}
+										}
+									}
+									return r;
 								}
-							}
-						}
-						while (n && r) {
-							n -= 1;
-							t = tagging.length;
-							debugFunc("filtering for not " + not[h]);
-							while (t) {
-								t -= 1;
-								if (tagging[t] === not[h]) {
-									r = false;
-								}
-							}
-						}
-						return r;
-					}
+							: function () {
+								return true;
+							};
+					return rtn;
 				},
 				isComplete = function () {
 					var rtn = false,
@@ -375,7 +383,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					return agendaItem;
 				};
 			// update time every second	
-			//setInterval(updateTimer, 1000);
+			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
 			return {
 				getCurrentItem: getCurrentItem, // TODO: may not need to expose this anymore
 				getCurrentFilter: getCurrentFilter
@@ -387,7 +395,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			// Check if the user has said anything recently and process it. [REACTIVE]
 			var input = readlog(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
-				filterCallback = agendaManager.getCurrentFilter(),
+				filterCallback = agendaManager.getCurrentFilter("reactive"),
 				responses;
 				
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].

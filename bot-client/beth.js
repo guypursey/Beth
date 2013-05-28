@@ -300,8 +300,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				},
 				getCurrentFilter = function () {
 					return function(tagging) {
-						var has = agendaItem.filters.reactive.HAS || [],
-							not = agendaItem.filters.reactive.NOT || [],
+						var has = agendaItem.reactive.filters.HAS || [],
+							not = agendaItem.reactive.filters.NOT || [],
 							h = has.length,
 							n = not.length,
 							t,
@@ -387,7 +387,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			// Check if the user has said anything recently and process it. [REACTIVE]
 			var input = readlog(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
-				filterCallback = agendaItem.getCurrentFilter(),
+				filterCallback = agendaManager.getCurrentFilter(),
 				responses;
 				
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].

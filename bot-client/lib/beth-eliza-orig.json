@@ -6,8 +6,8 @@
 				"dountil": {
 					"botsent": 1
 				},
-				"filters": {
-					"proactive": {
+				"proactive": {
+					"filters": {
 						"HAS": ["initial"]
 					}
 				}
@@ -17,8 +17,8 @@
 					"endured": "00:10:00",
 					"usrsent": 5
 				},
-				"filters": {
-					"reactive": {
+				"reactive": {
+					"filters": {
 						"HAS": ["generic"]
 					}
 				}
@@ -27,8 +27,8 @@
 				"dountil": {
 					"iterate": "1"
 				},
-				"filters": {
-					"proactive": {
+				"proactive": {
+					"filters": {
 						"HAS": ["farewell"]
 					}
 				}

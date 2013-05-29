@@ -25,7 +25,7 @@
 			},			
 			{
 				"dountil": {
-					"iterate": "1"
+					"botsent": 1
 				},
 				"proactive": {
 					"filters": {
@@ -109,7 +109,7 @@
 				]
 			},
 			{
-				"forward": "Bye!",
+				"forward": "Bye then!",
 				"tagging": [
 					"farewell"
 				]

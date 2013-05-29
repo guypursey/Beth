@@ -380,6 +380,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					}
 					debugFunc("returning agenda item " + agendaStatus.agendaItemNum);
 					debugFunc(agendaItem);
+
+					if (!agendaItem) {
+						// TODO: For neatness' sake this would ideally be a callback.
+						// Doesn't actually work currently, but is almost a graceful exit.
+						clientsocket.emit("disconnect");
+					}
+
 					return agendaItem;
 				};
 			// update time every second	
@@ -403,9 +410,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				responses = process(input, libraryData.ruleset, 0, filterCallback);
 				debugFunc(responses);
 				
-				// Send only first response (selection will be more varied in future versions).
-				postRoom.push(responses[0].respond);
-				
+				if (responses.length) {
+					// Send only first response (selection will be more varied in future versions).
+					postRoom.push(responses[0].respond);
+				}
 			}
 			
 			// Proactive selection...

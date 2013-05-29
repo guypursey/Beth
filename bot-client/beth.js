@@ -270,11 +270,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 
 		
 		agendaManager = (function (agendas) {
-			var agendaItem = agendas[1],
+			var agendaItem = agendas[0],
 				// TODO: this object's name should be prefixed atStart
 				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
 				agendaStatus = {
-					agendaItemNum: 1,
+					agendaItemNum: 0,
 					agendaUsrSent: sessionStats.getUsrSent(),
 					agendaBotSent: sessionStats.getBotSent(),
 					agendaTimeStarted: new Date().getTime()
@@ -336,7 +336,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 									return r;
 								}
 							: function () {
-								return true;
+								return false;
 							};
 					return rtn;
 				},
@@ -406,14 +406,25 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				// Send only first response (selection will be more varied in future versions).
 				postRoom.push(responses[0].respond);
 				
-				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
-				sessionStats.updateBotSent();
-				
+			}
+			
+			// Proactive selection...
+			var m = libraryData.moveset.length,
+				fC = agendaManager.getCurrentFilter("proactive");
+			debugFunc("filter proactive");
+			debugFunc(fC);
+			while (m) {
+				m -= 1;
+				if (fC(libraryData.moveset[m].tagging)) {
+					postRoom.push(libraryData.moveset[m].forward);
+				}
 			}
 				
 			// Check if any responses are waiting to go out.
 			if (postRoom.length) {
 				postMsg(postRoom.shift());
+				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
+				sessionStats.updateBotSent();
 			}
 				
 			

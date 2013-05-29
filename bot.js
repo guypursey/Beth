@@ -71,7 +71,6 @@ prompt.question("Which bot model do you want to load? ", function (botfile) {
 						console.log('Connected!');
 						// call the server-side function 'adduser' and send one parameter (value of prompt)
 						clientsocket.emit('adduser', prompt.botname);
-						clientsocket.emit('sendchat', botobj.getInitial());
 					});
 					
 					clientsocket.on('updatedisplay', function (username, data, datetime) {

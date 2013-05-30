@@ -168,8 +168,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 							
 							if (results[j].respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
-								ki = this._getRuleIndexByKey(results[j].respond.substring(5));     // get the key we should go to,
-								if (ki >= 0) {										// and assuming the key exists in the keyword array,
+								ki = results[j].respond.substring(5);     // get the key we should go to,
+								if (libraryData.hasOwnProperty(ki)) {										// and assuming the key exists in the keyword array,
 									console.log(tabbing, 'Going to ruleset ' + ki + ':', results[j].respond.substring(5));
 									rst = rst.concat(process(input, libraryData[ki].ruleset, order + 1));
 								}

@@ -1,3 +1,6 @@
+// v0.0.1
+// Hotfix for goto handling.
+
 // Create the constructor.
 var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 	// Currently the constructor takes three arguments because that's what I built eliza-node to do to be backward compatible.
@@ -137,7 +140,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			    rst = [],	// for storing results
 				results,
 			    m,		// matching string
-			    ki,		// for goto
+			    goto,		// for goto
 			    order = order || 0,
 			    tabbing = '';	// for debugging
 			
@@ -168,10 +171,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 							
 							if (results[j].respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
-								ki = this._getRuleIndexByKey(results[j].respond.substring(5));     // get the key we should go to,
-								if (ki >= 0) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + ki + ':', results[j].respond.substring(5));
-									rst = rst.concat(process(input, libraryData[ki].ruleset, order + 1));
+								goto = results[j].respond.substring(5);     // get the key we should go to,
+								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
+									console.log(tabbing, 'Going to ruleset ' + goto + ':', results[j].respond.substring(5));
+									rst = rst.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1));
 								}
 								results.splice(j);
 								

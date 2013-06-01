@@ -236,7 +236,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			var sessionStatus = {
 					usrsent: 0,
 					botsent: 0,
-					totsent: 0
+					totsent: 0,
+					flagset: {}
 				},
 				updateUsrSent = function () {
 					sessionStatus.usrsent += 1;
@@ -247,6 +248,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				updateTotSent = function () {
 					sessionStatus.totsent += 1;
 				},
+				setFlag = function (flag) {
+					sessionStatus.flagset[flag] = true;
+				},
 				getUsrSent = function (){
 					return sessionStatus.usrsent;
 				},
@@ -255,15 +259,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				},
 				getTotSent = function (){
 					return sessionStatus.totsent;
+				},
+				getFlag = function (flag) {
+					return sessionStatus.flagset[flag] || false;
 				};
 				
 			return {
 				updateUsrSent: updateUsrSent,
 				updateBotSent: updateBotSent,
 				updateTotSent: updateTotSent,
+				setFlag: setFlag,
 				getUsrSent: getUsrSent,
 				getBotSent: getBotSent,
-				getTotSent: getTotSent
+				getTotSent: getTotSent,
+				getFlag: getFlag
 			};
 			
 		})();
@@ -355,17 +364,35 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
 							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr))
+							: false,
+						flgComp = (agendaItem.dountil.hasOwnProperty('flagset'))
+							?
+								(function () {
+									var rtn = true,
+										f = agendaItem.dountil.flagset.length;
+									while (f && rtn) {
+										f -= 1;
+										rtn = sessionStats.getFlag(agendaItem.dountil.flagset[f]);
+									}
+									return rtn;
+								})()
 							: false
 						;
-						
+					
+					debugFunc(usrComp);
+					debugFunc(botComp);
+					debugFunc(edrComp);
+					debugFunc(flgComp);
+						/*
 					debugFunc("current:  " + new Date().getTime());
 					debugFunc("deadline: " + (agendaStatus.agendaTimeStarted + convertTime(edr)));
 					debugFunc("current usr:  " + sessionStats.getUsrSent());
 					debugFunc("deadline usr: " + (agendaStatus.agendaUsrSent + usr));
 					debugFunc("current bot:  " + sessionStats.getBotSent());
 					debugFunc("deadline bot: " + (agendaStatus.agendaBotSent + bot));
-					
-					if (usrComp || botComp || edrComp) {
+					*/
+						
+					if (usrComp || botComp || edrComp || flgComp) {
 						debugFunc("agenda item " + agendaStatus.agendaItemNum + " complete");
 						return true;
 					}
@@ -403,7 +430,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			var input = readlog(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
-				responses;
+				responses,
+				f; // flag counter
 				
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) {
@@ -411,8 +439,22 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				debugFunc(responses);
 				
 				if (responses.length) {
-					// Send only first response (selection will be more varied in future versions).
-					postRoom.push(responses[0].respond);
+					
+					if (responses[0].respond) {
+						// Send only first response (selection will be more varied in future versions).
+						postRoom.push(responses[0].respond);
+					}
+					
+					// Set any flags mentioned to true.
+					if (typeof responses[0].setflag === 'object') {
+						debugFunc("setting flags");
+						f = responses[0].setflag.length;
+						while (f) {
+							f -= 1;
+							sessionStats.setFlag(responses[0].setflag[f]);
+							debugFunc("set flag " + responses[0].setflag[f]);
+						}
+					}
 				}
 			}
 			

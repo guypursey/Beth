@@ -15,7 +15,8 @@
 			{
 				"dountil": {
 					"endured": "00:10:00",
-					"usrsent": 5
+					"usrsent": 5,
+					"flagset": ["quit"]
 				},
 				"reactive": {
 					"filters": {
@@ -3148,7 +3149,7 @@
 								"tagging": [
 									"generic"
 								],
-								"setflag": "quit",
+								"setflag": ["quit"],
 								"comment": "Quits the conversation."
 							}
 						]

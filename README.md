@@ -1,6 +1,8 @@
 #BETH#
-##v0.0.0##
-##(Very much work in progress.)##
+##v0.0.1##
+
+LATEST: Hotfix applied to fix goto handling.
+This is all very much a work in progress.
 
 ###USING BETH###
 
@@ -14,17 +16,16 @@ The second terminal will act as a bot (being a client to the mediator) and also 
 
  1. It will ask which library you want to run. In this version, there are two options:
 
-	 -  `beth`
-	 -  `eliza-node`
+ -  `beth`
+ -  `eliza-node`
     
-	You can type either of these options and hit the return key.
+You can type either of these options and hit the return key.
 
  2. You will be asked to give the name of the bot which you can choose all by yourself.
  
  3. Finally you'll be asked to load a library. In this version, there are a couple of libraries to choose from;
-	
-	 -  `beth-eliza-orig`	(only works with `beth`)
-	 -  `eliza-orig`		(only works with `eliza-node`)
+ -  `beth-eliza-orig`	(only works with `beth`)
+ -  `eliza-orig`		(only works with `eliza-node`)
 	
 Once you have answered these questions, you are almost ready to go. Visit (in a separate tab, window, or browser) `localhost:8375` and this will trigger the bot into action.
 
@@ -55,21 +56,21 @@ Dependencies are listed in `package.json`, so you can import what is needed to r
 Ignoring the folder `node-modules` which will need importing and maintaing via NPM, and putting aside hidden, trivial, and/or experimental files, the following crucial files/folders reside within Beth:
 
 	./
-	|___bot-client/
-		|___lib/
-			|___beth-eliza-orig.json
-			|___eliza-orig.json
-        |___beth.js
-		|___eliza-node.js
-		|___ui-console.html
-	|___usr-client/
-		|___lib/
-			|___jquery-1.9.1.js
-		|___ui-simple.html
-	|___bot.js
-	|___med.js
-	|___package.json
-	|___README.md
+	|___ bot-client/
+		|___ lib/
+			|___ beth-eliza-orig.json
+			|___ eliza-orig.json
+        |___ beth.js
+		|___ eliza-node.js
+		|___ ui-console.html
+	|___ usr-client/
+		|___ lib/
+			|___ jquery-1.9.1.js
+		|___ ui-simple.html
+	|___ bot.js
+	|___ med.js
+	|___ package.json
+	|___ README.md
 
 
 ###FREQUENTLY ASKED QUESTIONS###
@@ -81,8 +82,4 @@ It's an experiment. It's a piece of research I'm doing for academic purposes.
 > **Why 'Beth'?**
 
 It's a long-ish story.
-
-> **Are you ready to eat yet?**
-
-I'm never finished before dinnertime.
 

@@ -1,3 +1,6 @@
+// v0.0.1
+// Hotfix for goto handling.
+
 // Create the constructor.
 var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 	// Currently the constructor takes three arguments because that's what I built eliza-node to do to be backward compatible.

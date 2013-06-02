@@ -66,6 +66,7 @@ prompt.question("Which bot model do you want to load? ", function (botfile) {
 					
 					severFn = function () {
 						clientsocket.emit('disconnect');
+						process.exit();
 					};
 					
 					botobj = new bot.BotObj(true, lib.data, postMsg, severFn, debugFn);

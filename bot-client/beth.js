@@ -278,20 +278,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		})();
 
 		
-		agendaManager = (function (agendas) {
+		agendaManager = (function (agendas, getUsrSent, getBotSent, getFlag) {
 			var agendaItem = agendas[0],
 				// TODO: this object's name should be prefixed atStart
 				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
 				agendaStatus = {
 					agendaItemNum: 0,
-					agendaUsrSent: sessionStats.getUsrSent(),
-					agendaBotSent: sessionStats.getBotSent(),
+					agendaUsrSent: getUsrSent(),
+					agendaBotSent: getBotSent(),
 					agendaTimeStarted: new Date().getTime()
 				},
 				resetStatus = function (itemNum) {
 					agendaStatus.agendaItemNum = itemNum;
-					agendaStatus.agendaUsrSent = sessionStats.getUsrSent();
-					agendaStatus.agendaBotSent = sessionStats.getBotSent();
+					agendaStatus.agendaUsrSent = getUsrSent();
+					agendaStatus.agendaBotSent = getBotSent();
 					agendaStatus.agendaTimeStarted = new Date().getTime();
 				},
 				convertTime = function (itemTime) {
@@ -355,10 +355,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				   
 						// if properties are on the agenda, check if conditions are met
 						usrComp = (agendaItem.dountil.hasOwnProperty('usrsent'))
-							? (sessionStats.getUsrSent() >= agendaStatus.agendaUsrSent + usr)
+							? (getUsrSent() >= agendaStatus.agendaUsrSent + usr)
 							: false,
 						botComp = (agendaItem.dountil.hasOwnProperty('botsent'))
-							? (sessionStats.getBotSent() >= agendaStatus.agendaBotSent + bot)
+							? (getBotSent() >= agendaStatus.agendaBotSent + bot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
 							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr))
@@ -370,7 +370,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 										f = agendaItem.dountil.flagset.length;
 									while (f && rtn) {
 										f -= 1;
-										rtn = sessionStats.getFlag(agendaItem.dountil.flagset[f]);
+										rtn = getFlag(agendaItem.dountil.flagset[f]);
 									}
 									return rtn;
 								})()
@@ -419,7 +419,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			return {
 				getCurrentFilter: getCurrentFilter
 			};
-		})(libraryData.agendas);
+		})(libraryData.agendas, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag);
 		
 		timedcheck = function () {
 			

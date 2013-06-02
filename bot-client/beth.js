@@ -289,12 +289,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					agendaTimeStarted: new Date().getTime()
 				},
 				resetStatus = function (itemNum) {
-					agendaStatus = {
-						agendaItemNum: itemNum,
-						agendaUsrSent: sessionStats.getUsrSent(),
-						agendaBotSent: sessionStats.getBotSent(),
-						agendaTimeStarted: new Date().getTime()
-					};
+					agendaStatus.agendaItemNum = itemNum;
+					agendaStatus.agendaUsrSent = sessionStats.getUsrSent();
+					agendaStatus.agendaBotSent = sessionStats.getBotSent();
+					agendaStatus.agendaTimeStarted = new Date().getTime();
 				},
 				convertTime = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
@@ -419,7 +417,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			// update time every second	
 			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
 			return {
-				getCurrentItem: getCurrentItem, // TODO: may not need to expose this anymore
 				getCurrentFilter: getCurrentFilter
 			};
 		})(libraryData.agendas);
@@ -446,6 +443,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					}
 					
 					// Set any flags mentioned to true.
+					// TODO; Should these be set regardless of which response is returned?
 					if (typeof responses[0].setflag === 'object') {
 						debugFunc("setting flags");
 						f = responses[0].setflag.length;
@@ -455,6 +453,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 							debugFunc("set flag " + responses[0].setflag[f]);
 						}
 					}
+					
 				}
 			}
 			

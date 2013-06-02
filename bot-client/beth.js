@@ -1,5 +1,5 @@
 // Create the constructor.
-var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
+var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	// Currently the constructor takes three arguments because that's what I built eliza-node to do to be backward compatible.
 	// I am preparing the two for use in tandem.
 	// For now, the first argument is defunct. I will ignore it.
@@ -278,7 +278,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		})();
 
 		
-		agendaManager = (function (agendas, getUsrSent, getBotSent, getFlag) {
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
 			var agendaItem = agendas[0],
 				// TODO: this object's name should be prefixed atStart
 				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
@@ -407,9 +407,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					debugFunc(agendaItem);
 
 					if (!agendaItem) {
-						// TODO: For neatness' sake this would ideally be a callback.
-						// Doesn't actually work currently, but is almost a graceful exit.
-						clientsocket.emit("disconnect");
+						debugFunc("should disconnect now");
+						// If no agenda item exists, disconnect Beth.
+						exitSession();
 					}
 
 					return agendaItem;
@@ -419,7 +419,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			return {
 				getCurrentFilter: getCurrentFilter
 			};
-		})(libraryData.agendas, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag);
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag);
 		
 		timedcheck = function () {
 			

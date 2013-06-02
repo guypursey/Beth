@@ -13,6 +13,7 @@ var ioc = require('socket.io-client'),
 	server = require('http').createServer(app),
     io = require('socket.io').listen(server),
     postMsg,
+	severFn,
 	debugFn,
 	settings = ["beth", "beth", "beth-eliza-orig"];
 
@@ -61,9 +62,13 @@ prompt.question("Which bot model do you want to load? ", function (botfile) {
 					// prepare callback for use within bot
 					postMsg = function (input) {
 						clientsocket.emit('sendchat', input);
-					}
+					};
 					
-					botobj = new bot.BotObj(true, lib.data, postMsg, debugFn);
+					severFn = function () {
+						clientsocket.emit('disconnect');
+					};
+					
+					botobj = new bot.BotObj(true, lib.data, postMsg, severFn, debugFn);
 
 					
 					// on connection to server, ask for user's name with an anonymous callback			

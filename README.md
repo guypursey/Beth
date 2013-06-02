@@ -1,7 +1,7 @@
 #BETH#
-##v0.0.1##
+##v0.0.2##
 
-LATEST: Hotfix applied to fix goto handling.
+LATEST: Hotfix applied to fix undefined substitutions.
 This is all very much a work in progress.
 
 ###USING BETH###
@@ -14,18 +14,18 @@ The first terminal will act as a mediator and will serve the interface which you
 
 The second terminal will act as a bot (being a client to the mediator) and also serve a console for the bot. You will be prompted for three pieces of information.
 
- 1. It will ask which library you want to run. In this version, there are two options:
+1. It will ask which library you want to run. In this version, there are two options:
 
- -  `beth`
- -  `eliza-node`
+   - `beth`
+   - `eliza-node`
     
-You can type either of these options and hit the return key.
+   You can type either of these options and hit the return key.
 
- 2. You will be asked to give the name of the bot which you can choose all by yourself.
+2. You will be asked to give the name of the bot which you can choose all by yourself.
  
- 3. Finally you'll be asked to load a library. In this version, there are a couple of libraries to choose from;
- -  `beth-eliza-orig`	(only works with `beth`)
- -  `eliza-orig`		(only works with `eliza-node`)
+3. Finally you'll be asked to load a library. In this version, there are a couple of libraries to choose from;
+   - `beth-eliza-orig`	(only works with `beth`)
+   - `eliza-orig`		(only works with `eliza-node`)
 	
 Once you have answered these questions, you are almost ready to go. Visit (in a separate tab, window, or browser) `localhost:8375` and this will trigger the bot into action.
 

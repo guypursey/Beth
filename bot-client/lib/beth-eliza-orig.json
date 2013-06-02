@@ -14,8 +14,6 @@
 			},
 			{
 				"dountil": {
-					"endured": "00:10:00",
-					"usrsent": 5,
 					"flagset": ["quit"]
 				},
 				"reactive": {

@@ -1,30 +1,30 @@
 [
 	{
 		"dountil": {
-			"iterate": "1"
+			"botsent": 1
 		},
-		"filters": {
-			"proactive": {
+		"proactive": {
+			"filters": {
 				"HAS": ["initial"]
 			}
 		}
 	},
 	{
 		"dountil": {
-			"flagset": "quit"
+			"flagset": ["quit"]
 		},
-		"filters": {
-			"reactive": {
+		"reactive": {
+			"filters": {
 				"HAS": ["generic"]
 			}
 		}
 	},			
 	{
 		"dountil": {
-			"iterate": "1"
+			"botsent": 1
 		},
-		"filters": {
-			"proactive": {
+		"proactive": {
+			"filters": {
 				"HAS": ["farewell"]
 			}
 		}

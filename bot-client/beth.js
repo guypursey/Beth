@@ -36,6 +36,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Localise post message callback function.
 		postMsg = postMsg,
 		
+		// Localise connection severance function.
+		severFn = severFn,
+		
 		// Set up a wildcard regex pattern, to look for anything.
 		wildcardPattern = '\\s*(.*)\\s*',
 		
@@ -381,14 +384,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc(botComp);
 					debugFunc(edrComp);
 					debugFunc(flgComp);
-						/*
-					debugFunc("current:  " + new Date().getTime());
-					debugFunc("deadline: " + (agendaStatus.agendaTimeStarted + convertTime(edr)));
-					debugFunc("current usr:  " + sessionStats.getUsrSent());
-					debugFunc("deadline usr: " + (agendaStatus.agendaUsrSent + usr));
-					debugFunc("current bot:  " + sessionStats.getBotSent());
-					debugFunc("deadline bot: " + (agendaStatus.agendaBotSent + bot));
-					*/
 						
 					if (usrComp || botComp || edrComp || flgComp) {
 						debugFunc("agenda item " + agendaStatus.agendaItemNum + " complete");
@@ -401,13 +396,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (isComplete()) {
 						resetStatus(agendaStatus.agendaItemNum + 1);
 						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
-						debugFunc("updated agenda item");
+						debugFunc("updated agenda item to #" + agendaStatus.agendaItemNum);
+						debugFunc(agendaItem);
 					}
-					debugFunc("returning agenda item " + agendaStatus.agendaItemNum);
-					debugFunc(agendaItem);
 
 					if (!agendaItem) {
-						debugFunc("should disconnect now");
+						debugFunc("no further agenda items found; should disconnect now");
 						// If no agenda item exists, disconnect Beth.
 						exitSession();
 					}

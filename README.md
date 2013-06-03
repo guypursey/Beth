@@ -1,7 +1,7 @@
 #BETH#
-##v0.0.2##
+##v0.1.0##
 
-LATEST: Hotfix applied to fix undefined substitutions.
+LATEST: Now allows for agendas.
 This is all very much a work in progress.
 
 ###USING BETH###
@@ -15,10 +15,9 @@ The first terminal will act as a mediator and will serve the interface which you
 The second terminal will act as a bot (being a client to the mediator) and also serve a console for the bot. You will be prompted for three pieces of information.
 
 1. It will ask which library you want to run. In this version, there are two options:
-
    - `beth`
    - `eliza-node`
-    
+
    You can type either of these options and hit the return key.
 
 2. You will be asked to give the name of the bot which you can choose all by yourself.
@@ -33,9 +32,9 @@ Back in the tab on which you have loaded `localhost:8374`, the bot will greet yo
 
 ###HOW BETH WORKS###
 
-Each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed, it processes it and sends you a reply through the mediator. This reply will then appear in the chat interface.
+Each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed and searches for appropriate responses according to a ruleset provided to it. These responses are filtered according to an agenda that comes with the ruleset, which may change how Beth reacts at various points in the conversation. It sends replies through the mediator to appear in the chat interface.
 
-Currently, the way Beth interacts with the user is very similar to Eliza, and the only Beth library available at this moment in time is a Beth-formatted version of Eliza's original keywords, decomposition rules and reassembly patterns (see [ElizaBeth-Converter](https://github.com/guypursey/ElizaBeth-Converter) for more details on the conversion to Beth format rulesets).
+The only Beth library available at this moment in time is a Beth-formatted version of Eliza's original keywords, decomposition rules and reassembly patterns (see [ElizaBeth-Converter](https://github.com/guypursey/ElizaBeth-Converter) for more details on the conversion to Beth format rulesets). With this library, Beth can say hello, send one response to each input from a user, and end the conversation when the user says bye, almost just like Eliza.
 
 ###ELIZA###
 

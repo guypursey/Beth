@@ -1,5 +1,5 @@
-// v0.0.2
-// Hotfix for undefined substitutions.
+// v0.1.0
+// First minor version. Now featuring agenda capabilities.
 
 // Create the constructor.
 var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {

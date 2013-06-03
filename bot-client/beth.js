@@ -1,5 +1,5 @@
-// v0.0.1
-// Hotfix for goto handling.
+// v0.0.2
+// Hotfix for undefined substitutions.
 
 // Create the constructor.
 var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {

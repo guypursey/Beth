@@ -1,58 +1,22 @@
 [
 	{
 		"dountil": {
-			"endured": "",
-			"iterate": ""
+			"endured": "00:00:00",
+			"usrsent": 0,
+			"botsent": 0,
+			"flagset": []
 		},
-		"filters": {
-			"proactive": {
+		"proactive": {
+			"filters": {
 				"HAS": [],
 				"NOT": []
-			},
-			"reactive": {
+			}
+		},
+		"reactive": {
+			"filters": {
 				"HAS": [],
 				"NOT": []
 			}
 		}
-	},
-	{
-		"dountil": {
-			"endured": "",
-			"iterate": ""
-		},
-		"agendas": [
-			{
-				"dountil": {
-					"endured": "",
-					"iterate": ""
-				},
-				"filters": {
-					"proactive": {
-						"HAS": [],
-						"NOT": []
-					},
-					"reactive": {
-						"HAS": [],
-						"NOT": []
-					},
-				}
-			},
-			{
-				"dountil": {
-					"endured": "",
-					"iterate": ""
-				},
-				"filters": {
-					"proactive": {
-						"HAS": [],
-						"NOT": []
-					},
-					"reactive": {
-						"HAS": [],
-						"NOT": []
-					},
-				}
-			}
-		]
 	}
 ]

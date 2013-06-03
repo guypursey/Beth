@@ -2,7 +2,7 @@
 // Hotfix for undefined substitutions.
 
 // Create the constructor.
-var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
+var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	// Currently the constructor takes three arguments because that's what I built eliza-node to do to be backward compatible.
 	// I am preparing the two for use in tandem.
 	// For now, the first argument is defunct. I will ignore it.
@@ -38,6 +38,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		
 		// Localise post message callback function.
 		postMsg = postMsg,
+		
+		// Localise connection severance function.
+		severFn = severFn,
 		
 		// Set up a wildcard regex pattern, to look for anything.
 		wildcardPattern = '\\s*(.*)\\s*',
@@ -119,6 +122,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		// Accepts user's input, puts it on a stack which is then regularly checked.
 		// Do we here check who the input is from and whether it needs responding to?
 			logData.toprocess.push(input);
+			
+		// Update number of items received from user in sessionStats.
+		// TODO: There may be a more efficient/elegant way to do this than just calling the stats method directly.
+			sessionStats.updateUsrSent();
 		},
 		preprocess = function (input) {
 		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
@@ -134,6 +141,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			debugFunc('received rules', rules);
 		    var input = input,
 				rules = rules,
+				filter = (typeof filter === "function")
+					? filter
+					: function () { console.log("No filter found."); return true },
 				i,
 				j,
 			    rex,	// for storing regular expression
@@ -142,8 +152,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			    m,		// matching string
 			    goto,		// for goto
 			    order = order || 0,
-			    tabbing = '';	// for debugging
-			
+			    tabbing = '';	// for debugging	
+				
 			for (i = 0; i < order; i += 1) {
 				tabbing += '\t';
 			}
@@ -151,48 +161,62 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			tabbing += order + ':';
 			
 			for (i in rules) {
-				debugFunc("looping through rules");
 			    rex = new RegExp(rules[i].pattern, 'i');
 			    m = (rex).exec(input);
+				
+				// If a match is found.
 			    if (m) {
 					(tabbing, "Examined:", rex);
 					console.log(tabbing, "Found:", m[0]);
 					if (rules[i].hasOwnProperty('ruleset')) {
 						console.log(tabbing, "Exploring further...");
-						rst = rst.concat(process(input, rules[i].ruleset, order + 1));
+						// Recursively call this function for nested rulesets.
+						rst = rst.concat(process(input, rules[i].ruleset, order + 1, filter));
 					}
 					if (typeof rules[i].results === 'object') {
+						// Take a copy of all the results in the array.
 						results = rules[i].results.slice(0);
-						console.log(tabbing, "Obtaining results...");
-						if (results.length) {
-							console.log(tabbing, "Results found.");
-						}
+						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < results.length; j += 1) {
+							debugFunc(rules[i].pattern);
+							debugFunc("loop: " + j);
+							debugFunc(results);
 							
 							if (results[j].respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
 								goto = results[j].respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
 									console.log(tabbing, 'Going to ruleset ' + goto + ':', results[j].respond.substring(5));
-									rst = rst.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1));
+									rst = rst.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
 								}
-								results.splice(j);
+								
+								// Remove object.
+								results.splice(j, 1);
+								// Set the marker back now that the result has been spliced.
+								j -= 1;
 								
 							} else {
-								results[j].refined = order;
-							
-								results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
-									return function (a0, a1) {
-										var rtn = m[parseInt(a1, 10)];
-										results[j].respond = results[j].respond.replace(context.postExp, function () {
-											return context.posts[a1];
-										});
-										return rtn;
-									};
-								})(this)); // iife temporary fix for use of `this` within lambda function
-								
+								// Check that the results conform to the filter.
+								if (filter(results[j].tagging)) {
+									// If the tags in this result match the ones specified, use it.									results[j].refined = order;
+									results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
+										return function (a0, a1) {
+											var rtn = m[parseInt(a1, 10)];
+											results[j].respond = results[j].respond.replace(context.postExp, function () {
+												return context.posts[a1];
+											});
+											return rtn;
+										};
+									})(this)); // iife temporary fix for use of `this` within lambda function
+								} else {
+									// If the result does not survive the filter, get rid of it.
+									results.splice(j, 1);
+									debugFunc("spliced result due to filter");
+									debugFunc(results);
+									// Set the marker back now that the result has been spliced.
+									j -= 1;
+								}
 							}
-							
 						}
 						rst = rst.concat(results);
 					}
@@ -213,18 +237,243 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 			}
 			return rtn;
 		},
+		
+		sessionStats = (function () {
+			var sessionStatus = {
+					usrsent: 0,
+					botsent: 0,
+					totsent: 0,
+					flagset: {}
+				},
+				updateUsrSent = function () {
+					sessionStatus.usrsent += 1;
+				},
+				updateBotSent = function () {
+					sessionStatus.botsent += 1;
+				},
+				updateTotSent = function () {
+					sessionStatus.totsent += 1;
+				},
+				setFlag = function (flag) {
+					sessionStatus.flagset[flag] = true;
+				},
+				getUsrSent = function (){
+					return sessionStatus.usrsent;
+				},
+				getBotSent = function (){
+					return sessionStatus.botsent;
+				},
+				getTotSent = function (){
+					return sessionStatus.totsent;
+				},
+				getFlag = function (flag) {
+					return sessionStatus.flagset[flag] || false;
+				};
+				
+			return {
+				updateUsrSent: updateUsrSent,
+				updateBotSent: updateBotSent,
+				updateTotSent: updateTotSent,
+				setFlag: setFlag,
+				getUsrSent: getUsrSent,
+				getBotSent: getBotSent,
+				getTotSent: getTotSent,
+				getFlag: getFlag
+			};
+			
+		})();
+
+		
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
+			var agendaItem = agendas[0],
+				// TODO: this object's name should be prefixed atStart
+				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
+				agendaStatus = {
+					agendaItemNum: 0,
+					agendaUsrSent: getUsrSent(),
+					agendaBotSent: getBotSent(),
+					agendaTimeStarted: new Date().getTime()
+				},
+				resetStatus = function (itemNum) {
+					agendaStatus.agendaItemNum = itemNum;
+					agendaStatus.agendaUsrSent = getUsrSent();
+					agendaStatus.agendaBotSent = getBotSent();
+					agendaStatus.agendaTimeStarted = new Date().getTime();
+				},
+				convertTime = function (itemTime) {
+					// expects one string argument "hh:mm:ss"
+					var timeArr = itemTime.split(":"),
+						timeMsc = 0,
+						timeUnits = [3600, 60, 1];
+					while (timeArr.length) {
+						timeMsc += timeUnits.pop() * +timeArr.pop() * 1000;
+					}
+					// returns argument provided as number of milliseconds
+					return timeMsc;
+				},
+				getCurrentFilter = function (whichMode) {
+					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
+					var whichMode = whichMode,
+						mode = agendaItem[whichMode];
+						rtn = (mode)
+							? function(tagging) {
+									var	has = mode.filters.HAS || [],
+										not = mode.filters.NOT || [],
+										h = has.length,
+										n = not.length,
+										t,
+										r = false;
+									while (h && !r) {
+										h -= 1;
+										t = tagging.length;
+										debugFunc("filtering for has " + has[h]);
+										while (t) {
+											t -= 1;
+											if (tagging[t] === has[h]) {
+												debugFunc("tag " + has[h] + " found!");
+												r = true;
+											}
+										}
+									}
+									while (n && r) {
+										n -= 1;
+										t = tagging.length;
+										debugFunc("filtering for not " + not[h]);
+										while (t) {
+											t -= 1;
+											if (tagging[t] === not[h]) {
+												r = false;
+											}
+										}
+									}
+									return r;
+								}
+							: function () {
+								return false;
+							};
+					return rtn;
+				},
+				isComplete = function () {
+					var rtn = false,
+						usr = agendaItem.dountil.usrsent || 0,
+						bot = agendaItem.dountil.botsent || 0,
+						edr = agendaItem.dountil.endured || "0",
+				   
+						// if properties are on the agenda, check if conditions are met
+						usrComp = (agendaItem.dountil.hasOwnProperty('usrsent'))
+							? (getUsrSent() >= agendaStatus.agendaUsrSent + usr)
+							: false,
+						botComp = (agendaItem.dountil.hasOwnProperty('botsent'))
+							? (getBotSent() >= agendaStatus.agendaBotSent + bot)
+							: false,
+						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
+							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr))
+							: false,
+						flgComp = (agendaItem.dountil.hasOwnProperty('flagset'))
+							?
+								(function () {
+									var rtn = true,
+										f = agendaItem.dountil.flagset.length;
+									while (f && rtn) {
+										f -= 1;
+										rtn = getFlag(agendaItem.dountil.flagset[f]);
+									}
+									return rtn;
+								})()
+							: false
+						;
+					
+					debugFunc(usrComp);
+					debugFunc(botComp);
+					debugFunc(edrComp);
+					debugFunc(flgComp);
+						
+					if (usrComp || botComp || edrComp || flgComp) {
+						debugFunc("agenda item " + agendaStatus.agendaItemNum + " complete");
+						return true;
+					}
+					return rtn;
+				},
+				// TODO: see if this method can be removed or if it can be used for recursion
+				getCurrentItem = function () {
+					if (isComplete()) {
+						resetStatus(agendaStatus.agendaItemNum + 1);
+						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
+						debugFunc("updated agenda item to #" + agendaStatus.agendaItemNum);
+						debugFunc(agendaItem);
+					}
+
+					if (!agendaItem) {
+						debugFunc("no further agenda items found; should disconnect now");
+						// If no agenda item exists, disconnect Beth.
+						exitSession();
+					}
+
+					return agendaItem;
+				};
+			// update time every second	
+			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
+			return {
+				getCurrentFilter: getCurrentFilter
+			};
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag);
+		
 		timedcheck = function () {
-		// Check if anything on the agenda needs doing. [PROACTIVE]
-		// Check if any responses are waiting to go out.
-		// Check if the user has said anything recently and process it. [REACTIVE]
+			
+			// Check if the user has said anything recently and process it. [REACTIVE]
 			var input = readlog(),
-				responses;
-		// Sort responses to deliver to user via mediator [if staggered, then add to queue].
-			if (input) { 
-				responses = process(input, libraryData.ruleset, 0);
+				// Get filter to pass to process() as callback to prevent duplication of loops.
+				filterCallback = agendaManager.getCurrentFilter("reactive"),
+				responses,
+				f; // flag counter
+				
+			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
+			if (input) {
+				responses = process(input, libraryData.ruleset, 0, filterCallback);
 				debugFunc(responses);
-				postMsg(responses[0].respond)
+				
+				if (responses.length) {
+					
+					if (responses[0].respond) {
+						// Send only first response (selection will be more varied in future versions).
+						postRoom.push(responses[0].respond);
+					}
+					
+					// Set any flags mentioned to true.
+					// TODO; Should these be set regardless of which response is returned?
+					if (typeof responses[0].setflag === 'object') {
+						debugFunc("setting flags");
+						f = responses[0].setflag.length;
+						while (f) {
+							f -= 1;
+							sessionStats.setFlag(responses[0].setflag[f]);
+							debugFunc("set flag " + responses[0].setflag[f]);
+						}
+					}
+					
+				}
 			}
+			
+			// Proactive selection...
+			var m = libraryData.moveset.length,
+				fC = agendaManager.getCurrentFilter("proactive");
+			debugFunc("filter proactive");
+			debugFunc(fC);
+			while (m) {
+				m -= 1;
+				if (fC(libraryData.moveset[m].tagging)) {
+					postRoom.push(libraryData.moveset[m].forward);
+				}
+			}
+				
+			// Check if any responses are waiting to go out.
+			if (postRoom.length) {
+				postMsg(postRoom.shift());
+				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
+				sessionStats.updateBotSent();
+			}
+				
+			
 		}
 		; //eof variable declarations
 		

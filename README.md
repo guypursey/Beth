@@ -1,8 +1,7 @@
 #BETH#
-##v0.0.2##
+##v0.0.3##
 
-LATEST: Hotfix applied to fix undefined substitutions.
-This is all very much a work in progress.
+LATEST: **Hotfix defines keyword boundaries, fixing issue #6.** Now, for example the pattern "no" means "no" and not the letters "no" in the word "not" or "know". This also sees a change in the definition of the wildcard, in the sense that it can be used at the beginning, at the end, or in the middle of a word now. So to find "not" or "know" with "no", one can should be able to use "no*" or "*know*". This is all very much a work in progress.
 
 ###USING BETH###
 
@@ -15,10 +14,9 @@ The first terminal will act as a mediator and will serve the interface which you
 The second terminal will act as a bot (being a client to the mediator) and also serve a console for the bot. You will be prompted for three pieces of information.
 
 1. It will ask which library you want to run. In this version, there are two options:
-
    - `beth`
    - `eliza-node`
-    
+
    You can type either of these options and hit the return key.
 
 2. You will be asked to give the name of the bot which you can choose all by yourself.

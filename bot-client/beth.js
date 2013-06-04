@@ -40,7 +40,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		postMsg = postMsg,
 		
 		// Set up a wildcard regex pattern, to look for anything.
-		wildcardPattern = '\\s*(.*)\\s*',
+		wildcardPattern = '(.*)',
 		
 		// Variables for identifying synonyms. Other markers will be used.
 		// TODO: Work out way to systematise this.
@@ -98,6 +98,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 							rtn += wildcardPattern;
 							return rtn;
 						});
+						
+						// If the string begins with a word boundary put this in the regex pattern.
+						ruleobj.pattern = ruleobj.pattern.replace(/^\b/g, "\\b");
+						
+						// If the string ends with a word boundary put this in the regex pattern.
+						ruleobj.pattern = ruleobj.pattern.replace(/\b$/g, "\\b");
+						
 					}
 					
 					// Replace multiple spaces with single spaces.

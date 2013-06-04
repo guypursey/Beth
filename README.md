@@ -1,9 +1,15 @@
 #BETH#
+<<<<<<< HEAD
 
 ##v0.1.0##
 
 LATEST: Now allows for agendas.
 This is all very much a work in progress.
+=======
+##v0.0.4##
+
+LATEST: **Hotfix ensures substitution of certain input words to output words for use by Beth, mostly first- to second-person or vice versa, fixing issue #9.** For example, user says "They are absurd to people such as myself". Beth will now answer "Did you think they might not be absurd to people such as yourself. ?" using "yourself" in place of "myself".
+>>>>>>> hotfix-0.0.4
 
 ###USING BETH###
 

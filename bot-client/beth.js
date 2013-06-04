@@ -49,6 +49,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// TODO: Work out way to systematise this.
 		synonymMarker = '@',
 		synonymPattern = /@(\S+)/,
+		
+		// A variable to hold the regular expression combining all the keys.
+		ioregex,
 
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
@@ -120,6 +123,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 				}
 			}
+		},
+		parseIo = function (intoout) {
+			var i,
+				
+				// An array to store all the keys.
+				ioarray = [];				
+				
+			// Loop through keys in object an push to array.
+			for (i in intoout) {
+				ioarray.push(i);
+			}
+			
+			// Create a regex from this array to search any input for any of the keys.
+			// Variable declared at higher level.
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b");
 		},
 		getInitial = function () {
 			// Return the first statement of the conversation.
@@ -196,7 +214,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									console.log(tabbing, 'Going to ruleset ' + goto + ':', results[j].respond.substring(5));
 									rst = rst.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
 								}
-								
+
 								// Remove object.
 								results.splice(j, 1);
 								// Set the marker back now that the result has been spliced.
@@ -209,15 +227,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									// results[j].refined = order;
 									debugFunc("raw and processed respond");
 									debugFunc(results[j].respond);
-									results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
-										return function (a0, a1) {
-											var rtn = m[parseInt(a1, 10)];
-											results[j].respond = results[j].respond.replace(context.postExp, function () {
-												return context.posts[a1];
-											});
-											return rtn;
-										};
-									})(this)); // iife temporary fix for use of `this` within lambda function
+									results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
+										var rtn = m[parseInt(a1, 10)];
+										rtn = rtn.replace(ioregex, function (a0, a1) {
+											return libraryData.intoout[a1];
+										});
+										return rtn;
+									});
 									debugFunc(results[j].respond);
 									debugFunc(libraryData.ruleset);
 								} else {
@@ -489,8 +505,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		}
 		; //eof variable declarations
 		
+
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
 	parseRuleset(libraryData.ruleset);
+	
+	// Io in this case refering to the object of how certain input words should be treated.
+	parseIo(libraryData.intoout);
 	
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
@@ -501,6 +521,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	
 	// Set interval to check agenda and log every 2 seconds.
 	setInterval(timedcheck, 2000);
+
 	
 };
 

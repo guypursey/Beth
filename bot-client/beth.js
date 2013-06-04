@@ -1,5 +1,3 @@
-// v0.0.2
-// Hotfix for undefined substitutions.
 
 // Create the constructor.
 var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
@@ -46,6 +44,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		// TODO: Work out way to systematise this.
 		synonymMarker = '@',
 		synonymPattern = /@(\S+)/,
+		
+		// A variable to hold the regular expression combining all the keys.
+		ioregex,
 
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
@@ -118,6 +119,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				}
 			}
 		},
+		parseIo = function (intoout) {
+			var i,
+				
+				// An array to store all the keys.
+				ioarray = [];				
+				
+			// Loop through keys in object an push to array.
+			for (i in intoout) {
+				ioarray.push(i);
+			}
+			
+			// Create a regex from this array to search any input for any of the keys.
+			// Variable declared at higher level.
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b");
+		},
 		getInitial = function () {
 			// Return the first statement of the conversation.
 			return "Hello World!";
@@ -188,15 +204,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 							} else {
 								results[j].refined = order;
 							
-								results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
-									return function (a0, a1) {
-										var rtn = m[parseInt(a1, 10)];
-										results[j].respond = results[j].respond.replace(context.postExp, function () {
-											return context.posts[a1];
-										});
-										return rtn;
-									};
-								})(this)); // iife temporary fix for use of `this` within lambda function
+								results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
+									var rtn = m[parseInt(a1, 10)];
+									rtn = rtn.replace(ioregex, function (a0, a1) {
+										return libraryData.intoout[a1];
+									});
+									return rtn;
+								});
 								
 							}
 							
@@ -237,6 +251,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		
 		// Ruleset needs to be parsed, checked and amended before anything else can happen.
 		parseRuleset(libraryData.ruleset);
+		
+		// Io in this case refering to the object of how certain input words should be treated.
+		parseIo(libraryData.intoout);
 		
 		console.log("debug:", debugFn);
 		debugFunc(libraryData.ruleset);

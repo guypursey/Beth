@@ -1,7 +1,7 @@
 #BETH#
-##v0.0.3##
+##v0.0.4##
 
-LATEST: **Hotfix defines keyword boundaries, fixing issue #6.** Now, for example the pattern "no" means "no" and not the letters "no" in the word "not" or "know". This also sees a change in the definition of the wildcard, in the sense that it can be used at the beginning, at the end, or in the middle of a word now. So to find "not" or "know" with "no", one can should be able to use "no*" or "*know*". This is all very much a work in progress.
+LATEST: **Hotfix ensures substitution of certain input words to output words for use by Beth, mostly first- to second-person or vice versa, fixing issue #9.** For example, user says "They are absurd to people such as myself". Beth will now answer "Did you think they might not be absurd to people such as yourself. ?" using "yourself" in place of "myself".
 
 ###USING BETH###
 

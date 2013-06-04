@@ -198,7 +198,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							} else {
 								// Check that the results conform to the filter.
 								if (filter(results[j].tagging)) {
-									// If the tags in this result match the ones specified, use it.									results[j].refined = order;
+									// If the tags in this result match the ones specified, use it.
+									// results[j].refined = order;
+									debugFunc("raw and processed respond");
+									debugFunc(results[j].respond);
 									results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
 										return function (a0, a1) {
 											var rtn = m[parseInt(a1, 10)];
@@ -208,6 +211,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 											return rtn;
 										};
 									})(this)); // iife temporary fix for use of `this` within lambda function
+									debugFunc(results[j].respond);
+									debugFunc(libraryData.ruleset);
 								} else {
 									// If the result does not survive the filter, get rid of it.
 									results.splice(j, 1);

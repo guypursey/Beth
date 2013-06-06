@@ -195,6 +195,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 								copyobj = {
 									"respond": origobj.respond,
 									"tagging": origobj.tagging,
+									"covered": m[0].length,
+									// need a percentage?
+									"indexof": m.index,
 									"origobj": origobj
 								}; // could be a loop through obj properties
 							
@@ -250,12 +253,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 		// Check if any responses are waiting to go out.
 		// Check if the user has said anything recently and process it. [REACTIVE]
 			var input = readlog(),
-				responses;
+				responses,
+				datetime = new Date();
 		// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) { 
 				responses = process(input, libraryData.ruleset, 0);
+				postMsg(responses[0].respond);
+				responses[0].origobj.history = responses[0].origobj.history || [];
+				responses[0].origobj.history.push(datetime);
 				debugFunc(responses);
-				postMsg(responses[0].respond)
 			}
 		}
 		; //eof variable declarations

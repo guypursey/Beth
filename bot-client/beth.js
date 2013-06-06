@@ -160,7 +160,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 				i,
 				j,
 			    rex,	// for storing regular expression
-			    rst = [],	// for storing results
+			    rtn = [],	// for storing results
 				results,
 			    m,		// matching string
 			    goto,		// for goto
@@ -182,46 +182,57 @@ var Beth = function (noRandomFlag, libraryData, postMsg, debugFn) {
 					console.log(tabbing, "Found:", m[0]);
 					if (rules[i].hasOwnProperty('ruleset')) {
 						console.log(tabbing, "Exploring further...");
-						rst = rst.concat(process(input, rules[i].ruleset, order + 1));
+						rtn = rtn.concat(process(input, rules[i].ruleset, order + 1));
 					}
 					if (typeof rules[i].results === 'object') {
-						results = rules[i].results.slice(0);
+						results = []
 						console.log(tabbing, "Obtaining results...");
 						if (results.length) {
 							console.log(tabbing, "Results found.");
 						}
-						for (j = 0; j < results.length; j += 1) {
+						for (j = 0; j < rules[i].results.length; j += 1) {
+							var origobj = rules[i].results[j],
+								copyobj = {
+									"respond": origobj.respond,
+									"tagging": origobj.tagging,
+									"origobj": origobj
+								}; // could be a loop through obj properties
 							
-							if (results[j].respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
+							if (copyobj.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
-								goto = results[j].respond.substring(5);     // get the key we should go to,
+								goto = copyobj.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + goto + ':', results[j].respond.substring(5));
-									rst = rst.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1));
+									console.log(tabbing, 'Going to ruleset ' + goto + ':', copyobj.substring(5));
+									rtn = rtn.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1));
 								}
-								results.splice(j);
 								
 							} else {
-								results[j].refined = order;
-							
-								results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
+								
+								// Record how far down the tree we are.
+								copyobj.refined = order;
+								
+								// Make necessary substitutions in the response.
+								copyobj.respond = copyobj.respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
 									var rtn = m[parseInt(a1, 10)];
+									// Transform any input substitutions using the intoout object (first- to second- person and vice versa.)
 									rtn = rtn.replace(ioregex, function (a0, a1) {
 										return libraryData.intoout[a1];
 									});
 									return rtn;
 								});
 								
+								results.push(copyobj);
+								
 							}
 							
 						}
-						rst = rst.concat(results);
+						rtn = rtn.concat(results);
 					}
 			    }
 			}
 						
-			//console.log(tabbing, "Returning result:", rst);
-			return rst;
+			//console.log(tabbing, "Returning result:", rtn);
+			return rtn;
 
 		},
 		readlog = function () {

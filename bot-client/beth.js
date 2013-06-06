@@ -221,12 +221,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								
 							} else {
 								// Check that the results conform to the filter.
-								if (filter(results[j].tagging)) {
+								if (filter(copyobj.tagging)) {
 									// If the tags in this result match the ones specified, use it.
 									copyobj.refined = order;
 									
 									// Make necessary substitutions in the response.
-									copyobj.respond = results[j].respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
+									copyobj.respond = copyobj.respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
 										var rtn = m[parseInt(a1, 10)];
 										rtn = rtn.replace(ioregex, function (a0, a1) {
 											return libraryData.intoout[a1];

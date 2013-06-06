@@ -1,7 +1,7 @@
 #BETH#
-##v0.0.4##
+##v0.0.5##
 
-LATEST: **Hotfix ensures substitution of certain input words to output words for use by Beth, mostly first- to second-person or vice versa, fixing issue #9.** For example, user says "They are absurd to people such as myself". Beth will now answer "Did you think they might not be absurd to people such as yourself. ?" using "yourself" in place of "myself".
+LATEST: **Hotfix stops repetition by making copies of results objects from the rulesets, fixing issue #10.** As a result of this, a few extra lines of code have also been added to start planning for how a reference to the original object can be maintained (for purposes of updating history of use, etc.)
 
 ###USING BETH###
 

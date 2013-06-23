@@ -1,0 +1,22 @@
+[
+	{
+		"dountil": {
+			"endured": "00:00:00",
+			"usrsent": 0,
+			"botsent": 0,
+			"flagset": []
+		},
+		"proactive": {
+			"filters": {
+				"HAS": [],
+				"NOT": []
+			}
+		},
+		"reactive": {
+			"filters": {
+				"HAS": [],
+				"NOT": []
+			}
+		}
+	}
+]

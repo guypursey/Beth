@@ -1,5 +1,39 @@
 {
 	"data": {
+	
+		"agendas": [
+			{
+				"dountil": {
+					"botsent": 1
+				},
+				"proactive": {
+					"filters": {
+						"HAS": ["initial"]
+					}
+				}
+			},
+			{
+				"dountil": {
+					"flagset": ["quit"]
+				},
+				"reactive": {
+					"filters": {
+						"HAS": ["generic"]
+					}
+				}
+			},			
+			{
+				"dountil": {
+					"botsent": 1
+				},
+				"proactive": {
+					"filters": {
+						"HAS": ["farewell"]
+					}
+				}
+			}
+		],
+		
 		"gambits": [
 			"How do you do.  Please tell me your problem.",
 			"Please tell me what's been bothering you.",
@@ -65,7 +99,22 @@
 			"happy": ["elated", "glad", "better"],
 			"sad": ["unhappy", "depressed", "sick"]
 		},
-
+		
+		"moveset": [
+			{	
+				"forward": "Hello world!",
+				"tagging": [
+					"initial"
+				]
+			},
+			{
+				"forward": "Bye then!",
+				"tagging": [
+					"farewell"
+				]
+			}
+		],
+		
 		"ruleset": {
 			"*": {
 				"pattern": "*",
@@ -2651,6 +2700,20 @@
 								"comment": ""
 							}
 						}
+					},
+					"bye": {
+						"pattern": "bye",
+						"results": [
+							{
+								"respond": "I guess that brings this conversation to a close then.",
+								"ranking": 0,
+								"tagging": [
+									"generic"
+								],
+								"setflag": ["quit"],
+								"comment": "Quits the conversation."
+							}
+						]
 					}
 				}
 			}

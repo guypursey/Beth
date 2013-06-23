@@ -205,6 +205,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								copyobj = {
 									"respond": origobj.respond,
 									"tagging": origobj.tagging,
+									"setflag": origobj.setflag,
 									"covered": m[0].length,
 									// need a percentage?
 									"indexof": m.index,

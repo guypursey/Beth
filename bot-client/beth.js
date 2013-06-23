@@ -1,5 +1,3 @@
-// v0.0.2
-// Hotfix for undefined substitutions.
 
 // Create the constructor.
 var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
@@ -43,12 +41,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		severFn = severFn,
 		
 		// Set up a wildcard regex pattern, to look for anything.
-		wildcardPattern = '\\s*(.*)\\s*',
+		wildcardPattern = '(.*)',
 		
 		// Variables for identifying synonyms. Other markers will be used.
 		// TODO: Work out way to systematise this.
 		synonymMarker = '@',
 		synonymPattern = /@(\S+)/,
+		
+		// A variable to hold the regular expression combining all the keys.
+		ioregex,
 
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
@@ -101,6 +102,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							rtn += wildcardPattern;
 							return rtn;
 						});
+						
+						// If the string begins with a word boundary put this in the regex pattern.
+						ruleobj.pattern = ruleobj.pattern.replace(/^\b/g, "\\b");
+						
+						// If the string ends with a word boundary put this in the regex pattern.
+						ruleobj.pattern = ruleobj.pattern.replace(/\b$/g, "\\b");
+						
 					}
 					
 					// Replace multiple spaces with single spaces.
@@ -113,6 +121,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 				}
 			}
+		},
+		parseIo = function (intoout) {
+			var i,
+				
+				// An array to store all the keys.
+				ioarray = [];				
+				
+			// Loop through keys in object an push to array.
+			for (i in intoout) {
+				ioarray.push(i);
+			}
+			
+			// Create a regex from this array to search any input for any of the keys.
+			// Variable declared at higher level.
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b");
 		},
 		getInitial = function () {
 			// Return the first statement of the conversation.
@@ -147,7 +170,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				i,
 				j,
 			    rex,	// for storing regular expression
-			    rst = [],	// for storing results
+			    rtn = [],	// for storing results
 				results,
 			    m,		// matching string
 			    goto,		// for goto
@@ -171,60 +194,59 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (rules[i].hasOwnProperty('ruleset')) {
 						console.log(tabbing, "Exploring further...");
 						// Recursively call this function for nested rulesets.
-						rst = rst.concat(process(input, rules[i].ruleset, order + 1, filter));
+						rtn = rtn.concat(process(input, rules[i].ruleset, order + 1, filter));
 					}
 					if (typeof rules[i].results === 'object') {
 						// Take a copy of all the results in the array.
-						results = rules[i].results.slice(0);
+						results = [];
 						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
-						for (j = 0; j < results.length; j += 1) {
-							debugFunc(rules[i].pattern);
-							debugFunc("loop: " + j);
-							debugFunc(results);
-							
-							if (results[j].respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
+						for (j = 0; j < rules[i].results.length; j += 1) {
+							var origobj = rules[i].results[j],
+								copyobj = {
+									"respond": origobj.respond,
+									"tagging": origobj.tagging,
+									"setflag": origobj.setflag,
+									"covered": m[0].length,
+									// need a percentage?
+									"indexof": m.index,
+									"origobj": origobj
+								}; // could be a loop through obj properties
+
+							if (copyobj.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
-								goto = results[j].respond.substring(5);     // get the key we should go to,
+								goto = copyobj.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + goto + ':', results[j].respond.substring(5));
-									rst = rst.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
+									console.log(tabbing, 'Going to ruleset ' + goto + ':', copyobj.substring(5));
+									rtn = rtn.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
 								}
-								
-								// Remove object.
-								results.splice(j, 1);
-								// Set the marker back now that the result has been spliced.
-								j -= 1;
 								
 							} else {
 								// Check that the results conform to the filter.
-								if (filter(results[j].tagging)) {
-									// If the tags in this result match the ones specified, use it.									results[j].refined = order;
-									results[j].respond = results[j].respond.replace(/\(([0-9]+)\)/, (function(context) {
-										return function (a0, a1) {
-											var rtn = m[parseInt(a1, 10)];
-											results[j].respond = results[j].respond.replace(context.postExp, function () {
-												return context.posts[a1];
-											});
-											return rtn;
-										};
-									})(this)); // iife temporary fix for use of `this` within lambda function
-								} else {
-									// If the result does not survive the filter, get rid of it.
-									results.splice(j, 1);
-									debugFunc("spliced result due to filter");
-									debugFunc(results);
-									// Set the marker back now that the result has been spliced.
-									j -= 1;
+								if (filter(copyobj.tagging)) {
+									// If the tags in this result match the ones specified, use it.
+									copyobj.refined = order;
+									
+									// Make necessary substitutions in the response.
+									copyobj.respond = copyobj.respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
+										var rtn = m[parseInt(a1, 10)];
+										rtn = rtn.replace(ioregex, function (a0, a1) {
+											return libraryData.intoout[a1];
+										});
+										return rtn;
+									});
+									
+									results.push(copyobj);
+									
 								}
 							}
 						}
-						rst = rst.concat(results);
+						rtn = rtn.concat(results);
 					}
 			    }
 			}
 						
-			//console.log(tabbing, "Returning result:", rst);
-			return rst;
+			//console.log(tabbing, "Returning result:", rtn);
+			return rtn;
 
 		},
 		readlog = function () {
@@ -425,18 +447,25 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				// Get filter to pass to process() as callback to prevent duplication of loops.
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
 				responses,
+				datetime = new Date(),
 				f; // flag counter
 				
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) {
 				responses = process(input, libraryData.ruleset, 0, filterCallback);
-				debugFunc(responses);
+
 				
 				if (responses.length) {
 					
 					if (responses[0].respond) {
 						// Send only first response (selection will be more varied in future versions).
 						postRoom.push(responses[0].respond);
+					}
+					
+					// Record use of this object on the original database if possible.
+					if (responses[0].origobj) {
+						responses[0].origobj.history = responses[0].origobj.history || [];
+						responses[0].origobj.history.push(datetime);
 					}
 					
 					// Set any flags mentioned to true.
@@ -450,8 +479,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							debugFunc("set flag " + responses[0].setflag[f]);
 						}
 					}
-					
 				}
+				
+				debugFunc(responses);
 			}
 			
 			// Proactive selection...
@@ -477,8 +507,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		}
 		; //eof variable declarations
 		
+
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
 	parseRuleset(libraryData.ruleset);
+	
+	// Io in this case refering to the object of how certain input words should be treated.
+	parseIo(libraryData.intoout);
 	
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
@@ -489,6 +523,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	
 	// Set interval to check agenda and log every 2 seconds.
 	setInterval(timedcheck, 2000);
+
 	
 };
 

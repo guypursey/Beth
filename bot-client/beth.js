@@ -28,7 +28,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			autograph: []
 			// Autograph may in fact need to be an object, whose keys are statements put to the user.
 			// Each property would be an array logging all the times the statement has been said.
-			// Every so after, the arrays could shifted so that repetition is allowed over time and memory saved.
+			// Every so often, the arrays could be shifted so that repetition is allowed over time and memory saved.
 		},
 		
 		// Set up object for storing responses to be sent out.
@@ -48,9 +48,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		synonymMarker = '@',
 		synonymPattern = /@(\S+)/,
 		
-		// A variable to hold the regular expression combining all the keys.
-		ioregex,
-
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
 			
@@ -122,6 +119,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				}
 			}
 		},
+		
+		// A variable to hold the regular expression combining all the keys.
+		ioregex,
+		
 		parseIo = function (intoout) {
 			var i,
 				
@@ -517,13 +518,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
 	
-	// Finally, expose private variables to public API.
-	this.getInitial = getInitial;
-	this.transform = loginput;
-	
 	// Set interval to check agenda and log every 2 seconds.
 	setInterval(timedcheck, 2000);
 
+	
+	// Finally, expose private variables to public API.
+	this.getInitial = getInitial;
+	this.transform = loginput;
 	
 };
 

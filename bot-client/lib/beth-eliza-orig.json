@@ -176,7 +176,7 @@
 						"pattern": "different",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "How is it different ?",
@@ -236,7 +236,7 @@
 						"pattern": "like",
 						"ruleset": {
 							"* @be *like *": {
-								"pattern": " * @be *like * ",
+								"pattern": "* @be *like *",
 								"results": [
 									{
 										"respond": "goto alike",
@@ -254,7 +254,7 @@
 						"pattern": "alike",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "In what way ?",
@@ -321,7 +321,7 @@
 						"pattern": "always",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Can you think of a specific example ?",
@@ -360,7 +360,7 @@
 						"pattern": "noone",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto everyone",
@@ -378,7 +378,7 @@
 						"pattern": "nobody",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto everyone",
@@ -396,7 +396,7 @@
 						"pattern": "everybody",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto everyone",
@@ -414,7 +414,7 @@
 						"pattern": "everyone",
 						"ruleset": {
 							"* @everyone *": {
-								"pattern": " * @everyone * ",
+								"pattern": "* @everyone *",
 								"results": [
 									{
 										"respond": "Really, (2) ?",
@@ -488,7 +488,7 @@
 						"pattern": "why",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto what",
@@ -501,7 +501,7 @@
 								"comment": ""
 							},
 							"* why can't i *": {
-								"pattern": " * why can't i * ",
+								"pattern": "* why can't i *",
 								"results": [
 									{
 										"respond": "Do you think you should be able to (2) ?",
@@ -542,7 +542,7 @@
 								"comment": ""
 							},
 							"* why don't you *": {
-								"pattern": " * why don't you * ",
+								"pattern": "* why don't you *",
 								"results": [
 									{
 										"respond": "Do you believe I don't (2) ?",
@@ -588,7 +588,7 @@
 						"pattern": "because",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Is that the real reason ?",
@@ -627,7 +627,7 @@
 						"pattern": "how",
 						"ruleset": {
 							"how *": {
-								"pattern": " how * ",
+								"pattern": "how *",
 								"results": [
 									{
 										"respond": "goto what",
@@ -645,7 +645,7 @@
 						"pattern": "where",
 						"ruleset": {
 							"where *": {
-								"pattern": " where * ",
+								"pattern": "where *",
 								"results": [
 									{
 										"respond": "goto what",
@@ -663,7 +663,7 @@
 						"pattern": "when",
 						"ruleset": {
 							"when *": {
-								"pattern": " when * ",
+								"pattern": "when *",
 								"results": [
 									{
 										"respond": "goto what",
@@ -681,7 +681,7 @@
 						"pattern": "who",
 						"ruleset": {
 							"who *": {
-								"pattern": " who * ",
+								"pattern": "who *",
 								"results": [
 									{
 										"respond": "goto what",
@@ -699,7 +699,7 @@
 						"pattern": "what",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Why do you ask ?",
@@ -773,7 +773,7 @@
 						"pattern": "can",
 						"ruleset": {
 							"* can i *": {
-								"pattern": " * can i * ",
+								"pattern": "* can i *",
 								"results": [
 									{
 										"respond": "Whether or not you can (2) depends on you more than on me.",
@@ -807,7 +807,7 @@
 								"comment": ""
 							},
 							"* can you *": {
-								"pattern": " * can you * ",
+								"pattern": "* can you *",
 								"results": [
 									{
 										"respond": "You believe I can (2) don't you ?",
@@ -846,7 +846,7 @@
 						"pattern": "my",
 						"ruleset": {
 							"* my *": {
-								"pattern": " * my * ",
+								"pattern": "* my *",
 								"results": [
 									{
 										"respond": "Your (2) ?",
@@ -875,12 +875,60 @@
 										"tagging": [
 											"generic"
 										]
+									},
+									{
+										"respond": "Does that have anything to do with the fact that your (2) ?",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"deferto": [
+											[
+												"*"
+											]
+										]
+									},
+									{
+										"respond": "Lets discuss further why your (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"deferto": [
+											[
+												"*"
+											]
+										]
+									},
+									{
+										"respond": "Earlier you said your (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"deferto": [
+											[
+												"*"
+											]
+										]
+									},
+									{
+										"respond": "But your (2).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"deferto": [
+											[
+												"*"
+											]
+										]
 									}
 								],
 								"comment": ""
 							},
 							"* my* @family *": {
-								"pattern": " * my* @family * ",
+								"pattern": "* my* @family *",
 								"results": [
 									{
 										"respond": "Tell me more about your family.",
@@ -912,40 +960,6 @@
 									}
 								],
 								"comment": ""
-							},
-							"$ * my *": {
-								"pattern": " $ * my * ",
-								"results": [
-									{
-										"respond": "Does that have anything to do with the fact that your (2) ?",
-										"ranking": 2,
-										"tagging": [
-											"generic"
-										]
-									},
-									{
-										"respond": "Lets discuss further why your (2).",
-										"ranking": 2,
-										"tagging": [
-											"generic"
-										]
-									},
-									{
-										"respond": "Earlier you said your (2).",
-										"ranking": 2,
-										"tagging": [
-											"generic"
-										]
-									},
-									{
-										"respond": "But your (2).",
-										"ranking": 2,
-										"tagging": [
-											"generic"
-										]
-									}
-								],
-								"comment": ""
 							}
 						}
 					},
@@ -953,7 +967,7 @@
 						"pattern": "no",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Are you saying no just to be negative?",
@@ -987,7 +1001,7 @@
 								"comment": ""
 							},
 							"* no one *": {
-								"pattern": " * no one * ",
+								"pattern": "* no one *",
 								"results": [
 									{
 										"respond": "Are you sure, no one (2) ?",
@@ -1047,7 +1061,7 @@
 						"pattern": "yes",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "You seem to be quite positive.",
@@ -1086,7 +1100,7 @@
 						"pattern": "you",
 						"ruleset": {
 							"* you *": {
-								"pattern": " * you * ",
+								"pattern": "* you *",
 								"results": [
 									{
 										"respond": "We were discussing you -- not me.",
@@ -1120,7 +1134,7 @@
 								"comment": ""
 							},
 							"* you* me *": {
-								"pattern": " * you* me * ",
+								"pattern": "* you* me *",
 								"results": [
 									{
 										"respond": "Why do you think I (2) you ?",
@@ -1175,7 +1189,7 @@
 								"comment": ""
 							},
 							"* you are *": {
-								"pattern": " * you are * ",
+								"pattern": "* you are *",
 								"results": [
 									{
 										"respond": "What makes you think I am (2) ?",
@@ -1209,7 +1223,7 @@
 								"comment": ""
 							},
 							"* you remind me of *": {
-								"pattern": " * you remind me of * ",
+								"pattern": "* you remind me of *",
 								"results": [
 									{
 										"respond": "goto alike",
@@ -1227,7 +1241,7 @@
 						"pattern": "i",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "You say (1) ?",
@@ -1261,7 +1275,7 @@
 								"comment": ""
 							},
 							"* i * you *": {
-								"pattern": " * i * you * ",
+								"pattern": "* i * you *",
 								"results": [
 									{
 										"respond": "Perhaps in your fantasies we (2) each other.",
@@ -1295,7 +1309,7 @@
 								"comment": ""
 							},
 							"* i feel *": {
-								"pattern": " * i feel * ",
+								"pattern": "* i feel *",
 								"results": [
 									{
 										"respond": "Tell me more about such feelings.",
@@ -1329,7 +1343,7 @@
 								"comment": ""
 							},
 							"* i don't *": {
-								"pattern": " * i don't * ",
+								"pattern": "* i don't *",
 								"results": [
 									{
 										"respond": "Don't you really (2) ?",
@@ -1363,7 +1377,7 @@
 								"comment": ""
 							},
 							"* i @cannot *": {
-								"pattern": " * i @cannot * ",
+								"pattern": "* i @cannot *",
 								"results": [
 									{
 										"respond": "How do you know that you can't (3) ?",
@@ -1404,7 +1418,7 @@
 								"comment": ""
 							},
 							"* i am *": {
-								"pattern": " * i am * ",
+								"pattern": "* i am *",
 								"results": [
 									{
 										"respond": "Is it because you are (2) that you came to me ?",
@@ -1445,7 +1459,7 @@
 								"comment": ""
 							},
 							"* i* @belief *you *": {
-								"pattern": " * i* @belief *you * ",
+								"pattern": "* i* @belief *you *",
 								"results": [
 									{
 										"respond": "goto you",
@@ -1458,7 +1472,7 @@
 								"comment": ""
 							},
 							"* i @belief i *": {
-								"pattern": " * i @belief i * ",
+								"pattern": "* i @belief i *",
 								"results": [
 									{
 										"respond": "Do you really think so ?",
@@ -1485,7 +1499,7 @@
 								"comment": ""
 							},
 							"* i was *": {
-								"pattern": " * i was * ",
+								"pattern": "* i was *",
 								"results": [
 									{
 										"respond": "goto was",
@@ -1498,7 +1512,7 @@
 								"comment": ""
 							},
 							"* i am* @happy *": {
-								"pattern": " * i am* @happy * ",
+								"pattern": "* i am* @happy *",
 								"results": [
 									{
 										"respond": "How have I helped you to be (3) ?",
@@ -1532,7 +1546,7 @@
 								"comment": ""
 							},
 							"* i am* @sad *": {
-								"pattern": " * i am* @sad * ",
+								"pattern": "* i am* @sad *",
 								"results": [
 									{
 										"respond": "I am sorry to hear that you are (3).",
@@ -1566,7 +1580,7 @@
 								"comment": ""
 							},
 							"* i @desire *": {
-								"pattern": " * i @desire * ",
+								"pattern": "* i @desire *",
 								"results": [
 									{
 										"respond": "What would it mean to you if you got (3) ?",
@@ -1619,7 +1633,7 @@
 						"pattern": "was",
 						"ruleset": {
 							"* was you *": {
-								"pattern": " * was you * ",
+								"pattern": "* was you *",
 								"results": [
 									{
 										"respond": "Would you like to believe I was (2) ?",
@@ -1660,7 +1674,7 @@
 								"comment": ""
 							},
 							"* i was *": {
-								"pattern": " * i was * ",
+								"pattern": "* i was *",
 								"results": [
 									{
 										"respond": "Were you really ?",
@@ -1687,7 +1701,7 @@
 								"comment": ""
 							},
 							"* was i *": {
-								"pattern": " * was i * ",
+								"pattern": "* was i *",
 								"results": [
 									{
 										"respond": "What if you were (2) ?",
@@ -1740,7 +1754,7 @@
 						"pattern": "your",
 						"ruleset": {
 							"* your *": {
-								"pattern": " * your * ",
+								"pattern": "* your *",
 								"results": [
 									{
 										"respond": "Why are you concerned over my (2) ?",
@@ -1793,7 +1807,7 @@
 						"pattern": "are",
 						"ruleset": {
 							"* are *": {
-								"pattern": " * are * ",
+								"pattern": "* are *",
 								"results": [
 									{
 										"respond": "Did you think they might not be (2) ?",
@@ -1841,7 +1855,7 @@
 								"comment": ""
 							},
 							"* you are *": {
-								"pattern": " * you are * ",
+								"pattern": "* you are *",
 								"results": [
 									{
 										"respond": "goto you",
@@ -1854,7 +1868,7 @@
 								"comment": ""
 							},
 							"* are you *": {
-								"pattern": " * are you * ",
+								"pattern": "* are you *",
 								"results": [
 									{
 										"respond": "Why are you interested in whether I am (2) or not ?",
@@ -1914,7 +1928,7 @@
 						"pattern": "am",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Why do you say 'am' ?",
@@ -1934,7 +1948,7 @@
 								"comment": ""
 							},
 							"* i am *": {
-								"pattern": " * i am * ",
+								"pattern": "* i am *",
 								"results": [
 									{
 										"respond": "goto i",
@@ -1947,7 +1961,7 @@
 								"comment": ""
 							},
 							"* am i *": {
-								"pattern": " * am i * ",
+								"pattern": "* am i *",
 								"results": [
 									{
 										"respond": "Do you believe you are (2) ?",
@@ -1993,7 +2007,7 @@
 						"pattern": "computer",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Do computers worry you ?",
@@ -2053,7 +2067,7 @@
 						"pattern": "hello",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "How do you do.  Please state your problem.",
@@ -2078,7 +2092,7 @@
 						"pattern": "xforeign",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "I speak only English.",
@@ -2096,7 +2110,7 @@
 						"pattern": "espanol",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto xforeign",
@@ -2121,7 +2135,7 @@
 						"pattern": "italiano",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto xforeign",
@@ -2146,7 +2160,7 @@
 						"pattern": "francais",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto xforeign",
@@ -2171,7 +2185,7 @@
 						"pattern": "deutsch",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto xforeign",
@@ -2196,7 +2210,7 @@
 						"pattern": "name",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "I am not interested in names.",
@@ -2221,7 +2235,7 @@
 						"pattern": "perhaps",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "You don't seem quite certain.",
@@ -2274,7 +2288,7 @@
 						"pattern": "dream",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "What does that dream suggest to you ?",
@@ -2313,7 +2327,7 @@
 						"pattern": "dreamed",
 						"ruleset": {
 							"* i dreamed *": {
-								"pattern": " * i dreamed * ",
+								"pattern": "* i dreamed *",
 								"results": [
 									{
 										"respond": "Really, (2) ?",
@@ -2352,7 +2366,7 @@
 						"pattern": "if",
 						"ruleset": {
 							"* if *": {
-								"pattern": " * if * ",
+								"pattern": "* if *",
 								"results": [
 									{
 										"respond": "Do you think it's likely that (2) ?",
@@ -2412,7 +2426,7 @@
 						"pattern": "forget",
 						"ruleset": {
 							"* did you forget *": {
-								"pattern": " * did you forget * ",
+								"pattern": "* did you forget *",
 								"results": [
 									{
 										"respond": "Why do you ask ?",
@@ -2460,7 +2474,7 @@
 								"comment": ""
 							},
 							"* i forget *": {
-								"pattern": " * i forget * ",
+								"pattern": "* i forget *",
 								"results": [
 									{
 										"respond": "Can you think of why you might forget (2) ?",
@@ -2520,7 +2534,7 @@
 						"pattern": "remember",
 						"ruleset": {
 							"* you remember *": {
-								"pattern": " * you remember * ",
+								"pattern": "* you remember *",
 								"results": [
 									{
 										"respond": "How could I forget (2) ?",
@@ -2547,7 +2561,7 @@
 								"comment": ""
 							},
 							"* do you remember *": {
-								"pattern": " * do you remember * ",
+								"pattern": "* do you remember *",
 								"results": [
 									{
 										"respond": "Did you think I would forget (2) ?",
@@ -2588,7 +2602,7 @@
 								"comment": ""
 							},
 							"* i remember *": {
-								"pattern": " * i remember * ",
+								"pattern": "* i remember *",
 								"results": [
 									{
 										"respond": "Do you often think of (2) ?",
@@ -2648,7 +2662,7 @@
 						"pattern": "apologise",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "goto sorry",
@@ -2666,7 +2680,7 @@
 						"pattern": "sorry",
 						"ruleset": {
 							"*": {
-								"pattern": " * ",
+								"pattern": "*",
 								"results": [
 									{
 										"respond": "Please don't apologise.",

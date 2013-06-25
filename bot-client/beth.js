@@ -468,7 +468,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					while (r) {
 						r -= 1;
 						if (responses[r].deferto) {
-						// TODO: check not just that deferto exists but that is also an array
+						// TODO: check not just that deferto exists but that is also an array and not empty
 							
 							deferwhere = libraryData;
 							// Set up deferwhere to start looking at libraryData.
@@ -476,33 +476,42 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// Take just the first element of deferto.
 							deferpath = responses[r].deferto.shift();
 							//TODO: check this is also an array
-							d = 0;
+							debugFunc("defer path");
+							debugFunc(deferpath);
 							
-							while (d < deferpath.length && typeof deferpath[d] === "String") {
-							// Check the element in the array can be a valid key value.
-								
-								// If the path does not current exist, create it.
-								if (!deferwhere.hasOwnProperty("ruleset")) {
-									deferwhere.ruleset = {};
-								}
-								if (!deferwhere.ruleset.hasOwnProperty(deferpath[d])) {
-									deferwhere.ruleset[deferpath[d]] = {};
-								}
-								
-								deferwhere = deferwhere.ruleset[deferpath[d]];
-								d += 1;
+							if (deferpath) {
+							// TODO: need a better check that this is an array -- this whole section to be refactored
+								d = 0;
+								debugFunc("okay");
+								debugFunc(typeof deferpath[d]);
+								while (d < deferpath.length && typeof deferpath[d] === "string") {
+								// Check the element in the array can be a valid key value.
+									
+									// If the path does not current exist, create it.
+									if (!(deferwhere.hasOwnProperty("ruleset"))) {
+										deferwhere.ruleset = {};
+									}
+									if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+										deferwhere.ruleset[deferpath[d]] = {};
+									}
+									
+									deferwhere = deferwhere.ruleset[deferpath[d]];
+									debugFunc("defer loc: " + d);
+									debugFunc(deferwhere);
+									d += 1;
+								}							
 							}
 							
 							// Record that this item is not part of the original ruleset but deferred.
 							responses[r].deferrd = true;
 							
 							// If the deferral location does not have a results array create one.
-							if (!deferwhere.hasOwnProperty("results")) {
+							if (!(deferwhere.hasOwnProperty("results"))) {
 								deferwhere.results = [];
 							}
 							
 							// Push the response into the specified deferral location.
-							deferwhere.results.push(responses[r]);
+							deferwhere.results.unshift(responses[r]);
 							
 						}
 					}
@@ -532,6 +541,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				}
 				
 				debugFunc(responses);
+				debugFunc(libraryData);
 			}
 			
 			// Proactive selection...

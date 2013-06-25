@@ -476,14 +476,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// Take just the first element of deferto.
 							deferpath = responses[r].deferto.shift();
 							//TODO: check this is also an array
-							debugFunc("defer path");
-							debugFunc(deferpath);
 							
 							if (deferpath) {
 							// TODO: need a better check that this is an array -- this whole section to be refactored
 								d = 0;
-								debugFunc("okay");
-								debugFunc(typeof deferpath[d]);
 								while (d < deferpath.length && typeof deferpath[d] === "string") {
 								// Check the element in the array can be a valid key value.
 									

@@ -210,7 +210,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									"respond": origobj.respond,
 									"tagging": origobj.tagging,
 									"setflag": origobj.setflag,
-									"deferto": origobj.deferto, // needs copying in order not to change the original
+									"deferto": origobj.deferto, // TODO: copy, in order not to change the original
 									"covered": m[0].length,
 									// need a percentage?
 									"indexof": m.index,
@@ -240,7 +240,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										return rtn;
 									});
 									
+									// Sift out deferred options first.
 									if (copyobj.deferto) {
+									// TODO: could also check for nested parentheses as a condition of deferral?
 									// TODO: check not just that deferto exists but that is also an array and not empty
 										
 										deferwhere = libraryData;
@@ -504,9 +506,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
 				responses,
 				r, // counter
-				deferpath, // array holder
-				d, // counter
-				deferwhere, // for calculating position of defer via recursion
 				datetime = new Date(),
 				f; // flag counter
 				
@@ -516,13 +515,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 				
 				if (responses.length) {
-				
-					// Sift out deferred options first.
-					r = responses.length;
-					while (r) {
-						r -= 1;
-						
-					}
 					
 					if (responses[0].respond) {
 						// Send only first response (selection will be more varied in future versions).

@@ -923,6 +923,18 @@
 												"*"
 											]
 										]
+									},
+									{
+										"respond": "Earlier you said your (2). Now you say ((1)).",
+										"ranking": 2,
+										"tagging": [
+											"generic"
+										],
+										"deferto": [
+											[
+												"*"
+											]
+										]
 									}
 								],
 								"comment": ""

@@ -245,12 +245,17 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									objcopy.refined = order;
 									
 									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
+									objcopy.respond = objcopy.respond.replace(/[^\(]\(([0-9]+)\)[^\)]/g, function (a0, a1) {
 										var rtn = m[parseInt(a1, 10)];
 										rtn = rtn.replace(ioregex, function (a0, a1) {
 											return libraryData.intoout[a1];
 										});
 										return rtn;
+									});
+									
+									// remove single pair of outer parentheses from any future substitution markers
+									objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
+										return a1;
 									});
 									
 									// Sift out deferred options first.

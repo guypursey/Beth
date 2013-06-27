@@ -245,11 +245,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									objcopy.refined = order;
 									
 									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/[^\(]\(([0-9]+)\)[^\)]/g, function (a0, a1) {
-										var rtn = m[parseInt(a1, 10)];
+									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3) {
+										var rtn = m[parseInt(a2, 10)];
 										rtn = rtn.replace(ioregex, function (a0, a1) {
 											return libraryData.intoout[a1];
 										});
+										// restore surrounding characters
+										rtn = a1 + rtn + a3;
 										return rtn;
 									});
 									

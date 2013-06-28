@@ -72,7 +72,7 @@ The variables in the Beth constructor are as follows:
 
 ###`debugFlag`###
 
-*Boolean value.* An internally that enables/disables the debugging that Beth produces. [May not actually be required as the callback parameter can be provided as empty or false to produce the same effect.]
+*Boolean value.* An internally set variable that enables/disables the debugging that Beth produces. [May not actually be required as the callback parameter can be provided as empty or false to produce the same effect.]
 
 ###`debugFn`###
 
@@ -127,7 +127,7 @@ The variables in the Beth constructor are as follows:
 
 *Function.* Given a ruleset as a parameter, this function will initialise it by changing each `pattern` property into a string that can be used to create a regular expression.
 
-Calls itself recursively, in that it can the be used to parse rulesets of greater depth (i.e., rulesets within rulesets).
+Calls itself recursively, in that it can then be used to parse rulesets of greater depth (i.e., rulesets within rulesets).
 
 ###`ioregex`###
 
@@ -153,7 +153,19 @@ Calls itself recursively, in that it can the be used to parse rulesets of greate
  
 ###`process`###
 
-*Function.* Receives input from user, a ruleset, the order of depth (beginning at zero) and a filter within which to sift results. Returns a results based on the reassembly rules of the provided ruleset.
+*Function.* The main function for forming responses to the user. Receives input from user, a ruleset, the order of depth (beginning at zero) and a filter within which to sift results. Returns a results based on the reassembly rules of the provided ruleset.
+
+If the ruleset has a ruleset, this function is called recursively and the returned results are then concatenated.
+
+Results are copied from the `libraryData` with a local `copyObj` function that ensures the originals are not changed accidentally. References to the original result object is included in the copy for the purposes of logging use of a particular result.
+
+The filter provided as a parameter is used to ensure that only results with the necessary tags are processed.
+
+The response of each result is filled out with the required part of the user's input.
+
+Since the introduction of a memory convention, results with `deferto` values are actually placed back into the `libraryData` for later use. Some variables within the reassembly rule (`respond`) may be further deferred according to the convention.
+
+Results are then concatenated to any previous results (i.e. from successful recursive calls) and returned.
 
 ###`readlog`###
 
@@ -187,4 +199,16 @@ Finally, if `postRoom` has anything in it, the zeroth element is shifted out and
 
 Called by a regular timed interval.
 
+###INITIALISATION###
 
+After all variable declarations, the `ruleset` in `libraryData` is parsed with `parseRuleset()` (see above). This basically involves going through each ruleset and turning keys into pattern values that can be used as regular expressions.
+
+The `intoout` values are parsed with `parseIo()`.
+
+Finally the function `timedCheck` is set to be called every two seconds with an interval timer. 
+
+###API EXPOSURE###
+
+Currently, the function `getInitial` is exposed with `this.getInitial`. [no longer required]
+
+Most importantly, the `process` function is exposed with `this.transform`, the public name being a legacy of the old Eliza code. [this may be changed]

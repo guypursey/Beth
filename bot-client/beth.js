@@ -40,8 +40,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Localise connection severance function.
 		severFn = severFn,
 		
-		// Set up a wildcard regex pattern, to look for anything.
-		wildcardPattern = '(.*)',
+		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
+		wildcardPattern = '\\s*(.*)\\s*',
 		
 		// Variables for identifying synonyms. Other markers will be used.
 		// TODO: Work out way to systematise this.
@@ -176,7 +176,24 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			    m,		// matching string
 			    goto,		// for goto
 			    order = order || 0,
-			    tabbing = '';	// for debugging	
+			    tabbing = '',	// for debugging	
+				deferwhere,
+				deferpath,
+				d,
+				origobj, // reference to the original object
+				objcopy, // copy of the object
+				copyObj = function (obj) {
+					var i,
+						copy = (typeof obj === "object") ? ((obj instanceof Array) ? [] : {}) : obj;
+					for (i in obj) {
+						if (typeof obj[i] === "object") {
+							copy[i] = copyObj(obj[i]);
+						} else {
+							copy[i] = obj[i];
+						}
+					}
+					return copy;
+				};
 				
 			for (i = 0; i < order; i += 1) {
 				tabbing += '\t';
@@ -203,41 +220,100 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < rules[i].results.length; j += 1) {
 							var origobj = rules[i].results[j],
-								copyobj = {
+								objcopy = {
 									"respond": origobj.respond,
 									"tagging": origobj.tagging,
 									"setflag": origobj.setflag,
+									"deferto": copyObj(origobj.deferto),
 									"covered": m[0].length,
 									// need a percentage?
 									"indexof": m.index,
 									"origobj": origobj
 								}; // could be a loop through obj properties
-
-							if (copyobj.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
+							if (objcopy.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
 								
-								goto = copyobj.respond.substring(5);     // get the key we should go to,
+								goto = objcopy.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + goto + ':', copyobj.substring(5));
+									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.substring(5));
 									rtn = rtn.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
 								}
 								
 							} else {
 								// Check that the results conform to the filter.
-								if (filter(copyobj.tagging)) {
+								if (filter(objcopy.tagging)) {
 									// If the tags in this result match the ones specified, use it.
-									copyobj.refined = order;
+									objcopy.refined = order;
 									
 									// Make necessary substitutions in the response.
-									copyobj.respond = copyobj.respond.replace(/\(([0-9]+)\)/, function (a0, a1) {
-										var rtn = m[parseInt(a1, 10)];
+									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
+										var rtn = m[parseInt(a2, 10)];
 										rtn = rtn.replace(ioregex, function (a0, a1) {
 											return libraryData.intoout[a1];
 										});
+										// restore surrounding characters
+										rtn = a1 + rtn + a3;
 										return rtn;
 									});
 									
-									results.push(copyobj);
+									// remove single pair of outer parentheses from any future substitution markers
+									objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
+										return a1;
+									});
 									
+									// Sift out deferred options first.
+									if (objcopy.deferto) {
+									// TODO: could also check for nested parentheses as a condition of deferral?
+									// TODO: check not just that deferto exists but that is also an array and not empty
+										deferwhere = libraryData;
+										// Set up deferwhere to start looking at libraryData.
+										
+										// Take just the first element of deferto.
+										deferpath = objcopy.deferto.shift();
+										//TODO: check this is also an array
+										
+										// If array is empty, change value to false, so that this item is not eternally deferred.
+										if (objcopy.deferto.length === 0) {
+											objcopy.deferto = false;
+										}
+										// TODO: could refactor this so the emptiness of the array is checked upfront
+										
+										if (deferpath) {
+										// TODO: need a better check that this is an array -- this whole section to be refactored
+											d = 0;
+											while (d < deferpath.length && typeof deferpath[d] === "string") {
+											// Check the element in the array can be a valid key value.
+												
+												// If the path does not current exist, create it.
+												if (!(deferwhere.hasOwnProperty("ruleset"))) {
+													deferwhere.ruleset = {};
+												}
+												if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+													deferwhere.ruleset[deferpath[d]] = {};
+												}
+												
+												deferwhere = deferwhere.ruleset[deferpath[d]];
+												debugFunc("defer loc: " + d);
+												debugFunc(deferwhere);
+												d += 1;
+											}							
+										}
+										
+										// Record that this item is not part of the original ruleset but deferred.
+										objcopy.deferrd = true;
+										
+										// If the deferral location does not have a results array create one.
+										if (!(deferwhere.hasOwnProperty("results"))) {
+											deferwhere.results = [];
+										}
+										
+										// Push the response into the specified deferral location.
+										deferwhere.results.unshift(objcopy);
+										
+									} else {
+										// This result is good to use.
+										results.push(objcopy);
+									
+									}
 								}
 							}
 						}
@@ -448,6 +524,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				// Get filter to pass to process() as callback to prevent duplication of loops.
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
 				responses,
+				r, // counter
 				datetime = new Date(),
 				f; // flag counter
 				
@@ -483,6 +560,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				}
 				
 				debugFunc(responses);
+				debugFunc(libraryData);
 			}
 			
 			// Proactive selection...

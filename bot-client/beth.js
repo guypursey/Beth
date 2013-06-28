@@ -40,8 +40,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Localise connection severance function.
 		severFn = severFn,
 		
-		// Set up a wildcard regex pattern, to look for anything.
-		wildcardPattern = '(.*)',
+		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
+		wildcardPattern = '\\s*(.*)\\s*',
 		
 		// Variables for identifying synonyms. Other markers will be used.
 		// TODO: Work out way to systematise this.
@@ -245,7 +245,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									objcopy.refined = order;
 									
 									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3) {
+									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
 										var rtn = m[parseInt(a2, 10)];
 										rtn = rtn.replace(ioregex, function (a0, a1) {
 											return libraryData.intoout[a1];

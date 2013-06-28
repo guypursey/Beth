@@ -308,6 +308,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										
 										// Push the response into the specified deferral location.
 										deferwhere.results.unshift(objcopy);
+										// Currently modifies the ruleset we are looping through -- not ideal!
+										// TODO: Can the deferral itself be deferred?
 										
 									} else {
 										// This result is good to use.

@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.1.0##
+##v0.2.0##
 
-LATEST: Now allows for agendas.
+LATEST: Now features process for deferral/memory.
 This is all very much a work in progress.
 
 
@@ -34,7 +34,7 @@ Back in the tab on which you have loaded `localhost:8374`, the bot will greet yo
 
 ###HOW BETH WORKS###
 
-Each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed and searches for appropriate responses according to a ruleset provided to it. These responses are filtered according to an agenda that comes with the ruleset, which may change how Beth reacts at various points in the conversation. It sends replies through the mediator to appear in the chat interface.
+Each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed and searches for appropriate responses according to a ruleset provided to it. These responses are filtered according to an agenda that comes with the ruleset, which may change how Beth reacts at various points in the conversation. Some responses are completed but deferred for a later point in the conversation, giving Beth a crude sort of memory. It sends replies through the mediator to appear in the chat interface.
 
 The only Beth library available at this moment in time is a Beth-formatted version of Eliza's original keywords, decomposition rules and reassembly patterns (see [ElizaBeth-Converter](https://github.com/guypursey/ElizaBeth-Converter) for more details on the conversion to Beth format rulesets). With this library, Beth can say hello, send one response to each input from a user, and end the conversation when the user says bye, almost just like Eliza.
 
@@ -64,6 +64,7 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
         |___ beth.js
 		|___ eliza-node.js
 		|___ ui-console.html
+		|___ README.md
 	|___ usr-client/
 		|___ lib/
 			|___ jquery-1.9.1.js

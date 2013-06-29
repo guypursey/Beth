@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.2.0##
+##v0.2.1##
 
-LATEST: Now features process for deferral/memory.
+LATEST: Fixed problem with use of user's input within responses.
 This is all very much a work in progress.
 
 

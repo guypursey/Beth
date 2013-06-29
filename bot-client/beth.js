@@ -71,7 +71,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						
 						// Substitute synonyms.
 						ruleobj.pattern = ruleobj.pattern.replace(synonymPattern, function (a0, a1) {
-							return libraryData.substitutions[a1] || a1; 
+							return libraryData.synonyms[a1] || a1; 
 						});
 						
 						// Substitute wildcards.
@@ -136,7 +136,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Create a regex from this array to search any input for any of the keys.
 			// Variable declared at higher level.
-			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b");
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "g");
 		},
 		getInitial = function () {
 			// Return the first statement of the conversation.
@@ -234,7 +234,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								
 								goto = objcopy.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.substring(5));
+									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.respond.substring(5));
 									rtn = rtn.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
 								}
 								
@@ -247,7 +247,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									// Make necessary substitutions in the response.
 									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
 										var rtn = m[parseInt(a2, 10)];
+										
+										debugFunc("Return, pre-intoout");
+										debugFunc(rtn);
 										rtn = rtn.replace(ioregex, function (a0, a1) {
+											debugFunc("intoout sub");
+											debugFunc(libraryData.intoout[a1]);
 											return libraryData.intoout[a1];
 										});
 										// restore surrounding characters

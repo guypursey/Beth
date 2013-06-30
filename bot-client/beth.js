@@ -401,24 +401,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 		})();
 
-		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
-			var agendaItem = agendas[0],
-				// TODO: this object's name should be prefixed atStart
-				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
-				agendaStatus = {
-					agendaItemNum: 0,
-					agendaUsrSent: getUsrSent(),
-					agendaBotSent: getBotSent(),
-					agendaTimeStarted: new Date().getTime()
-				},
-				resetStatus = function (itemNum) {
-					agendaStatus.agendaItemNum = itemNum;
-					agendaStatus.agendaUsrSent = getUsrSent(); // number of messages user sent at start of item
-					agendaStatus.agendaBotSent = getBotSent(); // number of messages user sent at start of item
-					agendaStatus.agendaTimeStarted = new Date().getTime(); // date and time at start of item
-				},
-				convertTime = function (itemTime) {
+		utilities = (function () {
+			var convertBethTimeToMS = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
 					var timeArr = itemTime.split(":"),
 						timeMsc = 0,
@@ -428,6 +412,22 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					// returns argument provided as number of milliseconds
 					return timeMsc;
+				};
+			return {
+				convertBethTimeToMS: convertBethTimeToMS
+			};
+		})();
+		
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
+			var agendaItem = agendas[0],
+				// TODO: this object's name should be prefixed atStart
+				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
+				agendaStatus = {},
+				resetStatus = function (itemNum) {
+					agendaStatus.agendaItemNum = itemNum;
+					agendaStatus.agendaUsrSent = getUsrSent(); // number of messages user sent at start of item
+					agendaStatus.agendaBotSent = getBotSent(); // number of messages user sent at start of item
+					agendaStatus.agendaTimeStarted = new Date().getTime(); // date and time at start of item
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
@@ -471,9 +471,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							};
 					return rtn;
 				},
-				isComplete = function () {
+				isComplete = function (agendaItem) {
 					var rtn = false,
-						agendaItem = agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
 						edr = agendaItem.dountil.endured || "0",
@@ -486,7 +485,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							? (getBotSent() >= agendaStatus.agendaBotSent + bot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
-							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr))
+							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + utilities.convertBethTimeToMS(edr))
 							: false,
 						flgComp = (agendaItem.dountil.hasOwnProperty('flagset'))
 							?
@@ -515,7 +514,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
-					if (isComplete()) {
+					if (isComplete(agendaItem)) {
 						resetStatus(agendaStatus.agendaItemNum + 1);
 						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
 						debugFunc("updated agenda item to #" + agendaStatus.agendaItemNum);
@@ -530,6 +529,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 					return agendaItem;
 				};
+				
+			resetStatus(0); // important for initialisation
+			
 			// update time every second	
 			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
 			return {

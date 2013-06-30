@@ -422,16 +422,40 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			var agendaItem = agendas[0],
 				// TODO: this object's name should be prefixed atStart
 				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
-				agendaStatus = {},
-				resetStatus = function (itemNum) {
-					agendaStatus.agendaItemNum = itemNum;
-					agendaStatus.agendaUsrSent = getUsrSent(); // number of messages user sent at start of item
-					agendaStatus.agendaBotSent = getBotSent(); // number of messages user sent at start of item
-					agendaStatus.agendaTimeStarted = new Date().getTime(); // date and time at start of item
+				agendaStatus = [],
+				resetStatus = function (address, itemNum) {
+					
+					// variable for pointing at agenda item in question
+					var agendaLevel = agendas;
+					
+					// remove all child items (those preceding the current address)
+					agendaStatus = agendaStatus.slice(address);
+					
+					// (re)do the snapshot for child
+					agendaStatus[0] = {
+						agendaItem: agendaLevel[itemNum],
+						agendaItemNum: itemNum,
+						agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+						agendaBotSent: getBotSent(), // number of messages user sent at start of item
+						agendaTimeStarted: new Date().getTime() // date and time at start of item
+					}
+					
+					// as long as there are sub-agendas, prepend similar snapshots
+					while (agendaStatus[0].agendaItem.agendas) {
+						agendaLevel = agendaStatus.agendaItem.agendas;
+						agendaStatus.unshift({
+							agendaItem: agendaLevel[itemNum],
+							agendaItemNum: itemNum,
+							agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+							agendaBotSent: getBotSent(), // number of messages user sent at start of item
+							agendaTimeStarted: new Date().getTime() // date and time at start of item
+						});
+					}
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
 					var whichMode = whichMode,
+						agendaItem = agendaStatus[0].agendaItem, // get most childish item
 						mode = agendaItem[whichMode];
 						rtn = (mode)
 							? function(tagging) {
@@ -471,8 +495,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							};
 					return rtn;
 				},
-				isComplete = function (agendaItem) {
+				isComplete = function (agendaStatus) {
 					var rtn = false,
+						agendaStatus = agendaStatus, // localisation
+						agendaItem = agendaStatus.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
 						edr = agendaItem.dountil.endured || "0",
@@ -514,11 +540,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
-					if (isComplete(agendaItem)) {
-						resetStatus(agendaStatus.agendaItemNum + 1);
-						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
-						debugFunc("updated agenda item to #" + agendaStatus.agendaItemNum);
-						debugFunc(agendaItem);
+					var a = agendaStatus.length;
+					
+					// loop through all currently active agenda items from top down; if any is complete, resetStatus
+					while (a) {
+						a -= 1;
+						if (isComplete(agendaStatus[a])) {
+							resetStatus(a, agendaStatus[a].agendaItemNum + 1);
+							a = false; // end loop as all children will be reset/adjusted anyway
+						}
 					}
 
 					if (!agendaItem) {
@@ -530,7 +560,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					return agendaItem;
 				};
 				
-			resetStatus(0); // important for initialisation
+			resetStatus(0, 0); // important for initialisation
 			
 			// update time every second	
 			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);

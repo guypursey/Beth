@@ -171,7 +171,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				i,
 				j,
 			    rex,	// for storing regular expression
-			    rtn = [],	// for storing results
+			    rtn = {
+					responses: [],
+					deferrals: []
+				},	// for storing results
+				recursive, // for collecting up returns from recursive calls
 				results,
 			    m,		// matching string
 			    goto,		// for goto
@@ -180,6 +184,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				deferwhere,
 				deferpath,
 				d,
+				deferarray = [], // for storing pointers and objects for final deferral loop
 				origobj, // reference to the original object
 				objcopy, // copy of the object
 				copyObj = function (obj) {
@@ -212,7 +217,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (rules[i].hasOwnProperty('ruleset')) {
 						console.log(tabbing, "Exploring further...");
 						// Recursively call this function for nested rulesets.
-						rtn = rtn.concat(process(input, rules[i].ruleset, order + 1, filter));
+						recursive = process(input, rules[i].ruleset, order + 1, filter);
+						rtn.responses = rtn.responses.concat(recursive.responses);
+						rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
 					}
 					if (typeof rules[i].results === 'object') {
 						// Take a copy of all the results in the array.
@@ -225,6 +232,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									"tagging": origobj.tagging,
 									"setflag": origobj.setflag,
 									"deferto": copyObj(origobj.deferto),
+									"deferrd": origobj.deferrd,
 									"covered": m[0].length,
 									// need a percentage?
 									"indexof": m.index,
@@ -235,14 +243,16 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								goto = objcopy.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
 									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.respond.substring(5));
-									rtn = rtn.concat(process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter));
+									recursive = process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter);
+									rtn.responses = rtn.responses.concat(recursive.responses);
+									rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
 								}
 								
 							} else {
 								// Check that the results conform to the filter.
 								if (filter(objcopy.tagging)) {
 									// If the tags in this result match the ones specified, use it.
-									objcopy.refined = order;
+									objcopy.nesting = order;
 									
 									// Make necessary substitutions in the response.
 									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
@@ -311,10 +321,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 											deferwhere.results = [];
 										}
 										
-										// Push the response into the specified deferral location.
-										deferwhere.results.unshift(objcopy);
-										// Currently modifies the ruleset we are looping through -- not ideal!
-										// TODO: Can the deferral itself be deferred?
+										// Set up the deferral for later.
+										deferarray.push({
+											"address": deferwhere.results,
+											"todefer": objcopy
+										});
 										
 									} else {
 										// This result is good to use.
@@ -324,7 +335,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								}
 							}
 						}
-						rtn = rtn.concat(results);
+						rtn.responses = rtn.responses.concat(results);
+						rtn.deferrals = rtn.deferrals.concat(deferarray);
 					}
 			    }
 			}
@@ -530,15 +542,41 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			var input = readlog(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
+				results,
 				responses,
+				deferrals,
+				d,
 				r, // counter
 				datetime = new Date(),
 				f; // flag counter
 				
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) {
-				responses = process(input, libraryData.ruleset, 0, filterCallback);
-
+				results = process(input, libraryData.ruleset, 0, filterCallback);
+				debugFunc("results!");
+				debugFunc(results);
+				responses = results.responses;
+				deferrals = results.deferrals;
+				//deal with deferrals
+				while (deferrals.length) {
+					d = deferrals.shift();
+					d.address.unshift(d.todefer);
+				}
+				
+				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
+				responses.sort(function (a, b) {
+					var rtn;
+					if (b.nesting > a.nesting) {
+						rtn = 1;
+					} else if (b.nesting < a.nesting) {
+						rtn = -1;
+					} else if (b.deferrd > a.deferrd) {
+						rtn = 1;
+					} else if (b.deferrd < a.deferrd) {
+						rtn = -1;
+					}
+					return rtn;
+				});
 				
 				if (responses.length) {
 					
@@ -566,7 +604,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 				}
 				
-				debugFunc(responses);
 				debugFunc(libraryData);
 			}
 			

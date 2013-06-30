@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.2.1##
+##v0.2.2##
 
-LATEST: Fixed problem with use of user's input within responses.
+LATEST: Fixed problem of expanding loops by moving the deferrals outside `process` (though `process` still does all the preparation).
 This is all very much a work in progress.
 
 

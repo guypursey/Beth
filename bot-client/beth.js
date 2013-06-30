@@ -414,9 +414,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				resetStatus = function (itemNum) {
 					agendaStatus.agendaItemNum = itemNum;
-					agendaStatus.agendaUsrSent = getUsrSent();
-					agendaStatus.agendaBotSent = getBotSent();
-					agendaStatus.agendaTimeStarted = new Date().getTime();
+					agendaStatus.agendaUsrSent = getUsrSent(); // number of messages user sent at start of item
+					agendaStatus.agendaBotSent = getBotSent(); // number of messages user sent at start of item
+					agendaStatus.agendaTimeStarted = new Date().getTime(); // date and time at start of item
 				},
 				convertTime = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
@@ -473,6 +473,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				isComplete = function () {
 					var rtn = false,
+						agendaItem = agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
 						edr = agendaItem.dountil.endured || "0",

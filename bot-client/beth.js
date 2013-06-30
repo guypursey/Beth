@@ -232,6 +232,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									"tagging": origobj.tagging,
 									"setflag": origobj.setflag,
 									"deferto": copyObj(origobj.deferto),
+									"deferrd": origobj.deferrd,
 									"covered": m[0].length,
 									// need a percentage?
 									"indexof": m.index,
@@ -251,7 +252,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								// Check that the results conform to the filter.
 								if (filter(objcopy.tagging)) {
 									// If the tags in this result match the ones specified, use it.
-									objcopy.refined = order;
+									objcopy.nesting = order;
 									
 									// Make necessary substitutions in the response.
 									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
@@ -561,7 +562,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					d = deferrals.shift();
 					d.address.unshift(d.todefer);
 				}
-
+				
+				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
+				responses.sort(function (a, b) {
+					var rtn;
+					if (b.nesting > a.nesting) {
+						rtn = 1;
+					} else if (b.nesting < a.nesting) {
+						rtn = -1;
+					} else if (b.deferrd > a.deferrd) {
+						rtn = 1;
+					} else if (b.deferrd < a.deferrd) {
+						rtn = -1;
+					}
+					return rtn;
+				});
 				
 				if (responses.length) {
 					

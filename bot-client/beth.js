@@ -242,7 +242,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								// Check that the results conform to the filter.
 								if (filter(objcopy.tagging)) {
 									// If the tags in this result match the ones specified, use it.
-									objcopy.refined = order;
+									objcopy.nesting = order;
 									
 									// Make necessary substitutions in the response.
 									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
@@ -538,7 +538,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) {
 				responses = process(input, libraryData.ruleset, 0, filterCallback);
-
+				
+				// sort responses by nesting, so highest nesting comes first
+				responses.sort(function (a, b) {
+					var rtn;
+					rtn = b.nesting - a.nesting;
+					return rtn;
+				});
 				
 				if (responses.length) {
 					

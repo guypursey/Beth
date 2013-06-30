@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.2.1##
+##CODE DOCUMENTATION for v0.2.2##
 
 ###NODE JS COMPATIBILITY###
 
@@ -153,7 +153,7 @@ Calls itself recursively, in that it can then be used to parse rulesets of great
  
 ###`process`###
 
-*Function.* The main function for forming responses to the user. Receives input from user, a ruleset, the order of depth (beginning at zero) and a filter within which to sift results. Returns a results based on the reassembly rules of the provided ruleset.
+*Function.* The main function for forming responses to the user. Receives input from user, a ruleset, the order of depth (beginning at zero) and a filter within which to sift results. Returns an object containing `responses` and `deferrals` properties, based on the reassembly rules of the provided ruleset.
 
 If the ruleset has a ruleset, this function is called recursively and the returned results are then concatenated.
 
@@ -163,7 +163,7 @@ The filter provided as a parameter is used to ensure that only results with the 
 
 The response of each result is filled out with the required part of the user's input.
 
-Since the introduction of a memory convention, results with `deferto` values are actually placed back into the `libraryData` for later use. Some variables within the reassembly rule (`respond`) may be further deferred according to the convention.
+Since the introduction of a memory convention, results with `deferto` values are put aside so that they can be actually placed back into the `libraryData` for later use. Some variables within the reassembly rule (`respond`) may be further deferred according to the convention.
 
 Results are then concatenated to any previous results (i.e. from successful recursive calls) and returned.
 
@@ -185,7 +185,9 @@ Has interval timer.
 
 *Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent with other appropriate parameters to `process`.
 
-Some sorting then happens so that results with higher `nesting` value are put first (i.e. closer to zero) in the array. Those with a true `deferrd` status are prioritised over those of the same nesting value without. 
+Results returned by `process` feature `responses` and `deferrals`. `Deferrals` are looped through and each object is placed back in the listed place of `libraryData`.
+
+Some sorting then happens so that responses with higher `nesting` value are put first (i.e. closer to zero) in the array. Those with a true `deferrd` status are prioritised over those of the same nesting value without. 
 
 Currently, only the top response (zero) is used and the `respond` property is pushed to the `postRoom` array.
 

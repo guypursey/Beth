@@ -185,7 +185,7 @@ Has interval timer.
 
 *Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent with other appropriate parameters to `process`.
 
-Currently, some sorting then happens [which could potentially happen in the `process` function itself]. Items marked for deferral will be placed appropriately back in `libraryData`.
+Some sorting then happens so that results with higher `nesting` value are put first (i.e. closer to zero) in the array. Those with a true `deferrd` status are prioritised over those of the same nesting value without. 
 
 Currently, only the top response (zero) is used and the `respond` property is pushed to the `postRoom` array.
 

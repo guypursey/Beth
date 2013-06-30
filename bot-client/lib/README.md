@@ -92,7 +92,7 @@ Object. Rulesets can themselves contain rulesets and Beth will parse these recur
 
 ####`results`####
 
-Array. Contains a series of objects, each of which can be considered a possible response to what a user has said. Results at a greater depth (i.e. which are nested within more rulesets, and therefore have higher `nesting`) are given higher priority and are therefore considered more appropriate than those at lower depths (i.e. with less `nesting`). 
+Array. Contains a series of objects, each of which can be considered a possible response to what a user has said. Results at a greater depth (i.e. which are nested within more rulesets, and therefore have higher `nesting`) are given higher priority and are therefore considered more appropriate than those at lower depths (i.e. with less `nesting`). If a result has been deferred, it will have higher priority than results of the same nesting with no deferral.
 
 Each object in the array should consist of at least two properties (extra optional properties are asterisked):
 

@@ -225,6 +225,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									"tagging": origobj.tagging,
 									"setflag": origobj.setflag,
 									"deferto": copyObj(origobj.deferto),
+									"deferrd": origobj.deferrd,
 									"covered": m[0].length,
 									// need a percentage?
 									"indexof": m.index,
@@ -539,10 +540,18 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			if (input) {
 				responses = process(input, libraryData.ruleset, 0, filterCallback);
 				
-				// sort responses by nesting, so highest nesting comes first
+				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
 				responses.sort(function (a, b) {
 					var rtn;
-					rtn = b.nesting - a.nesting;
+					if (b.nesting > a.nesting) {
+						rtn = 1;
+					} else if (b.nesting < a.nesting) {
+						rtn = -1;
+					} else if (b.deferrd > a.deferrd) {
+						rtn = 1;
+					} else if (b.deferrd < a.deferrd) {
+						rtn = -1;
+					}
 					return rtn;
 				});
 				

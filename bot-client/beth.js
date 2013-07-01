@@ -439,6 +439,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					// remove all child items (those preceding the current address)
 					agendaStatus = agendaStatus.slice(address);
 					
+					if (!agendaLevel.hasOwnProperty(itemNum)) {
+						itemNum = 0; // repeat
+						// increment `iterate` wherever that might be -- but top tier will not have an iterate...
+					}
+					
 					// (re)do the snapshot for child
 					agendaStatus[0] = {
 						agendaItem: agendaLevel[itemNum],
@@ -554,7 +559,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					while (a) {
 						a -= 1;
 						if (isComplete(agendaStatus[a])) {
-							debugFunc("Level " + a + " marked complete... Going to reset with item " + (agendaStatus[a].agendaItemNum + 1));
+							debugFunc("Item " + agendaStatus[a].agendaItemNum + " on level " + a + " marked complete... Going to reset with item " + (agendaStatus[a].agendaItemNum + 1));
 							resetStatus(a, agendaStatus[a].agendaItemNum + 1);
 							a = false; // end loop as all children will be reset/adjusted anyway
 						}

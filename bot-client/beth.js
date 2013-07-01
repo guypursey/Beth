@@ -440,29 +440,44 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					agendaStatus = agendaStatus.slice(address);
 					
 					if (!agendaLevel.hasOwnProperty(itemNum)) {
-						itemNum = 0; // repeat
-						// increment `iterate` wherever that might be -- but top tier will not have an iterate...
+						// assuming there is a level above
+						if ((a + 1) < agendaStatus.length) {
+						// increment `iterate` in level above
+							agendaStatus[a + 1].agendaIterate += 1;
+							// if iterate actually exceeds dountil for this item mark it complete and move up a level
+							if (agendaStatus[a + 1].agendaIterate >= agendaStatus[a + 1].agendaItem.dountil.iterate) {
+								// move on to next item at this level
+								//agendaStatus = agendaStatus.slice(a + 1);
+								resetStatus(a + 1, (agendaStatus[a + 1].agendaItem + 1));
+							} else {
+								// otherwise reset at this level...
+								itemNum = 0;
+							}
+						}
 					}
 					
 					// (re)do the snapshot for child
 					agendaStatus[0] = {
 						agendaItem: agendaLevel[itemNum],
 						agendaItemNum: itemNum,
+						agendaIterate: 0, // to be incremented, currently by this function
 						agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
 						agendaBotSent: getBotSent(), // number of messages user sent at start of item
 						agendaTimeStarted: new Date().getTime() // date and time at start of item
 					}
 					
 					// as long as there are sub-agendas, prepend similar snapshots
-					while (agendaStatus[0].agendaItem.agendas) {
-						agendaLevel = agendaStatus.agendaItem.agendas;
-						agendaStatus.unshift({
-							agendaItem: agendaLevel[itemNum],
-							agendaItemNum: itemNum,
-							agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
-							agendaBotSent: getBotSent(), // number of messages user sent at start of item
-							agendaTimeStarted: new Date().getTime() // date and time at start of item
-						});
+					if (agendaStatus[0].agendaItem) {
+						while (agendaStatus[0].agendaItem.agendas) {
+							agendaLevel = agendaStatus[0].agendaItem.agendas;
+							agendaStatus.unshift({
+								agendaItem: agendaLevel[0],
+								agendaItemNum: 0,
+								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+								agendaBotSent: getBotSent(), // number of messages user sent at start of item
+								agendaTimeStarted: new Date().getTime() // date and time at start of item
+							});
+						}
 					}
 				},
 				getCurrentFilter = function (whichMode) {
@@ -565,13 +580,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						}
 					}
 
-					if (!agendaItem) {
+					if (!agendaStatus[0].agendaItem) {
 						debugFunc("no further agenda items found; should disconnect now");
 						// If no agenda item exists, disconnect Beth.
 						exitSession();
 					}
 
-					return agendaItem;
+					return agendaStatus[0].agendaItem;
 				};
 				
 			resetStatus(0, 0); // important for initialisation

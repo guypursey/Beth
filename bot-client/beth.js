@@ -425,8 +425,16 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				agendaStatus = [],
 				resetStatus = function (address, itemNum) {
 					
-					// variable for pointing at agenda item in question
-					var agendaLevel = agendas;
+					var a = agendaStatus.length,
+						agendaLevel = agendas;
+					debugFunc(agendaLevel);
+					// loop for pointing at relevant level of agenda item
+					while (a && a > address && agendaLevel[agendaStatus[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+						a -= 1;
+						debugFunc(a);
+						agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;
+						debugFunc(agendaLevel);
+					}
 					
 					// remove all child items (those preceding the current address)
 					agendaStatus = agendaStatus.slice(address);
@@ -546,6 +554,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					while (a) {
 						a -= 1;
 						if (isComplete(agendaStatus[a])) {
+							debugFunc("Level " + a + " marked complete... Going to reset with item " + (agendaStatus[a].agendaItemNum + 1));
 							resetStatus(a, agendaStatus[a].agendaItemNum + 1);
 							a = false; // end loop as all children will be reset/adjusted anyway
 						}

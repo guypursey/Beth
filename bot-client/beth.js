@@ -424,17 +424,24 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
 				agendaStatus = [],
 				resetStatus = function (address, itemNum) {
+					debugFunc("agenda being reset to address " + address + " and itemnum " + itemNum);
 					
 					var a = agendaStatus.length,
-						agendaLevel = agendas;
-					debugFunc(agendaLevel);
+						agendaLevel = agendas,
+						l = false;
+
 					// loop for pointing at relevant level of agenda item
-					while (a && a > address && agendaLevel[agendaStatus[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+					while (a && a >= address && !l) {
 						a -= 1;
-						debugFunc(a);
-						agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;
-						debugFunc(agendaLevel);
+						if (agendaLevel[agendaStatus[a].agendaItemNum].hasOwnProperty("agendas")) {
+							agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;	
+						} else {
+							l = true;
+						}
 					}
+					
+					debugFunc("level " + a  + ", address: " + address);
+					debugFunc(agendaLevel);
 					
 					// remove all child items (those preceding the current address)
 					agendaStatus = agendaStatus.slice(address);
@@ -442,15 +449,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (!agendaLevel.hasOwnProperty(itemNum)) {
 						// assuming there is a level above
 						if ((a + 1) < agendaStatus.length) {
-						// increment `iterate` in level above
+							// increment `iterate` in level above
 							agendaStatus[a + 1].agendaIterate += 1;
+							
+							debugFunc("level " + (a + 1) + ": current iterates" + agendaStatus[a + 1].agendaIterate + " ... limit: " + agendaStatus[a + 1].agendaItem.dountil.iterate);
+							
 							// if iterate actually exceeds dountil for this item mark it complete and move up a level
 							if (agendaStatus[a + 1].agendaIterate >= agendaStatus[a + 1].agendaItem.dountil.iterate) {
+								debugFunc("iterations complete... move on...");
 								// move on to next item at this level
 								//agendaStatus = agendaStatus.slice(a + 1);
-								resetStatus(a + 1, (agendaStatus[a + 1].agendaItem + 1));
+								resetStatus(a + 1, (agendaStatus[a + 1].agendaItemNum + 1));
 							} else {
 								// otherwise reset at this level...
+								debugFunc("loop back to beginning of agenda level " + (a + 1));
 								itemNum = 0;
 							}
 						}
@@ -479,6 +491,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							});
 						}
 					}
+					debugFunc("after reset Status...")
+					
+					debugFunc(agendaStatus);
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.

@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.0##
+##v0.3.1##
 
-LATEST: Implemented recursive agendas.
+LATEST: Implemented recursive agendas and updated documentation.
 
 This is all very much a work in progress.
 

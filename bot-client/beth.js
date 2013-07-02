@@ -495,6 +495,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								itemNum = 0;
 								redoSnapshot();
 							}
+						} else {
+							// if there's no level above this one, we've presumably finished our agenda
+							// DISCONNECT
+							debugFunc("no further agenda items found; should disconnect now");
+							// If no agenda item exists, disconnect Beth.
+							exitSession();
 						}
 					} else {
 						redoSnapshot();
@@ -604,12 +610,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							resetStatus(a, agendaStatus[a].agendaItemNum + 1);
 							a = false; // end loop as all children will be reset/adjusted anyway
 						}
-					}
-
-					if (!agendaStatus[0].agendaItem) {
-						debugFunc("no further agenda items found; should disconnect now");
-						// If no agenda item exists, disconnect Beth.
-						exitSession();
 					}
 
 					return agendaStatus[0].agendaItem;

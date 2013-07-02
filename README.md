@@ -1,8 +1,9 @@
 #BETH#
 
-##v0.2.2##
+##v0.3.0##
 
-LATEST: Fixed problem of expanding loops by moving the deferrals outside `process` (though `process` still does all the preparation).
+LATEST: Implemented recursive agendas.
+
 This is all very much a work in progress.
 
 
@@ -24,8 +25,9 @@ The second terminal will act as a bot (being a client to the mediator) and also 
 
 2. You will be asked to give the name of the bot which you can choose all by yourself.
  
-3. Finally you'll be asked to load a library. In this version, there are a couple of libraries to choose from;
+3. Finally you'll be asked to load a library. In this version, there are a few libraries to choose from;
    - `beth-eliza-orig`	(only works with `beth`)
+   - `beth-agendas-test` (only works with `beth`)
    - `eliza-orig`		(only works with `eliza-node`)
 	
 Once you have answered these questions, you are almost ready to go. Visit (in a separate tab, window, or browser) `localhost:8375` and this will trigger the bot into action.
@@ -36,7 +38,9 @@ Back in the tab on which you have loaded `localhost:8374`, the bot will greet yo
 
 Each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed and searches for appropriate responses according to a ruleset provided to it. These responses are filtered according to an agenda that comes with the ruleset, which may change how Beth reacts at various points in the conversation. Some responses are completed but deferred for a later point in the conversation, giving Beth a crude sort of memory. It sends replies through the mediator to appear in the chat interface.
 
-The only Beth library available at this moment in time is a Beth-formatted version of Eliza's original keywords, decomposition rules and reassembly patterns (see [ElizaBeth-Converter](https://github.com/guypursey/ElizaBeth-Converter) for more details on the conversion to Beth format rulesets). With this library, Beth can say hello, send one response to each input from a user, and end the conversation when the user says bye, almost just like Eliza.
+The main Beth library available at this moment in time is a Beth-formatted version of Eliza's original keywords, decomposition rules and reassembly patterns (see [ElizaBeth-Converter](https://github.com/guypursey/ElizaBeth-Converter) for more details on the conversion to Beth format rulesets). With this library, Beth can say hello, send one response to each input from a user, and end the conversation when the user says bye, almost just like Eliza.
+
+The Beth library `beth-agendas-test` is to test out sub-agendas so that it's possible to say how Beth can be programmed to move through phases of reactions.
 
 ###ELIZA###
 
@@ -61,6 +65,7 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 		|___ lib/
 			|___ beth-eliza-orig.json
 			|___ eliza-orig.json
+			|___ beth-agendas-test.json
         |___ beth.js
 		|___ eliza-node.js
 		|___ ui-console.html

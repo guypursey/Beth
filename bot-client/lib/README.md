@@ -1,6 +1,6 @@
 #BETH DATA CONVENTIONS#
 
-##v0.2.2##
+##v0.3.1##
 
 ###ABOUT###
 
@@ -27,7 +27,43 @@ Below are the particulars of each of the above properties.
 
 ###`agendas`###
 
-Array. Each element of the array is an object, acting as an item on the agenda. Each object must contain a `dountil` property which describes the point at which the item is considered complete. There is a convention that one can include `proactive` and `reactive` behaviours for each item.
+Array. Each element of the array is an object, acting as an item on the agenda. Each object must contain a `dountil` property which describes the points at which the item can be considered complete. Only one of the conditions need be fulfilled for the item to be complete. There is a convention that one can include `proactive` and `reactive` behaviours for each item.
+
+Each agenda can also contain another agenda, with its own items.
+
+Here are the properties each agenda item can contain:
+
+####`dountil`####
+
+Object. This can contain several properties each of which set the conditions for when an item is considered complete or covered.
+
+#####`usersent`#####
+
+Number. When the user has sent this number of messages during this item on the agenda, the item is considered complete.
+
+#####`botsent`#####
+
+Number. When Beth has sent this number of messages during this item on the agenda, the item is considered complete.
+
+#####`flagset`#####
+ 
+String. When the flag named has been set to true by a certain of Beth's responses, the item is considered complete.
+
+#####`iterate`#####
+
+Number. When any sub-agendas have been gone over a certain number of times, the item is considered complete.
+
+####`proactive`#####
+
+Object. Currently to contain just one property, `filters` which is itself an object that can contain a `HAS` and `NOT` property. These correspond to which tags Beth should look for in the statements Beth could send out. For this `proactive` object, the filters are applied to `moveset` `forward` properties.
+ 
+####`reactive`####
+
+Object. As with `proactive` but applied to `ruleset` `respond` properties.
+
+####`agendas`####
+
+Array. See all the properties listed above. Sub-agendas are looped over according to the `iterate` property of `dountil` in their parents.
 
 ###`gambits`###
 

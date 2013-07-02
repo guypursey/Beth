@@ -425,72 +425,83 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				agendaStatus = [],
 				resetStatus = function (address, itemNum) {
 					debugFunc("agenda being reset to address " + address + " and itemnum " + itemNum);
+					debugFunc("current status");
+					debugFunc(agendaStatus);
 					
 					var a = agendaStatus.length,
 						agendaLevel = agendas,
-						l = false;
+						redoSnapshot = function () {
+							agendaStatus[0] = {
+								agendaItem: agendaLevel[itemNum],
+								agendaItemNum: itemNum,
+								agendaIterate: 0, // to be incremented, currently by this function
+								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+								agendaBotSent: getBotSent(), // number of messages user sent at start of item
+								agendaTimeStarted: new Date().getTime() // date and time at start of item
+							}
+							
+							// as long as there are sub-agendas, prepend similar snapshots
+							if (agendaStatus[0].agendaItem) {
+								while (agendaStatus[0].agendaItem.agendas) {
+									agendaLevel = agendaStatus[0].agendaItem.agendas;
+									agendaStatus.unshift({
+										agendaItem: agendaLevel[0],
+										agendaItemNum: 0,
+										agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+										agendaBotSent: getBotSent(), // number of messages user sent at start of item
+										agendaTimeStarted: new Date().getTime() // date and time at start of item
+									});
+								}
+							}
+						};
 
 					// loop for pointing at relevant level of agenda item
-					while (a && a >= address && !l) {
+					while (a && a > (address + 1) && agendaLevel[agendaStatus[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
 						a -= 1;
-						if (agendaLevel[agendaStatus[a].agendaItemNum].hasOwnProperty("agendas")) {
-							agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;	
-						} else {
-							l = true;
-						}
+						agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;
 					}
-					
+					a -= 1;
 					debugFunc("level " + a  + ", address: " + address);
 					debugFunc(agendaLevel);
 					
 					// remove all child items (those preceding the current address)
 					agendaStatus = agendaStatus.slice(address);
+					// bottom item should now be current address
 					
+					// if there is no next item on this level of the agenda...
 					if (!agendaLevel.hasOwnProperty(itemNum)) {
-						// assuming there is a level above
-						if ((a + 1) < agendaStatus.length) {
+						debugFunc("level " + address + " had no item #" + itemNum);
+						
+						// if there is a level above this one
+						if (agendaStatus.length > 1) {
+							
+							debugFunc("level above deepest current item");
+							debugFunc(agendaStatus[1]);
+							
 							// increment `iterate` in level above
-							agendaStatus[a + 1].agendaIterate += 1;
+							agendaStatus[1].agendaIterate += 1;
 							
-							debugFunc("level " + (a + 1) + ": current iterates" + agendaStatus[a + 1].agendaIterate + " ... limit: " + agendaStatus[a + 1].agendaItem.dountil.iterate);
+							debugFunc("level " + (1) + ": current iterates" + agendaStatus[1].agendaIterate + " ... limit: " + agendaStatus[1].agendaItem.dountil.iterate);
 							
-							// if iterate actually exceeds dountil for this item mark it complete and move up a level
-							if (agendaStatus[a + 1].agendaIterate >= agendaStatus[a + 1].agendaItem.dountil.iterate) {
+							// if iterate actually exceeds dountil for this item in level above mark it complete and move up a level
+							if (agendaStatus[1].agendaIterate >= agendaStatus[1].agendaItem.dountil.iterate) {
 								debugFunc("iterations complete... move on...");
-								// move on to next item at this level
+								// move on to next item at this igher level
 								//agendaStatus = agendaStatus.slice(a + 1);
-								resetStatus(a + 1, (agendaStatus[a + 1].agendaItemNum + 1));
+								resetStatus(1, (agendaStatus[1].agendaItemNum + 1));
 							} else {
 								// otherwise reset at this level...
-								debugFunc("loop back to beginning of agenda level " + (a + 1));
+								debugFunc("loop back to beginning of agenda level " + (1));
 								itemNum = 0;
+								redoSnapshot();
 							}
 						}
+					} else {
+						redoSnapshot();
 					}
 					
 					// (re)do the snapshot for child
-					agendaStatus[0] = {
-						agendaItem: agendaLevel[itemNum],
-						agendaItemNum: itemNum,
-						agendaIterate: 0, // to be incremented, currently by this function
-						agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
-						agendaBotSent: getBotSent(), // number of messages user sent at start of item
-						agendaTimeStarted: new Date().getTime() // date and time at start of item
-					}
-					
-					// as long as there are sub-agendas, prepend similar snapshots
-					if (agendaStatus[0].agendaItem) {
-						while (agendaStatus[0].agendaItem.agendas) {
-							agendaLevel = agendaStatus[0].agendaItem.agendas;
-							agendaStatus.unshift({
-								agendaItem: agendaLevel[0],
-								agendaItemNum: 0,
-								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
-								agendaBotSent: getBotSent(), // number of messages user sent at start of item
-								agendaTimeStarted: new Date().getTime() // date and time at start of item
-							});
-						}
-					}
+
 					debugFunc("after reset Status...")
 					
 					debugFunc(agendaStatus);

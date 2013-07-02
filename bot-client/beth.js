@@ -401,24 +401,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 		})();
 
-		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
-			var agendaItem = agendas[0],
-				// TODO: this object's name should be prefixed atStart
-				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
-				agendaStatus = {
-					agendaItemNum: 0,
-					agendaUsrSent: getUsrSent(),
-					agendaBotSent: getBotSent(),
-					agendaTimeStarted: new Date().getTime()
-				},
-				resetStatus = function (itemNum) {
-					agendaStatus.agendaItemNum = itemNum;
-					agendaStatus.agendaUsrSent = getUsrSent();
-					agendaStatus.agendaBotSent = getBotSent();
-					agendaStatus.agendaTimeStarted = new Date().getTime();
-				},
-				convertTime = function (itemTime) {
+		utilities = (function () {
+			var convertBethTimeToMS = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
 					var timeArr = itemTime.split(":"),
 						timeMsc = 0,
@@ -428,10 +412,110 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					// returns argument provided as number of milliseconds
 					return timeMsc;
+				};
+			return {
+				convertBethTimeToMS: convertBethTimeToMS
+			};
+		})();
+		
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
+			var agendaItem = agendas[0],
+				// TODO: this object's name should be prefixed atStart
+				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
+				agendaStatus = [],
+				resetStatus = function (address, itemNum) {
+					debugFunc("agenda being reset to address " + address + " and itemnum " + itemNum);
+					debugFunc("current status");
+					debugFunc(agendaStatus);
+					
+					var a = agendaStatus.length,
+						agendaLevel = agendas,
+						redoSnapshot = function () {
+							agendaStatus[0] = {
+								agendaItem: agendaLevel[itemNum],
+								agendaItemNum: itemNum,
+								agendaIterate: 0, // to be incremented, currently by this function
+								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+								agendaBotSent: getBotSent(), // number of messages user sent at start of item
+								agendaTimeStarted: new Date().getTime() // date and time at start of item
+							}
+							
+							// as long as there are sub-agendas, prepend similar snapshots
+							if (agendaStatus[0].agendaItem) {
+								while (agendaStatus[0].agendaItem.agendas) {
+									agendaLevel = agendaStatus[0].agendaItem.agendas;
+									agendaStatus.unshift({
+										agendaItem: agendaLevel[0],
+										agendaItemNum: 0,
+										agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+										agendaBotSent: getBotSent(), // number of messages user sent at start of item
+										agendaTimeStarted: new Date().getTime() // date and time at start of item
+									});
+								}
+							}
+						};
+
+					// loop for pointing at relevant level of agenda item
+					while (a && a > (address + 1) && agendaLevel[agendaStatus[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+						a -= 1;
+						agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;
+					}
+					a -= 1;
+					debugFunc("level " + a  + ", address: " + address);
+					debugFunc(agendaLevel);
+					
+					// remove all child items (those preceding the current address)
+					agendaStatus = agendaStatus.slice(address);
+					// bottom item should now be current address
+					
+					// if there is no next item on this level of the agenda...
+					if (!agendaLevel.hasOwnProperty(itemNum)) {
+						debugFunc("level " + address + " had no item #" + itemNum);
+						
+						// if there is a level above this one
+						if (agendaStatus.length > 1) {
+							
+							debugFunc("level above deepest current item");
+							debugFunc(agendaStatus[1]);
+							
+							// increment `iterate` in level above
+							agendaStatus[1].agendaIterate += 1;
+							
+							debugFunc("level " + (1) + ": current iterates" + agendaStatus[1].agendaIterate + " ... limit: " + agendaStatus[1].agendaItem.dountil.iterate);
+							
+							// if iterate actually exceeds dountil for this item in level above mark it complete and move up a level
+							if (agendaStatus[1].agendaIterate >= agendaStatus[1].agendaItem.dountil.iterate) {
+								debugFunc("iterations complete... move on...");
+								// move on to next item at this igher level
+								//agendaStatus = agendaStatus.slice(a + 1);
+								resetStatus(1, (agendaStatus[1].agendaItemNum + 1));
+							} else {
+								// otherwise reset at this level...
+								debugFunc("loop back to beginning of agenda level " + (1));
+								itemNum = 0;
+								redoSnapshot();
+							}
+						} else {
+							// if there's no level above this one, we've presumably finished our agenda
+							// DISCONNECT
+							debugFunc("no further agenda items found; should disconnect now");
+							// If no agenda item exists, disconnect Beth.
+							exitSession();
+						}
+					} else {
+						redoSnapshot();
+					}
+					
+					// (re)do the snapshot for child
+
+					debugFunc("after reset Status...")
+					
+					debugFunc(agendaStatus);
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
 					var whichMode = whichMode,
+						agendaItem = agendaStatus[0].agendaItem, // get most childish item
 						mode = agendaItem[whichMode];
 						rtn = (mode)
 							? function(tagging) {
@@ -471,8 +555,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							};
 					return rtn;
 				},
-				isComplete = function () {
+				isComplete = function (agendaStatus) {
 					var rtn = false,
+						agendaStatus = agendaStatus, // localisation
+						agendaItem = agendaStatus.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
 						edr = agendaItem.dountil.endured || "0",
@@ -485,7 +571,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							? (getBotSent() >= agendaStatus.agendaBotSent + bot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
-							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + convertTime(edr))
+							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + utilities.convertBethTimeToMS(edr))
 							: false,
 						flgComp = (agendaItem.dountil.hasOwnProperty('flagset'))
 							?
@@ -514,21 +600,23 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
-					if (isComplete()) {
-						resetStatus(agendaStatus.agendaItemNum + 1);
-						agendaItem = agendas[agendaStatus.agendaItemNum] || null;
-						debugFunc("updated agenda item to #" + agendaStatus.agendaItemNum);
-						debugFunc(agendaItem);
+					var a = agendaStatus.length;
+					
+					// loop through all currently active agenda items from top down; if any is complete, resetStatus
+					while (a) {
+						a -= 1;
+						if (isComplete(agendaStatus[a])) {
+							debugFunc("Item " + agendaStatus[a].agendaItemNum + " on level " + a + " marked complete... Going to reset with item " + (agendaStatus[a].agendaItemNum + 1));
+							resetStatus(a, agendaStatus[a].agendaItemNum + 1);
+							a = false; // end loop as all children will be reset/adjusted anyway
+						}
 					}
 
-					if (!agendaItem) {
-						debugFunc("no further agenda items found; should disconnect now");
-						// If no agenda item exists, disconnect Beth.
-						exitSession();
-					}
-
-					return agendaItem;
+					return agendaStatus[0].agendaItem;
 				};
+				
+			resetStatus(0, 0); // important for initialisation
+			
 			// update time every second	
 			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
 			return {

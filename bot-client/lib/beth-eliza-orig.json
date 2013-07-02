@@ -3,34 +3,42 @@
 	
 		"agendas": [
 			{
+				"comment": "root",
 				"dountil": {
-					"botsent": 1
+					"iterate": 1
 				},
-				"proactive": {
-					"filters": {
-						"HAS": ["initial"]
+				"agendas": [
+					{
+						"dountil": {
+							"botsent": 1
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["initial"]
+							}
+						}
+					},
+					{
+						"dountil": {
+							"flagset": ["quit"]
+						},
+						"reactive": {
+							"filters": {
+								"HAS": ["generic"]
+							}
+						}
+					},			
+					{
+						"dountil": {
+							"botsent": 1
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["farewell"]
+							}
+						}
 					}
-				}
-			},
-			{
-				"dountil": {
-					"flagset": ["quit"]
-				},
-				"reactive": {
-					"filters": {
-						"HAS": ["generic"]
-					}
-				}
-			},			
-			{
-				"dountil": {
-					"botsent": 1
-				},
-				"proactive": {
-					"filters": {
-						"HAS": ["farewell"]
-					}
-				}
+				]
 			}
 		],
 		

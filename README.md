@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.1##
+##v0.3.2##
 
-LATEST: Implemented recursive agendas and updated documentation.
+LATEST: Fixed bug #17 around parentheticals at the very beginning or end of `respond` properties.
 
 This is all very much a work in progress.
 

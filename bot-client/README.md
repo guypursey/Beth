@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.3.1##
+##CODE DOCUMENTATION for v0.3.2##
 
 ###NODE JS COMPATIBILITY###
 
@@ -174,6 +174,14 @@ Results are then concatenated to any previous results (i.e. from successful recu
 ###`sessionStats`###
 
 *IIFE closure.* The closure returns an object whose properties are references to functions within the closure. This means that the stats themselves are private variables and should not be changeable from the outside. The functions provided can be used to increment the number of messages the user has sent or the bot has sent or the total overall messages sent. There is also a function for setting flags. In addition to these setters, getter properties can be used to retrieve the latest statistics.
+
+###`utilities`###
+
+*IIFE closure.* Contains generally useful functions, like:
+
+ - `convertBethTimeToMS`
+
+Maybe more to come.
 
 ###`agendaManager`###
 

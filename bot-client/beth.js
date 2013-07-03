@@ -255,7 +255,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									objcopy.nesting = order;
 									
 									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/([^\(])\(([0-9]+)\)([^\)])/g, function (a0, a1, a2, a3, offset, string) {
+									objcopy.respond = objcopy.respond.replace(/([^\(]?)\(([0-9]+)\)([^\)]?)/g, function (a0, a1, a2, a3, offset, string) {
 										var rtn = m[parseInt(a2, 10)];
 										
 										debugFunc("Return, pre-intoout");

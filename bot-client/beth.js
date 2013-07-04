@@ -255,18 +255,23 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									objcopy.nesting = order;
 									
 									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/([^\(]?)\(([0-9]+)\)([^\)]?)/g, function (a0, a1, a2, a3, offset, string) {
-										var rtn = m[parseInt(a2, 10)];
-										
-										debugFunc("Return, pre-intoout");
-										debugFunc(rtn);
-										rtn = rtn.replace(ioregex, function (a0, a1) {
-											debugFunc("intoout sub");
-											debugFunc(libraryData.intoout[a1]);
-											return libraryData.intoout[a1];
-										});
-										// restore surrounding characters
-										rtn = a1 + rtn + a3;
+									objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
+										var rtn;
+										if ($1) {
+											// if first capture found, ignore--surrounded my more than one pair of parentheses
+											rtn = $1;
+										} else {
+											// use number to get relevant part of earlier match with user input
+											rtn = m[parseInt($2, 10)];
+											debugFunc("Return, pre-intoout");
+											debugFunc(rtn);
+											// process part of user input and run inflections
+											rtn = rtn.replace(ioregex, function (match, $1) {
+												debugFunc("intoout sub");
+												debugFunc(libraryData.intoout[$1]);
+												return libraryData.intoout[$1];
+											});
+										};
 										return rtn;
 									});
 									

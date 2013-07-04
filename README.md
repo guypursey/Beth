@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.2##
+##v0.3.3##
 
-LATEST: Fixed bug #17 around parentheticals at the very beginning or end of `respond` properties.
+LATEST: Fixed bug #20 around only substituting singly parenthetical numerals.
 
 This is all very much a work in progress.
 

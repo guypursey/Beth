@@ -25,6 +25,11 @@
 			$('#users').append('<div>' + key + '</div>');
 		});
 	});
+	
+	socket.on('report', function(msg){
+		// Log reports in the console.
+		console.log(msg);
+	});
 
 	// on load of page
 	$(function(){

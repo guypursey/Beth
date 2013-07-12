@@ -1,19 +1,23 @@
 #BETH#
 
-##v0.3.3##
+##v0.3.4##
 
-LATEST: Fixed bug #20 around only substituting singly parenthetical numerals.
+LATEST: Introduced `sgl.js` allowing Beth to be run in a single Node JS server. Still weighing up the advantages of this. Issues-wise, closes [#24](https://github.com/guypursey/Beth/issues/24). No changes to the Beth model.
 
 This is all very much a work in progress.
 
 
 ###USING BETH###
 
-Beth currently requires the running of two Node JS terminals.
+There are two ways to run Beth.
 
-To interact with Beth, run 'node med' in one terminal and 'node bot' in the Beth folder.
+The simplest (though still experimental) way is to open up a Node JS terminal and run `sgl.js` with the command `node sgl` if you are located in the Beth folder.
 
-The first terminal will act as a mediator and will serve the interface which you can access by visiting `localhost:8374` with a browser. When you visit this site you will be asked for your name. This will then be logged in the simple chat interface.
+Then visit `localhost:8347` and give a name when asked.
+
+Currently `sgl.js` is set to use `beth.js` as its model and `beth-eliza-orig.json` as its data library.
+
+You can also run Beth with two Node JS terminals, treating the bot as if it were another user logging into the chat interface. Run 'node med' in one terminal and 'node bot' in the Beth folder. The first terminal will act as a mediator and will serve the interface which you can access by visiting `localhost:8374` with a browser. When you visit this site you will be asked for your name. This will then be logged in the simple chat interface.
 
 The second terminal will act as a bot (being a client to the mediator) and also serve a console for the bot. You will be prompted for three pieces of information.
 
@@ -36,7 +40,9 @@ Back in the tab on which you have loaded `localhost:8374`, the bot will greet yo
 
 ###HOW BETH WORKS###
 
-Each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed and searches for appropriate responses according to a ruleset provided to it. These responses are filtered according to an agenda that comes with the ruleset, which may change how Beth reacts at various points in the conversation. Some responses are completed but deferred for a later point in the conversation, giving Beth a crude sort of memory. It sends replies through the mediator to appear in the chat interface.
+In the case of the two terminals, each statement you enter is passed through the mediator (`med`) and fed to Beth (running in `bot`), which logs the input. In the case of `sgl.js`, all the logging and processing takes place on a single server.
+
+Beth does a periodic check to see if anything is in the log. If it finds something it hasn't yet processed and searches for appropriate responses according to a ruleset provided to it. These responses are filtered according to an agenda that comes with the ruleset, which may change how Beth reacts at various points in the conversation. Some responses are completed but deferred for a later point in the conversation, giving Beth a crude sort of memory. It sends replies through the mediator to appear in the chat interface.
 
 The main Beth library available at this moment in time is a Beth-formatted version of Eliza's original keywords, decomposition rules and reassembly patterns (see [ElizaBeth-Converter](https://github.com/guypursey/ElizaBeth-Converter) for more details on the conversion to Beth format rulesets). With this library, Beth can say hello, send one response to each input from a user, and end the conversation when the user says bye, almost just like Eliza.
 
@@ -76,6 +82,7 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 		|___ ui-simple.html
 	|___ bot.js
 	|___ med.js
+	|___ sgl.js
 	|___ package.json
 	|___ README.md
 

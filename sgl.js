@@ -5,7 +5,8 @@ var express = require('express'),
 	ioc = require('socket.io-client'),
 	bot = require('./bot-client/beth.js'), // load Beth file
 	lib = require('./bot-client/lib/beth-eliza-orig.json'), // load the library
-	nme = 'Beth';
+	nme = 'Beth', // name of Beth in chat
+	lgi = false; // a flag to say whether or not Beth is logged in
 	
  // 8374 === BETH || BETA
 server.listen(8374);
@@ -29,17 +30,18 @@ io.sockets.on('connection', function (socket) {
 			io.sockets.emit("report", msg);
 		},
 		postMsg = function (input) {
-			io.sockets.emit('updatedisplay', 'Beth', input, new Date());
+			io.sockets.emit('updatedisplay', nme, input, new Date());
 		},
 		severFn = function () {
-			delete usernames[socket.username];
+			delete usernames[nme];
+			lgi = false;
 			//process.exit();
 			// update list of users in chat, client-side
 			io.sockets.emit('updateusers', usernames);
 			// echo globally that this client has left
-			socket.broadcast.emit('updatedisplay', 'SERVER', 'Beth has disconnected', new Date());
+			socket.emit('updatedisplay', 'SERVER', nme + ' has disconnected', new Date());
 		},
-		botobj = new bot.BotObj(true, lib.data, postMsg, severFn, debugFn);
+		botobj; // variable declaration for Beth model
 	
 	// when the client emits 'sendchat', this listens and executes
 	socket.on('sendchat', function (data) {
@@ -48,7 +50,9 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.emit('updatedisplay', socket.username, data, new Date());
 		if (socket.username !== nme && socket.username !== 'SERVER') {
 			// is there a better model than this conditional to stop eliza from looping?
-			botobj.transform(data);
+			if (lgi) {
+				botobj.transform(data);
+			};
 			//setTimeout(function () { clientsocket.emit('sendchat', botobj.transform(data)) }, 2000);
 		}
 	});
@@ -68,6 +72,13 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('updatedisplay', 'SERVER', username + ' has connected', datetimeStr);
 		// update the list of users in chat, client-side
 		io.sockets.emit('updateusers', usernames);
+		if (!lgi) {
+				usernames[nme] = nme;
+				socket.broadcast.emit('updatedisplay', 'SERVER', nme + ' has connected', datetimeStr);
+				io.sockets.emit('updateusers', usernames);
+				botobj = new bot.BotObj(true, lib.data, postMsg, severFn, debugFn);
+				lgi = true;
+		}
 	});
 
 	// when the user disconnects.. perform this

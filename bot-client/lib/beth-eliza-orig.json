@@ -2762,7 +2762,7 @@
 		{
 			"i": "hello",
 			"o": [
-				"How do you do. Please state your problem."
+				"How do you do.  Please state your problem."
 			]
 		},
 		{
@@ -2781,7 +2781,7 @@
 			"i": "bye",
 			"o": [
 				"I guess that brings this conversation to a close then.",
-				"Bye!"
+				"Bye then!"
 			]
 		}
 	]

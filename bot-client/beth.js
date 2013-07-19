@@ -74,32 +74,34 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							return libraryData.synonyms[a1] || a1; 
 						});
 						
-						// Substitute wildcards.
-						ruleobj.pattern = ruleobj.pattern.replace(/(\S)\s*\*\s*(\S)/g, function (a0, a1, a2) {
-							var rtn = a1;
-							rtn += (a1 !== ')') ? '\\b' : '';
-							rtn += wildcardPattern;
-							rtn += ((a2 !== '(') && (a2 !== '\\')) ? '\\b' : '';
-							rtn += a2;
+						ruleobj.pattern = ruleobj.pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
+							var rtn = "";
+							if ($3) { // escape character check
+								rtn = $1 + $2 + $3 + $4 + $5;
+							} else {
+								if ($1) {
+									rtn += $1;
+									if ($2) {
+										rtn += "\\b";
+									}
+								}
+								if ($2 && !$4 && $5) {
+									rtn += "\\s+";
+								}
+								rtn += (($1 && !$2) || (!$4 && $5)) ? "\\S*" : "\\s*(.*)\\s*";
+								if ($4 && !$2 && $1) {
+									rtn += "\\s+";
+								}
+								if ($5) {
+									if ($4) {
+										rtn += "\\b";
+									}
+									rtn += $5;
+								}
+							}
 							return rtn;
 						});
-
-						// Substitute wildcards at beginning of string.
-						ruleobj.pattern = ruleobj.pattern.replace(/^\s*\*\s*(\S)/g, function (a0, a1) {
-							var rtn = wildcardPattern;
-							rtn += ((a0 !== ')') && (a1 !== '\\')) ? '\\b' : '';
-							rtn += a1;
-							return rtn;
-						});
-						
-						// Substitute wildcards at end of string.
-						ruleobj.pattern = ruleobj.pattern.replace(/(\S)\s*\*\s*$/g, function (a0, a1) {
-							var rtn = a1;
-							rtn += (a1 !== '(') ? '\\b' : '';
-							rtn += wildcardPattern;
-							return rtn;
-						});
-						
+												
 						// If the string begins with a word boundary put this in the regex pattern.
 						ruleobj.pattern = ruleobj.pattern.replace(/^\b/g, "\\b");
 						

@@ -1,6 +1,6 @@
 #BETH DATA CONVENTIONS#
 
-##v0.3.3##
+##v0.3.5##
 
 ###ABOUT###
 
@@ -117,6 +117,8 @@ Details below.
 ####`pattern`####
 
 String. The string used to form the regular expression. This is initialised when Beth begins. Before initialisation it should be the same as the key of the parent object, to prevent confusion, but it is not required as the property will be overwritten at this stage anyway.
+
+Wildcards take the form of asterisks `*`. A `*` surrounded by space, or at the beginning or end of the string with no words proximal to it, will match any number of words until it matches the proximal parts of the string. A `*` directly joined to a word, or in the middle of it, will match only letters adjoining to that word. For example, `"I am so *"` will match `"I am so tired."` whereas `"I am so*"` where the asterisk adjoins a word directly will match `"I am soaked"` (and, as it happens, `"I am so"` in the first sentence but not the `tired` bit). 
 
 ####`comment`####
 

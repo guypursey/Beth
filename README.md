@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.4##
+##v0.3.5##
 
-LATEST: Introduced `sgl.js` allowing Beth to be run in a single Node JS server. Still weighing up the advantages of this. Issues-wise, closes [#24](https://github.com/guypursey/Beth/issues/24). No changes to the Beth model.
+LATEST: Refactored wildcard initialisation to conform to new conventions. Issues-wise, closes [#26](https://github.com/guypursey/Beth/issues/26).
 
 This is all very much a work in progress.
 

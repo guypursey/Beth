@@ -745,8 +745,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	
 };
 
-// Expose the constructor for use by whatever is running in Node JS.
-exports.BotObj = Beth;
+// Expose the constructor for use by whatever is running in Node JS, assuming there is an exports object.
+if (exports) { exports.BotObj = Beth; }
 
 // As with the noRandomFlag argument for the constructor, the only reason Beth is coded as a constructor
 // is because I set up eliza-node in this way. This may change (radically affecting the API) soon.

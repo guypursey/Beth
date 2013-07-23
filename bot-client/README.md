@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.3.5##
+##CODE DOCUMENTATION for v0.3.6##
 
 ###NODE JS COMPATIBILITY###
 
@@ -149,7 +149,7 @@ Calls itself recursively, in that it can then be used to parse rulesets of great
 
 ###`preprocess`###
 
-*Function.* Currently empty, awaiting code for dealing with synonyms, etc.
+*Function.* Checks user's input for any substitutions that need to be made and makes them. Returns amended input.
  
 ###`process`###
 
@@ -193,7 +193,7 @@ Has interval timer which checks what the current item should be. If any current 
 
 ###`timedcheck`###
 
-*Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent with other appropriate parameters to `process`.
+*Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent first to `preprocess` and then with other appropriate parameters to `process`.
 
 Results returned by `process` feature `responses` and `deferrals`. `Deferrals` are looped through and each object is placed back in the listed place of `libraryData`.
 

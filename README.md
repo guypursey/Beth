@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.5##
+##v0.3.6##
 
-LATEST: Refactored wildcard initialisation to conform to new conventions. Issues-wise, closes [#26](https://github.com/guypursey/Beth/issues/26).
+LATEST: Inserted preprocess function to deal with user-input substitutions. Issues-wise, closes [#29](https://github.com/guypursey/Beth/issues/29).
 
 This is all very much a work in progress.
 

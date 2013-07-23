@@ -156,7 +156,28 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		preprocess = function (input) {
 		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
 		// Maintain a history of these substitutions.
-		
+			
+			var rtn,
+				sub = libraryData.substitutions, // local reference to relevant data
+				key, // key for data
+				arr = [],
+				rex;
+			
+			// For now, create substitution regular expression on the fly rather than as part of initialisation, so it can be dynamic.
+			for (key in sub) {
+				arr.push(key);
+			}
+			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "g");
+			
+			debugFunc("preprocess: " + input);
+			
+			rtn = input.replace(rex, function (m, $1) {
+				return sub[$1];
+			});
+			
+			debugFunc("result: " + rtn);
+			
+			return rtn;
 		},
 		process = function (input, rules, order, filter) {
 		// Parse input using rulesets, dealing with deference en route.
@@ -647,6 +668,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) {
+				input = preprocess(input);
 				results = process(input, libraryData.ruleset, 0, filterCallback);
 				debugFunc("results!");
 				debugFunc(results);
@@ -730,6 +752,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	parseRuleset(libraryData.ruleset);
 	
 	// Io in this case refering to the object of how certain input words should be treated.
+	// TODO: Should this be initialised or dynamic?
 	parseIo(libraryData.intoout);
 	
 	console.log("debug:", debugFn);

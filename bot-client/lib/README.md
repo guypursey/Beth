@@ -1,6 +1,6 @@
 #BETH DATA CONVENTIONS#
 
-##v0.3.5##
+##v0.3.6##
 
 ###ABOUT###
 
@@ -77,9 +77,9 @@ Array. Contains closing statements. [No longer necessary. Replaced by `moveset` 
 
 Array. Contains words Beth should look for to ascertain whether the user is finished the conversation or not. [Legacy from Eliza. May no longer be necessary.]
 
-###`standardisations`###
+###`substitutions`###
 
-Object. Words that we can consider safe to replace within a user's input. Includes contractions (e.g., replace `dont` with `don't`) and synonyms. It is important not to confuse this with the `synonyms` object however, which specifies a search range and does not alter the user's input.
+Object. Words that we can consider safe to replace within a user's input. Includes contractions (e.g., replace `dont` with `don't`) and synonyms. It is important not to confuse this with the `synonyms` object however, which specifies a search range and does not alter the user's input. (Should be `standardisations` in future minor release.)
 
 ###`intoout`###
 

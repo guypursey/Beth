@@ -117,7 +117,9 @@ CHATBOT_UI.addToDisplay = CHATBOT_UI.addToDisplay || function (msgObj) {
 	var msgObj = msgObj || {},
 		supDiv,
 		newDiv,
-		frag;
+		frag,
+		showBottom = document.getElementById('chat_display').scrollHeight - document.getElementById('chat_display').scrollTop === document.getElementById('chat_display').clientHeight;
+			// determines whether user is at bottom of chat display
 		
 	msgObj.text = msgObj.text || '';
 	msgObj.auth = msgObj.auth || '';
@@ -134,8 +136,11 @@ CHATBOT_UI.addToDisplay = CHATBOT_UI.addToDisplay || function (msgObj) {
 		supDiv.appendChild(newDiv);
 		frag.appendChild(supDiv);
 		document.getElementById('chat_display').appendChild(frag);
-		setTimeout(function () { newDiv.className = 'Beth'; }, 5000);
-		
+		//setTimeout(function () { newDiv.className = 'Beth'; }, 5000);
+		if (showBottom) {
+			// if user was originally at bottom of chat display, show the bottom again
+			document.getElementById('chat_display').scrollTop = document.getElementById('chat_display').scrollHeight;
+		}
 	} else {
 		console.log('there was a problem with the object submitted to addToHistory()', msgObj);
 	}

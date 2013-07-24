@@ -743,7 +743,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	this.getInitial = getInitial;
 	this.transform = loginput;
 	
-};
+},
+exports = exports || false;
 
 // Expose the constructor for use by whatever is running in Node JS, assuming there is an exports object.
 if (exports) { exports.BotObj = Beth; }

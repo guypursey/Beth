@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.6##
+##v0.3.7##
 
-LATEST: Inserted preprocess function to deal with user-input substitutions. Issues-wise, closes [#29](https://github.com/guypursey/Beth/issues/29).
+LATEST: Introduced new interface which should prove easier to use, customise and develop. (Launching `sgl` will serve this new interface, `med` will continue to serve the older, more primitive one.) Issues-wise, closes [#3](https://github.com/guypursey/Beth/issues/3).
 
 This is all very much a work in progress.
 
@@ -80,6 +80,7 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 		|___ lib/
 			|___ jquery-1.9.1.js
 		|___ ui-simple.html
+		|___ ui-proper.html
 	|___ bot.js
 	|___ med.js
 	|___ sgl.js

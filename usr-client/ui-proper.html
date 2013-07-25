@@ -146,6 +146,7 @@ CHATBOT_UI.addToDisplay = CHATBOT_UI.addToDisplay || function (msgObj) {
 		frag.appendChild(supDiv);
 		document.getElementById('chat_display').appendChild(frag);
 		//setTimeout(function () { newDiv.className = 'Beth'; }, 5000);
+		//proves that message format and contents can be changed after their appearance--worth considering for timing
 		if (showBottom) {
 			// if user was originally at bottom of chat display, show the bottom again
 			document.getElementById('chat_display').scrollTop = document.getElementById('chat_display').scrollHeight;

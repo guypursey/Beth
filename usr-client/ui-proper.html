@@ -1,0 +1,249 @@
+<!doctype html>
+<html>
+<head>
+<script src="lib/jquery-1.9.1.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<style type="text/css">
+/* apply a natural box layout model to all elements */
+/* will NOT work in any version of Internet Explorer BELOW 8 */
+
+* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+
+#chat_area {
+	width: 50%;
+	height: 100%;
+	position: absolute;
+	//display: inline-block;
+	top: 0;
+	left: 0;
+	//border: 1px solid #000;
+}
+
+#chat_display {
+	width: 100%;
+	height: 70%;
+	overflow-y: scroll;
+	position: static;
+}
+
+#chat_indicators {
+	width: 100%;
+	height: 10%; // should be collapsible
+}
+
+#chat_input {
+	width: 100%;
+	height: 20%;
+	position: absolute;
+	bottom: 0;
+	padding: 10px;
+	resize: none; /* for textarea elements in Chrome and Firefox only */
+	font-family: 'Georgia';
+	font-size: 16pt;
+	color: #999;
+}
+
+.single_msg_container {
+	width: 100%;
+	//display: block;
+	position: relative;
+}
+
+/* CSS experiments with aligning the divs: http://jsfiddle.net/guypursey/MHVAX/ */
+
+.user { 
+	width: 50%;
+	margin: 5px 0 5px 50%;
+	padding: 5px;
+	font-family: 'Georgia';
+	border: 1px solid #000;
+	background-color: #66c;
+}
+
+.Beth {
+	width: 50%;
+	margin: 5px 50% 5px 0;
+	padding: 5px;
+	font-family: 'Georgia';
+	border: 1px solid #000;
+	background-color: #6c6;
+}
+
+.SERVER {
+	width: 50%;
+	margin: 5px 25% 5px 25%;
+	padding: 5px;
+	font-family: 'Georgia';
+	border: 1px solid #000;
+	background-color: #c66;
+}
+
+#document_editor {
+	width: 50%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	//left: 50%;
+	right: 0;
+	//float: right;
+	border: 1px solid #000;
+}
+</style>
+
+
+<script>
+
+/*
+
+// revealing module pattern
+var CHATBOT_UI = CHATBOT_UI || (function () {
+	var log = [],
+		indicate = function (message) {
+			document.getElementById('chat_indicators').innerHTML = message;
+		};
+	
+	return {
+	
+	}
+});
+*/
+
+var CHATBOT_UI = CHATBOT_UI || {};
+CHATBOT_UI.log = CHATBOT_UI.log || []; // simple array literal for now; may need to be an object containing this array later
+CHATBOT_UI.indicate = CHATBOT_UI.indicate || function (message) {
+	document.getElementById('chat_indicators').innerHTML = message;
+};
+CHATBOT_UI.addToDisplay = CHATBOT_UI.addToDisplay || function (msgObj) {
+	var msgObj = msgObj || {},
+		supDiv,
+		newDiv,
+		frag,
+		showBottom = document.getElementById('chat_display').scrollHeight - document.getElementById('chat_display').scrollTop === document.getElementById('chat_display').clientHeight;
+			// determines whether user is at bottom of chat display
+		
+	msgObj.text = msgObj.text || '';
+	msgObj.auth = msgObj.auth || '';
+	msgObj.date = msgObj.date || '';
+	msgObj.time = msgObj.time || '';
+
+	if (msgObj.text && msgObj.auth && msgObj.date && msgObj.time) {
+		frag = document.createDocumentFragment();
+		supDiv = document.createElement('div'); // MAY NOT NEED SUPERDIV NOW CSS MARGIN PROPERTY HAS BEEN SET
+		supDiv.className = 'single_msg_container';
+		newDiv = document.createElement('div');
+		newDiv.className = msgObj.auth; /* just go with auth for now; also className may not be cross-browser */
+		newDiv.innerHTML = msgObj.text;
+		supDiv.appendChild(newDiv);
+		frag.appendChild(supDiv);
+		document.getElementById('chat_display').appendChild(frag);
+		//setTimeout(function () { newDiv.className = 'Beth'; }, 5000);
+		//proves that message format and contents can be changed after their appearance--worth considering for timing
+		if (showBottom) {
+			// if user was originally at bottom of chat display, show the bottom again
+			document.getElementById('chat_display').scrollTop = document.getElementById('chat_display').scrollHeight;
+		}
+	} else {
+		console.log('there was a problem with the object submitted to addToHistory()', msgObj);
+	}
+};
+
+CHATBOT_UI.addToLog = CHATBOT_UI.addToLog || function (msgObj) {
+	var msgObj = msgObj || {};  /* some of this is duplicated from addToHistory */
+	
+	/* may be best to have a central message verification function */
+	msgObj.text = msgObj.text || '';
+	msgObj.auth = msgObj.auth || '';
+	msgObj.date = msgObj.date || '';
+	msgObj.time = msgObj.time || '';
+	
+	if (msgObj.text && msgObj.auth && msgObj.date && msgObj.time) {
+		CHATBOT_UI.log.push(msgObj); // better within a closure?
+	}
+};
+
+CHATBOT_UI.clearInput = CHATBOT_UI.clearInput || function (message) {
+	document.getElementById('chat_input').value = '';
+};
+
+CHATBOT_UI.userInputElement = CHATBOT_UI.userInputElement || function () {
+	return document.getElementById('chat_input');
+}
+
+window.onload = function () {
+	document.getElementById('document_editor').contentEditable = true; // made this permanently editable for now, though may want user-toggle at some point...
+	
+	CHATBOT_UI.userInputElement().onkeyup = (function (indicate, sendmsg, clearinput) {
+		return function(e) {
+			var e = e || window.event, // for IE8
+				msgObj;
+			if (e.keyCode === 13) { // if user presses 'Enter' key
+				indicate('User submitted text');
+				sendmsg(this.value);	
+				clearinput();
+			}
+		}
+	})(CHATBOT_UI.indicate, function (msg) { socket.emit('sendchat', msg) }, CHATBOT_UI.clearInput);
+};
+</script>
+<script>
+	var socket = io.connect('http://localhost:8374');
+
+	// on connection to server, ask for user's name with an anonymous callback
+	socket.on('connect', function(){
+		console.log('Connected!');
+		// call the server-side function 'adduser' and send one parameter (value of prompt)
+		socket.emit('adduser', 'user');
+	});
+
+	// listener, whenever the server emits 'updatechat', this updates the chat body
+	socket.on('updatedisplay', function (username, data, datetime) {
+		console.log(datetime);
+		var msgObj = {
+			text: data, /* arg will need to be neutral if it's to work with bot too */
+			auth: username,	  /* as will the author */
+			date: 20130117,
+			time: 2302
+		};
+		CHATBOT_UI.addToDisplay(msgObj);
+		CHATBOT_UI.addToLog(msgObj);
+	});
+
+	// listener, whenever the server emits 'updateusers', this updates the username list
+	/*
+	socket.on('updateusers', function(data) {
+		$('#users').empty();
+		$.each(data, function(key, value) {
+			$('#users').append('<div>' + key + '</div>');
+		});
+	});
+	*/
+	
+	socket.on('report', function(msg){
+		// Log reports in the console.
+		console.log(msg);
+	});
+
+</script>
+</head>
+<body>
+<div id="chat_area">
+<div id="chat_display">
+</div>
+<div id="chat_indicators">
+</div>
+<textarea id="chat_input">
+</textarea>
+</div>
+<div id="document_editor">
+</div>
+</body>
+</html>

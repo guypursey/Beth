@@ -13,7 +13,7 @@ server.listen(8374);
 
 // On call, serve simple user interface file.
 app.get('/', function (req, res) {
-	res.sendfile(__dirname + '/usr-client/ui-simple.html');
+	res.sendfile(__dirname + '/usr-client/ui-proper.html');
 });
 
 // Use the libraries folder.

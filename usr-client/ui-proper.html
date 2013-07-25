@@ -180,22 +180,17 @@ CHATBOT_UI.userInputElement = CHATBOT_UI.userInputElement || function () {
 window.onload = function () {
 	document.getElementById('document_editor').contentEditable = true; // made this permanently editable for now, though may want user-toggle at some point...
 	
-	CHATBOT_UI.userInputElement().onkeyup = (function (indicate) {
+	CHATBOT_UI.userInputElement().onkeyup = (function (indicate, sendmsg, clearinput) {
 		return function(e) {
 			var e = e || window.event, // for IE8
 				msgObj;
 			if (e.keyCode === 13) { // if user presses 'Enter' key
-				CHATBOT_UI.indicate('User submitted text');
-				socket.emit('sendchat', this.value);	
-				CHATBOT_UI.clearInput();
+				indicate('User submitted text');
+				sendmsg(this.value);	
+				clearinput();
 			}
 		}
-	})(CHATBOT_UI.indicate);
-	
-	
-	
-	//document.getElementById('chat_input').onkeyup({keyCode: 13}); // simulated keycode
-	
+	})(CHATBOT_UI.indicate, function (msg) { socket.emit('sendchat', msg) }, CHATBOT_UI.clearInput);
 };
 </script>
 <script>
@@ -248,7 +243,6 @@ window.onload = function () {
 </textarea>
 </div>
 <div id="document_editor">
-This is a test...
 </div>
 </body>
 </html>

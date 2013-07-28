@@ -4,7 +4,7 @@ var express = require('express'),
     io = require('socket.io').listen(server), // 
 	ioc = require('socket.io-client'),
 	bot = require('./bot-client/beth.js'), // load Beth file
-	lib = require('./bot-client/lib/beth-eliza-orig.json'), // load the library
+	lib = require('./bot-client/lib/beth-agendas-test01.json'), // load the library
 	nme = 'Beth', // name of Beth in chat
 	lgi = false; // a flag to say whether or not Beth is logged in
 	
@@ -33,10 +33,10 @@ io.sockets.on('connection', function (socket) {
 			var debug;
 			io.sockets.emit('updatedisplay', nme, input, new Date());
 			if (input === (debug = expectation.shift())) {
-				io.sockets.emit('updatedisplay', "***", "PASSED", new Date());
+				io.sockets.emit('updatedisplay', "SERVER", "*** PASSED!", new Date());
 				results.passed += 1;
 			} else {
-				io.sockets.emit('updatedisplay', "***", "FAILED: Expected -- " + debug, new Date());
+				io.sockets.emit('updatedisplay', "SERVER", "*** FAILED: Expected -- " + debug, new Date());
 				results.failed += 1;
 			}
 			results.tested += 1;
@@ -53,6 +53,7 @@ io.sockets.on('connection', function (socket) {
 					socket.emit('updatedisplay', 'SERVER', (function () {
 						var rtn = "",
 							percentage = (100 / results.tested) * results.passed;
+						rtn += "Test unit completed. "
 						rtn += percentage + "%";
 						rtn += " " + results.passed + '/' + results.tested + ' passed.';
 						return rtn;

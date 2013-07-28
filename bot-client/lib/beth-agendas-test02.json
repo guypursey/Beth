@@ -1,66 +1,58 @@
 {
 	"data": {
-	
+
 		"agendas": [
 			{
-				"comment": "root",
+				"comment": "say hello",
 				"dountil": {
-					"iterate": 1
+					"botsent": 1
+				},
+				"proactive": {
+					"filters": {
+						"HAS": ["initial"]
+					}
+				}
+			},
+			{
+				"comment": "alterate between echo and flat",
+				"dountil": {
+					"flagset": ["quit"],
+					"iterate": 5
 				},
 				"agendas": [
-					{
-						"comment": "say hello",
+					{	
+						"comment": "echo",
 						"dountil": {
 							"botsent": 1
 						},
-						"proactive": {
+						"reactive": {
 							"filters": {
-								"HAS": ["initial"]
+								"HAS": ["echo"]
 							}
 						}
 					},
 					{
-						"comment": "alterate between echo and flat",
-						"dountil": {
-							"flagset": ["quit"],
-							"iterate": 5
-						},
-						"agendas": [
-							{	
-								"comment": "echo",
-								"dountil": {
-									"botsent": 1
-								},
-								"reactive": {
-									"filters": {
-										"HAS": ["echo"]
-									}
-								}
-							},
-							{
-								"comment": "flat",
-								"dountil": {
-									"botsent": 1
-								},
-								"reactive": {
-									"filters": {
-										"HAS": ["flat"]
-									}
-								}
-							}
-						]
-					},			
-					{
+						"comment": "flat",
 						"dountil": {
 							"botsent": 1
 						},
-						"proactive": {
+						"reactive": {
 							"filters": {
-								"HAS": ["farewell"]
+								"HAS": ["flat"]
 							}
 						}
 					}
 				]
+			},			
+			{
+				"dountil": {
+					"botsent": 1
+				},
+				"proactive": {
+					"filters": {
+						"HAS": ["farewell"]
+					}
+				}
 			}
 		],
 		
@@ -168,5 +160,73 @@
 				]
 			}
 		}
-	}
+	},
+	"test": [
+		{
+			"o": [
+				"Hello world!"
+			]
+		},
+		{
+			"i": "hello",
+			"o": [
+				"You say hello"
+			]
+		},
+		{
+			"i": "that's right",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "you seem fairly set in your ways",
+			"o": [
+				"You say I seem fairly set in my ways"
+			]
+		},
+		{
+			"i": "and repetitive",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "I am not sure this conversation is going anywhere.",
+			"o": [
+				"You say you are not sure this conversation is going anywhere."
+			]
+		},
+		{
+			"i": "Do you?",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "That illustrates my point exactly.",
+			"o": [
+				"You say That illustrates your point exactly."
+			]
+		},
+		{
+			"i": "Yes.",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "That illustrates my point exactly.",
+			"o": [
+				"You say That illustrates your point exactly."
+			]
+		},
+		{
+			"i": "Yes.",
+			"o": [
+				"I would have said this regardless of what you said.",
+				"Bye then!"
+			]
+		}
+	]
 }

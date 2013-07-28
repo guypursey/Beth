@@ -4,7 +4,7 @@ var express = require('express'),
     io = require('socket.io').listen(server), // 
 	ioc = require('socket.io-client'),
 	bot = require('./bot-client/beth.js'), // load Beth file
-	lib = require('./bot-client/lib/beth-eliza-orig.json'), // load the library
+	lib = require('./bot-client/lib/beth-agendas-test01.json'), // load the library
 	nme = 'Beth', // name of Beth in chat
 	lgi = false; // a flag to say whether or not Beth is logged in
 	

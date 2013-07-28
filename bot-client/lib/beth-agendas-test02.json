@@ -1,0 +1,232 @@
+{
+	"data": {
+
+		"agendas": [
+			{
+				"comment": "say hello",
+				"dountil": {
+					"botsent": 1
+				},
+				"proactive": {
+					"filters": {
+						"HAS": ["initial"]
+					}
+				}
+			},
+			{
+				"comment": "alterate between echo and flat",
+				"dountil": {
+					"flagset": ["quit"],
+					"iterate": 5
+				},
+				"agendas": [
+					{	
+						"comment": "echo",
+						"dountil": {
+							"botsent": 1
+						},
+						"reactive": {
+							"filters": {
+								"HAS": ["echo"]
+							}
+						}
+					},
+					{
+						"comment": "flat",
+						"dountil": {
+							"botsent": 1
+						},
+						"reactive": {
+							"filters": {
+								"HAS": ["flat"]
+							}
+						}
+					}
+				]
+			},			
+			{
+				"dountil": {
+					"botsent": 1
+				},
+				"proactive": {
+					"filters": {
+						"HAS": ["farewell"]
+					}
+				}
+			}
+		],
+		
+		"gambits": [
+			"How do you do.  Please tell me your problem.",
+			"Please tell me what's been bothering you.",
+			"Is something troubling you ?"
+		],
+
+		"farewells": [
+			"Goodbye.  It was nice talking to you.",
+			"Goodbye.  This was really a nice talk.",
+			"Goodbye.  I'm looking forward to our next session.",
+			"This was a good session, wasn't it -- but time is over now.   Goodbye.",
+			"Maybe we could discuss this moreover in our next session ?   Goodbye."
+		],
+
+		"quits": [
+			"bye",
+			"goodbye",
+			"done",
+			"exit",
+			"quit"
+		],
+
+		"substitutions": {
+			"dont": "don't",
+			"cant": "can't",
+			"wont": "won't",
+			"recollect": "remember",
+			"recall": "remember",
+			"dreamt": "dreamed",
+			"dreams": "dream",
+			"maybe": "perhaps",
+			"certainly": "yes",
+			"machine": "computer",
+			"machines": "computer",
+			"computers": "computer",
+			"were": "was",
+			"you're": "you are",
+			"i'm": "i am",
+			"same": "alike",
+			"identical": "alike",
+			"equivalent": "alike"
+		},
+
+		"intoout": {
+			"am": "are",
+			"your": "my",
+			"me": "you",
+			"myself": "yourself",
+			"yourself": "myself",
+			"i": "you",
+			"you": "I",
+			"my": "your",
+			"i'm": "you are"
+		},
+
+		"synonyms": {
+			"be": ["am", "is", "are", "was"],
+			"belief": ["feel", "think", "believe", "wish"],
+			"cannot": ["can't"],
+			"desire": ["want", "need"],
+			"everyone": ["everybody", "nobody", "noone"],
+			"family": ["mother", "mom", "father", "dad", "sister", "brother", "wife", "children", "child"],
+			"happy": ["elated", "glad", "better"],
+			"sad": ["unhappy", "depressed", "sick"]
+		},
+		
+		"moveset": [
+			{	
+				"forward": "Hello world!",
+				"tagging": [
+					"initial"
+				]
+			},
+			{
+				"forward": "Bye then!",
+				"tagging": [
+					"farewell"
+				]
+			}
+		],
+		
+		"ruleset": {
+			"*": {
+				"pattern": "*",
+				"ranking": 0,
+				"comment": "Top-level. Will match anything the user inputs.",
+				"results": [
+					{
+						"respond": "You say (1)",
+						"ranking": 0,
+						"tagging": [
+							"echo"
+						]
+					},
+					{
+						"respond": "I would have said this regardless of what you said.",
+						"ranking": 0,
+						"tagging": [
+							"flat"
+						]
+					}
+				]
+			}
+		}
+	},
+	"test": [
+		{
+			"o": [
+				"Hello world!"
+			]
+		},
+		{
+			"i": "hello",
+			"o": [
+				"You say hello"
+			]
+		},
+		{
+			"i": "that's right",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "you seem fairly set in your ways",
+			"o": [
+				"You say I seem fairly set in my ways"
+			]
+		},
+		{
+			"i": "and repetitive",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "I am not sure this conversation is going anywhere.",
+			"o": [
+				"You say you are not sure this conversation is going anywhere."
+			]
+		},
+		{
+			"i": "Do you?",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "That illustrates my point exactly.",
+			"o": [
+				"You say That illustrates your point exactly."
+			]
+		},
+		{
+			"i": "Yes.",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "That illustrates my point exactly.",
+			"o": [
+				"You say That illustrates your point exactly."
+			]
+		},
+		{
+			"i": "Yes.",
+			"o": [
+				"I would have said this regardless of what you said.",
+				"Bye then!"
+			]
+		}
+	]
+}

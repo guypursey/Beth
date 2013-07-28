@@ -33,10 +33,10 @@ io.sockets.on('connection', function (socket) {
 			var debug;
 			io.sockets.emit('updatedisplay', nme, input, new Date());
 			if (input === (debug = expectation.shift())) {
-				io.sockets.emit('updatedisplay', "SERVER", "*** PASSED!", new Date());
+				io.sockets.emit('updatedisplay', "SERVER", "*** Test " + results.tested + " PASSED!", new Date());
 				results.passed += 1;
 			} else {
-				io.sockets.emit('updatedisplay', "SERVER", "*** FAILED: Expected -- " + debug, new Date());
+				io.sockets.emit('updatedisplay', "SERVER", "*** Test " + results.tested + " FAILED: Expected -- " + debug, new Date());
 				results.failed += 1;
 			}
 			results.tested += 1;

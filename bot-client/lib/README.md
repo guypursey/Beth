@@ -1,6 +1,6 @@
 #BETH DATA CONVENTIONS#
 
-##v0.3.7##
+##v0.3.8##
 
 ###ABOUT###
 
@@ -8,7 +8,7 @@ Beth accepts a JSON file containing the data it needs to operate. This document 
 
 ###STRUCTURE###
 
-Within the JSON file should be a single object containing a single property called `data`.
+Within the JSON file should be a single object containing a single property called `data`. There is an option for a `test` property as well for use with testing units.
 
 `data` itself should be an object containing a number of different properties needed by Beth to perform:
 

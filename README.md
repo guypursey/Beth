@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.7##
+##v0.3.8##
 
-LATEST: Introduced new interface which should prove easier to use, customise and develop. (Launching `sgl` will serve this new interface, `med` will continue to serve the older, more primitive one.) Issues-wise, closes [#3](https://github.com/guypursey/Beth/issues/3).
+LATEST: Introduced automated testing in the form of `tst.js`. Issues-wise, closes [#15](https://github.com/guypursey/Beth/issues/15).
 
 This is all very much a work in progress.
 
@@ -71,7 +71,10 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 		|___ lib/
 			|___ beth-eliza-orig.json
 			|___ eliza-orig.json
-			|___ beth-agendas-test.json
+			|___ beth-agendas-test01.json
+			|___ beth-agendas-test02.json
+			|___ beth-agendas-test03.json
+			|___ beth-agendas-test04.json
         |___ beth.js
 		|___ eliza-node.js
 		|___ ui-console.html
@@ -84,8 +87,14 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 	|___ bot.js
 	|___ med.js
 	|___ sgl.js
+	|___ tst.js
 	|___ package.json
 	|___ README.md
+
+
+###TESTING###
+
+If a library file has a `test` property in its main object, it can be tested by launching `node tst` which will automate the conversation and show a pass or fail. 
 
 
 ###FREQUENTLY ASKED QUESTIONS###

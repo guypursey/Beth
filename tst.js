@@ -13,7 +13,7 @@ server.listen(8374);
 
 // On call, serve simple user interface file.
 app.get('/', function (req, res) {
-	res.sendfile(__dirname + '/usr-client/ui-simple.html');
+	res.sendfile(__dirname + '/usr-client/ui-proper.html');
 });
 
 // Use the libraries folder.
@@ -44,7 +44,7 @@ io.sockets.on('connection', function (socket) {
 				i += 1
 				if (i < lib.test.length) {
 					expectation = lib.test[i].o;
-					io.sockets.emit('updatedisplay', "test", lib.test[i].i, new Date());
+					io.sockets.emit('updatedisplay', "user", lib.test[i].i, new Date());
 					botobj.transform(lib.test[i].i);
 				} else {
 					delete usernames[nme];
@@ -78,7 +78,7 @@ io.sockets.on('connection', function (socket) {
 			tested: 0
 		};
 	
-	usernames["test"] = "test";
+	usernames["user"] = "user";
 	socket.broadcast.emit('updatedisplay', 'SERVER', nme + ' has connected', new Date());
 	io.sockets.emit('updateusers', usernames);
 	

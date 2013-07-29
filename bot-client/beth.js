@@ -138,7 +138,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Create a regex from this array to search any input for any of the keys.
 			// Variable declared at higher level.
-			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "g");
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "gi");
 		},
 		getInitial = function () {
 			// Return the first statement of the conversation.
@@ -292,7 +292,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 											rtn = rtn.replace(ioregex, function (match, $1) {
 												debugFunc("intoout sub");
 												debugFunc(libraryData.intoout[$1]);
-												return libraryData.intoout[$1];
+												return libraryData.intoout[$1.toLowerCase()];
 											});
 										};
 										return rtn;

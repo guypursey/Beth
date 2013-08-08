@@ -744,8 +744,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 				
 			
-		}
-		; //eof variable declarations
+		},
+		interval,
+		deactivate = function () {
+			clearInterval(interval);
+		}; //eof variable declarations
 		
 
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
@@ -759,12 +762,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	debugFunc(libraryData.ruleset);
 	
 	// Set interval to check agenda and log every 2 seconds.
-	setInterval(timedcheck, 2000);
+	interval = setInterval(timedcheck, 2000);
 
 	
 	// Finally, expose private variables to public API.
 	this.getInitial = getInitial;
 	this.transform = loginput;
+	this.deactivate = deactivate;
 	
 },
 exports = exports || false;

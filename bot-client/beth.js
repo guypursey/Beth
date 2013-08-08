@@ -427,7 +427,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				getFlag: getFlag
 			};
 			
-		})();
+		})(),
 
 		utilities = (function () {
 			var convertBethTimeToMS = function (itemTime) {
@@ -444,7 +444,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return {
 				convertBethTimeToMS: convertBethTimeToMS
 			};
-		})();
+		})(),
 		
 		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
 			var agendaItem = agendas[0],
@@ -650,7 +650,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return {
 				getCurrentFilter: getCurrentFilter
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag);
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag),
 		
 		timedcheck = function () {
 			

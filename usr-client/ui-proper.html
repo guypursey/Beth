@@ -63,28 +63,31 @@ html, body {
 .user { 
 	width: 50%;
 	margin: 5px 0 5px 50%;
-	padding: 5px;
+	padding: 5px 5px 20px 5px;
 	font-family: 'Georgia';
 	border: 1px solid #000;
 	background-color: #66c;
+	position: relative;
 }
 
 .Beth {
 	width: 50%;
 	margin: 5px 50% 5px 0;
-	padding: 5px;
+	padding: 5px 5px 20px 5px;
 	font-family: 'Georgia';
 	border: 1px solid #000;
 	background-color: #6c6;
+	position: relative;
 }
 
 .SERVER {
 	width: 50%;
 	margin: 5px 25% 5px 25%;
-	padding: 5px;
+	padding: 5px 5px 20px 5px;
 	font-family: 'Georgia';
 	border: 1px solid #000;
 	background-color: #c66;
+	position: relative;
 }
 
 #document_editor {
@@ -96,6 +99,15 @@ html, body {
 	right: 0;
 	//float: right;
 	border: 1px solid #000;
+}
+
+.message_time {
+	position: absolute;
+	width: 1px;
+	overflow: hidden;
+	bottom: 0;
+	right: 0;
+	font-size: 8pt;
 }
 </style>
 
@@ -135,13 +147,13 @@ CHATBOT_UI.addToDisplay = CHATBOT_UI.addToDisplay || function (msgObj) {
 	msgObj.date = msgObj.date || '';
 	msgObj.time = msgObj.time || '';
 
-	if (msgObj.text && msgObj.auth && msgObj.date && msgObj.time) {
+	if (msgObj.text && msgObj.auth && msgObj.time) {
 		frag = document.createDocumentFragment();
 		supDiv = document.createElement('div'); // MAY NOT NEED SUPERDIV NOW CSS MARGIN PROPERTY HAS BEEN SET
 		supDiv.className = 'single_msg_container';
 		newDiv = document.createElement('div');
 		newDiv.className = msgObj.auth; /* just go with auth for now; also className may not be cross-browser */
-		newDiv.innerHTML = msgObj.text;
+		newDiv.innerHTML = "<span class='message_time'>" + msgObj.time + "</span> " + msgObj.auth + ": " + msgObj.text;
 		supDiv.appendChild(newDiv);
 		frag.appendChild(supDiv);
 		document.getElementById('chat_display').appendChild(frag);
@@ -195,6 +207,7 @@ window.onload = function () {
 };
 </script>
 <script>
+	//var socket = io.connect('http://192.168.0.3:8374');
 	var socket = io.connect('http://localhost:8374');
 
 	// on connection to server, ask for user's name with an anonymous callback
@@ -206,12 +219,13 @@ window.onload = function () {
 
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('updatedisplay', function (username, data, datetime) {
-		console.log(datetime);
-		var msgObj = {
+		var datetime = new Date(),
+			datetimeStr = '[' + datetime.getDate() + '/' + (+datetime.getMonth() + 1) + '/' +
+			datetime.getFullYear() + ' ' + datetime.toLocaleTimeString() + ']';
+		msgObj = {
 			text: data, /* arg will need to be neutral if it's to work with bot too */
 			auth: username,	  /* as will the author */
-			date: 20130117,
-			time: 2302
+			time: datetimeStr
 		};
 		CHATBOT_UI.addToDisplay(msgObj);
 		CHATBOT_UI.addToLog(msgObj);

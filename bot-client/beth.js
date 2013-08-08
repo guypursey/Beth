@@ -138,7 +138,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Create a regex from this array to search any input for any of the keys.
 			// Variable declared at higher level.
-			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "g");
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "gi");
 		},
 		getInitial = function () {
 			// Return the first statement of the conversation.
@@ -292,7 +292,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 											rtn = rtn.replace(ioregex, function (match, $1) {
 												debugFunc("intoout sub");
 												debugFunc(libraryData.intoout[$1]);
-												return libraryData.intoout[$1];
+												return libraryData.intoout[$1.toLowerCase()];
 											});
 										};
 										return rtn;
@@ -427,7 +427,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				getFlag: getFlag
 			};
 			
-		})();
+		})(),
 
 		utilities = (function () {
 			var convertBethTimeToMS = function (itemTime) {
@@ -444,7 +444,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return {
 				convertBethTimeToMS: convertBethTimeToMS
 			};
-		})();
+		})(),
 		
 		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
 			var agendaItem = agendas[0],
@@ -650,7 +650,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return {
 				getCurrentFilter: getCurrentFilter
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag);
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag),
 		
 		timedcheck = function () {
 			
@@ -744,8 +744,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 				
 			
-		}
-		; //eof variable declarations
+		},
+		interval,
+		deactivate = function () {
+			clearInterval(interval);
+		}; //eof variable declarations
 		
 
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
@@ -759,12 +762,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	debugFunc(libraryData.ruleset);
 	
 	// Set interval to check agenda and log every 2 seconds.
-	setInterval(timedcheck, 2000);
+	interval = setInterval(timedcheck, 2000);
 
 	
 	// Finally, expose private variables to public API.
 	this.getInitial = getInitial;
 	this.transform = loginput;
+	this.deactivate = deactivate;
 	
 },
 exports = exports || false;

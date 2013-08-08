@@ -2,11 +2,8 @@ var express = require('express'),
     app = express(),
 	server = require('http').createServer(app),
     io = require('socket.io').listen(server), // 
-	ioc = require('socket.io-client'),
-	bot = require('./bot-client/beth.js'), // load Beth file
-	lib = require('./bot-client/lib/beth-agendas-test01.json'), // load the library
-	nme = 'Beth', // name of Beth in chat
-	lgi = false; // a flag to say whether or not Beth is logged in
+	ioc = require('socket.io-client');
+
 	
  // 8374 === BETH || BETA
 server.listen(8374);
@@ -26,7 +23,11 @@ var usernames = {};
 
 io.sockets.on('connection', function (socket) {
 	
-	var debugFn = function (msg) {
+	var bot = require('./bot-client/beth.js'), // load Beth file
+		lib = require('./bot-client/lib/beth-agendas-test03.json'), // load the library
+		nme = 'Beth', // name of Beth in chat
+		lgi = false, // a flag to say whether or not Beth is logged in
+		debugFn = function (msg) {
 			io.sockets.emit("report", msg);
 		},
 		postMsg = function (input) {
@@ -85,6 +86,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('disconnect', function(){
 		// remove the username from global usernames list
 		delete usernames[socket.username];
+		botobj.deactivate();
 		// update list of users in chat, client-side
 		io.sockets.emit('updateusers', usernames);
 		// echo globally that this client has left

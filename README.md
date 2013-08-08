@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.8##
+##v0.3.9##
 
-LATEST: Introduced automated testing in the form of `tst.js`. Issues-wise, closes [#15](https://github.com/guypursey/Beth/issues/15).
+LATEST: Fixed problem with refresh pages served from `sgl.js` and `tst.js` and enabled dates and messages to be parsed in a [Skype-parser](https://github.com/guypursey/Skype-parser) compatible way. Issues-wise, fixes [#33](https://github.com/guypursey/Beth/issues/33) and closes [#30](https://github.com/guypursey/Beth/issues/30).
 
 This is all very much a work in progress.
 

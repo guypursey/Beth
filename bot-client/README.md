@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.3.8##
+##CODE DOCUMENTATION for v0.3.9##
 
 ###NODE JS COMPATIBILITY###
 
@@ -211,16 +211,26 @@ Finally, if `postRoom` has anything in it, the zeroth element is shifted out and
 
 Called by a regular timed interval.
 
+###`interval`###
+
+A variable for holding the time interval.
+
+###`deactivate`###
+
+A function for deactivating Beth by clearing the time interval set as `interval`.
+
 ###INITIALISATION###
 
 After all variable declarations, the `ruleset` in `libraryData` is parsed with `parseRuleset()` (see above). This basically involves going through each ruleset and turning keys into pattern values that can be used as regular expressions.
 
 The `intoout` values are parsed with `parseIo()`.
 
-Finally the function `timedCheck` is set to be called every two seconds with an interval timer. 
+Finally the function `timedCheck` is set to be called every two seconds with an interval timer set to `interval`. 
 
 ###API EXPOSURE###
 
 Currently, the function `getInitial` is exposed with `this.getInitial`. [no longer required]
 
 Most importantly, the `process` function is exposed with `this.transform`, the public name being a legacy of the old Eliza code. [this may be changed]
+
+Finally, the function `deactivate` is exposed with `this.deactivate` to allow the server to stop Beth processing, particularly on a disconnect or a page refresh.

@@ -1,6 +1,6 @@
 #BETH DATA CONVENTIONS#
 
-##v0.3.8##
+##v0.3.9##
 
 ###ABOUT###
 

@@ -527,6 +527,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// DISCONNECT
 							debugFunc("no further agenda items found; should disconnect now");
 							// If no agenda item exists, disconnect Beth.
+							clearInterval(agendaInterval); // Stop the timer which fetches currentItem...
 							exitSession();
 						}
 					} else {
@@ -645,12 +646,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 
 					return agendaStatus[0].agendaItem;
-				};
+				},
+				agendaInterval;
 				
 			resetStatus(0, 0); // important for initialisation
 			
 			// update time every second	
-			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
+			agendaInterval = setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
 			return {
 				getCurrentFilter: getCurrentFilter
 			};

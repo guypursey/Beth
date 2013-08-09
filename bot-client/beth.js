@@ -511,8 +511,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							
 							debugFunc("Level " + (1) + ": Current iterations " + agendaStatus[1].agendaIterate + " ... Limit/quota: " + agendaStatus[1].agendaItem.dountil.iterate);
 							
-							if (agendaStatus[1].agendaIterate >= agendaStatus[1].agendaItem.dountil.iterate) {
 							// If `iterate` actually exceeds dountil for this item in level above mark it complete and move up a level
+							if (isComplete(agendaStatus[1])) {
 								debugFunc("Iterations complete... move on to next item at the higher level");
 								// Move on to next item at this higher level
 								resetStatus(1, (agendaStatus[1].agendaItemNum + 1));
@@ -589,7 +589,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
 						edr = agendaItem.dountil.endured || "0",
-				   
+						itr = agendaItem.dountil.iterate || 0,
 						// if properties are on the agenda, check if conditions are met
 						usrComp = (agendaItem.dountil.hasOwnProperty('usrsent'))
 							? (getUsrSent() >= agendaStatus.agendaUsrSent + usr)
@@ -611,6 +611,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									}
 									return rtn;
 								})()
+							: false,
+						itrComp = (agendaItem.dountil.hasOwnProperty('iterate'))
+							? (agendaStatus.agendaIterate >= itr)
+							// This check is different in that it compares an internally created property of agendaStatus with the condition, rather than using a method imported from sessionStats.
 							: false
 						;
 					
@@ -618,8 +622,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc(botComp);
 					debugFunc(edrComp);
 					debugFunc(flgComp);
+					debugFunc(itrComp);
 						
-					if (usrComp || botComp || edrComp || flgComp) {
+					if (usrComp || botComp || edrComp || flgComp || itrComp) {
 						debugFunc("Agenda item " + agendaStatus.agendaItemNum + " complete!");
 						return true;
 					}

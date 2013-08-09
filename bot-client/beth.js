@@ -448,37 +448,39 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		
 		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
 			var agendaStack = [], // An array to store all the current
+				redoSnapshot = function (agendaLevel, itemNum) {
+					
+					// Goes into the bottom level of the stack and resets with the new item number.
+					agendaStack[0] = {
+						agendaItem: agendaLevel[itemNum], // Pointer to the actual agenda item this snapshot refers to.
+						agendaItemNum: itemNum, // Index of agenda item so we don't lose our place.
+						agendaIterate: 0, // To be incremented, currently by this function
+						agendaUsrSent: getUsrSent(), // Number of messages user sent at start of item.
+						agendaBotSent: getBotSent(), // Number of messages user sent at start of item.
+						agendaTimeStarted: new Date().getTime() // Date and time at start of item.
+					};
+					
+					// Find any children for new item and inserting snapshots for those into the bottom of the stack too.
+					if (agendaStack[0].agendaItem) {
+						while (agendaStack[0].agendaItem.agendas) {
+							agendaLevel = agendaStack[0].agendaItem.agendas;
+							agendaStack.unshift({ // Add status object to bottom of the stack, so that next loop round we always access the newest.
+								agendaItem: agendaLevel[0],
+								agendaItemNum: 0,
+								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
+								agendaBotSent: getBotSent(), // number of messages user sent at start of item
+								agendaTimeStarted: new Date().getTime() // date and time at start of item
+							});
+						}
+					}
+				},
 				resetStatus = function (address, itemNum) {
 					debugFunc("Reset status called. Agenda being reset to address " + address + " and item number " + itemNum);
 					debugFunc("Current status object:");
 					debugFunc(agendaStack);
 					
 					var a = agendaStack.length,
-						agendaLevel = agendas, // Set agenda level at top and work down.
-						redoSnapshot = function () {
-							agendaStack[0] = {
-								agendaItem: agendaLevel[itemNum],
-								agendaItemNum: itemNum,
-								agendaIterate: 0, // To be incremented, currently by this function
-								agendaUsrSent: getUsrSent(), // Number of messages user sent at start of item.
-								agendaBotSent: getBotSent(), // Number of messages user sent at start of item.
-								agendaTimeStarted: new Date().getTime() // Date and time at start of item.
-							}
-							
-							// As long as there are sub-agendas, prepend similar snapshots.
-							if (agendaStack[0].agendaItem) {
-								while (agendaStack[0].agendaItem.agendas) {
-									agendaLevel = agendaStack[0].agendaItem.agendas;
-									agendaStack.unshift({ // Add status object to beginning of array, so that next loop round we always access the newest.
-										agendaItem: agendaLevel[0],
-										agendaItemNum: 0,
-										agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
-										agendaBotSent: getBotSent(), // number of messages user sent at start of item
-										agendaTimeStarted: new Date().getTime() // date and time at start of item
-									});
-								}
-							}
-						};
+						agendaLevel = agendas; // Set agenda level at top and work down.
 
 					// Loop until we have a pointer to the agenda item at the relevant level.
 					while (a && a > (address + 1) && agendaLevel[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
@@ -493,7 +495,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					agendaStack = agendaStack.slice(address);
 					// Bottom item should now be current address.
 					
-					// if there is no next item on this level of the agenda...
+					// If there is no next item on this level of the agenda.
 					if (!agendaLevel.hasOwnProperty(itemNum)) {
 						debugFunc("Level " + address + " had no item #" + itemNum);
 						
@@ -514,10 +516,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								// Move on to next item at this higher level
 								resetStatus(1, (agendaStack[1].agendaItemNum + 1));
 							} else {
-								// otherwise reset at this level...
+								// Otherwise reset at this level...
 								debugFunc("Loop back to beginning of agenda level " + (1));
-								itemNum = 0;
-								redoSnapshot();
+								redoSnapshot(agendaLevel, 0);
 							}
 						} else {
 							// If there's no level above this one, we've presumably finished our agenda
@@ -528,7 +529,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							exitSession();
 						}
 					} else {
-						redoSnapshot();
+						redoSnapshot(agendaLevel, itemNum);
 					}
 					
 					// (re)do the snapshot for child
@@ -646,7 +647,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				agendaInterval;
 				
-			resetStatus(0, 0); // important for initialisation
+			redoSnapshot(agendas, 0); // important for initialisation
 			
 			// update time every second	
 			agendaInterval = setInterval(function () { debugFunc(getCurrentItem()); }, 1000);

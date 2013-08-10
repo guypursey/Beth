@@ -447,7 +447,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		})(),
 		
 		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
-			var agendaStack = [], // An array to store all the current
+			var agendaStack = [], // An array to store all the current agenda items.
 				redoSnapshot = function (agendaLevel, itemNum) {
 					
 					// Goes into the bottom level of the stack and resets with the new item number.
@@ -566,7 +566,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					return rtn;
 				},
-				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
 					var a = agendaStack.length,
 						agendaLevel = agendas,
@@ -614,7 +613,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				agendaInterval;
 				
-			redoSnapshot(agendas, 0); // important for initialisation
+			redoSnapshot(agendas, 0); // Important for initialisation
 			
 			// update time every second	
 			agendaInterval = setInterval(function () { debugFunc(getCurrentItem()); }, 1000);

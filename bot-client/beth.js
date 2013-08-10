@@ -689,7 +689,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					
 					// Set any flags mentioned to true.
-					// TODO; Should these be set regardless of which response is returned?
 					if (typeof responses[whichResponse].setflag === 'object') {
 						debugFunc("setting flags");
 						f = responses[whichResponse].setflag.length;

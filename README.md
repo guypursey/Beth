@@ -1,8 +1,15 @@
 #BETH#
 
-##v0.3.9##
+##v0.3.10##
 
-LATEST: Fixed problem with refresh pages served from `sgl.js` and `tst.js` and enabled dates and messages to be parsed in a [Skype-parser](https://github.com/guypursey/Skype-parser) compatible way. Issues-wise, fixes [#33](https://github.com/guypursey/Beth/issues/33) and closes [#30](https://github.com/guypursey/Beth/issues/30).
+LATEST: Fixed several issues in this release:
+
+ - [#13](https://github.com/guypursey/Beth/issues/13): Made a decision for predictable behaviour.
+ - [#18](https://github.com/guypursey/Beth/issues/18): Made `agendaManager` much more concise and efficient, though further refactoring/commenting may be required.
+ - [#31](https://github.com/guypursey/Beth/issues/31): Introduced sorting by historical usage to both responses and actions.
+ - [#33](https://github.com/guypursey/Beth/issues/33): Ensured that only one action or response was being posted per interval, thus helping `agendaManager` judge the `sessionStats` correctly.
+
+Also started work towards randomisation as a last resort with reference to issue [#34](https://github.com/guypursey/Beth/issues/34).
 
 This is all very much a work in progress.
 

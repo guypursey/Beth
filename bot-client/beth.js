@@ -17,6 +17,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		},
 		
+		selectIndex = function (min, max) {
+			return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
+		},
+
 		// Declare imported library data locally.
 		libraryData = libraryData,
 		
@@ -447,103 +451,37 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		})(),
 		
 		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
-			var agendaItem = agendas[0],
-				// TODO: this object's name should be prefixed atStart
-				// TODO: ItemNum will also need to be sep'd out for semantic and functional reasons...
-				agendaStatus = [],
-				resetStatus = function (address, itemNum) {
-					debugFunc("agenda being reset to address " + address + " and itemnum " + itemNum);
-					debugFunc("current status");
-					debugFunc(agendaStatus);
+			var agendaStack = [], // An array to store all the current agenda items.
+				redoSnapshot = function (agendaLevel, itemNum) {
 					
-					var a = agendaStatus.length,
-						agendaLevel = agendas,
-						redoSnapshot = function () {
-							agendaStatus[0] = {
-								agendaItem: agendaLevel[itemNum],
-								agendaItemNum: itemNum,
-								agendaIterate: 0, // to be incremented, currently by this function
+					// Goes into the bottom level of the stack and resets with the new item number.
+					agendaStack[0] = {
+						agendaItem: agendaLevel[itemNum], // Pointer to the actual agenda item this snapshot refers to.
+						agendaItemNum: itemNum, // Index of agenda item so we don't lose our place.
+						agendaIterate: 0, // To be incremented, currently by this function
+						agendaUsrSent: getUsrSent(), // Number of messages user sent at start of item.
+						agendaBotSent: getBotSent(), // Number of messages user sent at start of item.
+						agendaTimeStarted: new Date().getTime() // Date and time at start of item.
+					};
+					
+					// Find any children for new item and inserting snapshots for those into the bottom of the stack too.
+					if (agendaStack[0].agendaItem) {
+						while (agendaStack[0].agendaItem.agendas) {
+							agendaLevel = agendaStack[0].agendaItem.agendas;
+							agendaStack.unshift({ // Add status object to bottom of the stack, so that next loop round we always access the newest.
+								agendaItem: agendaLevel[0],
+								agendaItemNum: 0,
 								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
 								agendaBotSent: getBotSent(), // number of messages user sent at start of item
 								agendaTimeStarted: new Date().getTime() // date and time at start of item
-							}
-							
-							// as long as there are sub-agendas, prepend similar snapshots
-							if (agendaStatus[0].agendaItem) {
-								while (agendaStatus[0].agendaItem.agendas) {
-									agendaLevel = agendaStatus[0].agendaItem.agendas;
-									agendaStatus.unshift({
-										agendaItem: agendaLevel[0],
-										agendaItemNum: 0,
-										agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
-										agendaBotSent: getBotSent(), // number of messages user sent at start of item
-										agendaTimeStarted: new Date().getTime() // date and time at start of item
-									});
-								}
-							}
-						};
-
-					// loop for pointing at relevant level of agenda item
-					while (a && a > (address + 1) && agendaLevel[agendaStatus[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
-						a -= 1;
-						agendaLevel = agendaLevel[agendaStatus[a].agendaItemNum].agendas;
-					}
-					a -= 1;
-					debugFunc("level " + a  + ", address: " + address);
-					debugFunc(agendaLevel);
-					
-					// remove all child items (those preceding the current address)
-					agendaStatus = agendaStatus.slice(address);
-					// bottom item should now be current address
-					
-					// if there is no next item on this level of the agenda...
-					if (!agendaLevel.hasOwnProperty(itemNum)) {
-						debugFunc("level " + address + " had no item #" + itemNum);
-						
-						// if there is a level above this one
-						if (agendaStatus.length > 1) {
-							
-							debugFunc("level above deepest current item");
-							debugFunc(agendaStatus[1]);
-							
-							// increment `iterate` in level above
-							agendaStatus[1].agendaIterate += 1;
-							
-							debugFunc("level " + (1) + ": current iterates" + agendaStatus[1].agendaIterate + " ... limit: " + agendaStatus[1].agendaItem.dountil.iterate);
-							
-							// if iterate actually exceeds dountil for this item in level above mark it complete and move up a level
-							if (agendaStatus[1].agendaIterate >= agendaStatus[1].agendaItem.dountil.iterate) {
-								debugFunc("iterations complete... move on...");
-								// move on to next item at this igher level
-								//agendaStatus = agendaStatus.slice(a + 1);
-								resetStatus(1, (agendaStatus[1].agendaItemNum + 1));
-							} else {
-								// otherwise reset at this level...
-								debugFunc("loop back to beginning of agenda level " + (1));
-								itemNum = 0;
-								redoSnapshot();
-							}
-						} else {
-							// if there's no level above this one, we've presumably finished our agenda
-							// DISCONNECT
-							debugFunc("no further agenda items found; should disconnect now");
-							// If no agenda item exists, disconnect Beth.
-							exitSession();
+							});
 						}
-					} else {
-						redoSnapshot();
 					}
-					
-					// (re)do the snapshot for child
-
-					debugFunc("after reset Status...")
-					
-					debugFunc(agendaStatus);
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
 					var whichMode = whichMode,
-						agendaItem = agendaStatus[0].agendaItem, // get most childish item
+						agendaItem = agendaStack[0].agendaItem, // get most childish item
 						mode = agendaItem[whichMode];
 						rtn = (mode)
 							? function(tagging) {
@@ -583,23 +521,23 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							};
 					return rtn;
 				},
-				isComplete = function (agendaStatus) {
+				isComplete = function (agendaSnapshot) {
 					var rtn = false,
-						agendaStatus = agendaStatus, // localisation
-						agendaItem = agendaStatus.agendaItem,
+						agendaSnapshot = agendaSnapshot, // localisation
+						agendaItem = agendaSnapshot.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
 						edr = agendaItem.dountil.endured || "0",
-				   
+						itr = agendaItem.dountil.iterate || 0,
 						// if properties are on the agenda, check if conditions are met
 						usrComp = (agendaItem.dountil.hasOwnProperty('usrsent'))
-							? (getUsrSent() >= agendaStatus.agendaUsrSent + usr)
+							? (getUsrSent() >= agendaSnapshot.agendaUsrSent + usr)
 							: false,
 						botComp = (agendaItem.dountil.hasOwnProperty('botsent'))
-							? (getBotSent() >= agendaStatus.agendaBotSent + bot)
+							? (getBotSent() >= agendaSnapshot.agendaBotSent + bot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
-							? (new Date().getTime() >= agendaStatus.agendaTimeStarted + utilities.convertBethTimeToMS(edr))
+							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utilities.convertBethTimeToMS(edr))
 							: false,
 						flgComp = (agendaItem.dountil.hasOwnProperty('flagset'))
 							?
@@ -612,6 +550,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									}
 									return rtn;
 								})()
+							: false,
+						itrComp = (agendaItem.dountil.hasOwnProperty('iterate'))
+							? (agendaSnapshot.agendaIterate >= itr)
+							// This check is different in that it compares an internally created property of agendaSnapshot with the condition, rather than using a method imported from sessionStats.
 							: false
 						;
 					
@@ -619,34 +561,66 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc(botComp);
 					debugFunc(edrComp);
 					debugFunc(flgComp);
+					debugFunc(itrComp);
 						
-					if (usrComp || botComp || edrComp || flgComp) {
-						debugFunc("agenda item " + agendaStatus.agendaItemNum + " complete");
+					if (usrComp || botComp || edrComp || flgComp || itrComp) {
+						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
+						debugFunc(agendaSnapshot);
 						return true;
 					}
 					return rtn;
 				},
-				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
-					var a = agendaStatus.length;
-					
-					// loop through all currently active agenda items from top down; if any is complete, resetStatus
+					var a = agendaStack.length,
+						agendaLevel = agendas,
+						getAgendaLevel = function (address) {
+							var a = agendaStack.length,
+								rtn = agendas;
+							while (a && a > (address) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+								a -= 1;
+								rtn = rtn[agendaStack[a].agendaItemNum].agendas;
+							}
+							return rtn;
+						},
+						itemNum,
+						redo = false;
 					while (a) {
 						a -= 1;
-						if (isComplete(agendaStatus[a])) {
-							debugFunc("Item " + agendaStatus[a].agendaItemNum + " on level " + a + " marked complete... Going to reset with item " + (agendaStatus[a].agendaItemNum + 1));
-							resetStatus(a, agendaStatus[a].agendaItemNum + 1);
-							a = false; // end loop as all children will be reset/adjusted anyway
+						if (isComplete(agendaStack[a])) {
+							itemNum = agendaStack[a].agendaItemNum + 1;
+							agendaStack = agendaStack.slice(a);
+							agendaLevel = getAgendaLevel(a);
+							if (agendaLevel.hasOwnProperty(itemNum)) {
+								redoSnapshot(agendaLevel, itemNum);
+								a = 0;
+							} else {
+								if (agendaStack.length > 1) {
+									agendaStack[1].agendaIterate += 1;
+									itemNum = 0;
+									a = 2;
+									redo = true;
+								} else {
+									a = 0;
+									clearInterval(agendaInterval);
+									exitSession();
+								}
+							}
+						} else {
+							if (redo) {
+								redoSnapshot(agendaLevel, itemNum);
+								a = 0;
+							}
 						}
 					}
 
-					return agendaStatus[0].agendaItem;
-				};
+					return agendaStack[0].agendaItem;
+				},
+				agendaInterval;
 				
-			resetStatus(0, 0); // important for initialisation
+			redoSnapshot(agendas, 0); // Important for initialisation
 			
 			// update time every second	
-			setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
+			agendaInterval = setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
 			return {
 				getCurrentFilter: getCurrentFilter
 			};
@@ -682,7 +656,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
 				responses.sort(function (a, b) {
-					var rtn;
+					var rtn = 0;
 					if (b.nesting > a.nesting) {
 						rtn = 1;
 					} else if (b.nesting < a.nesting) {
@@ -691,32 +665,37 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						rtn = 1;
 					} else if (b.deferrd < a.deferrd) {
 						rtn = -1;
+					} else if (b.origobj.history[0] > a.origobj.history[0]) {
+						rtn = 1;
+					} else if (b.origobj.history[0] < a.origobj.history[0]) {
+						rtn = -1;
 					}
 					return rtn;
 				});
-				
+
 				if (responses.length) {
+
+					var whichResponse = selectIndex(0, (responses.length - 1));
 					
-					if (responses[0].respond) {
+					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).
-						postRoom.push(responses[0].respond);
+						postRoom.push(responses[whichResponse].respond);
 					}
 					
 					// Record use of this object on the original database if possible.
-					if (responses[0].origobj) {
-						responses[0].origobj.history = responses[0].origobj.history || [];
-						responses[0].origobj.history.push(datetime);
+					if (responses[whichResponse].origobj) {
+						responses[whichResponse].origobj.history = responses[whichResponse].origobj.history || [];
+						responses[whichResponse].origobj.history.unshift(datetime);
 					}
 					
 					// Set any flags mentioned to true.
-					// TODO; Should these be set regardless of which response is returned?
-					if (typeof responses[0].setflag === 'object') {
+					if (typeof responses[whichResponse].setflag === 'object') {
 						debugFunc("setting flags");
-						f = responses[0].setflag.length;
+						f = responses[whichResponse].setflag.length;
 						while (f) {
 							f -= 1;
-							sessionStats.setFlag(responses[0].setflag[f]);
-							debugFunc("set flag " + responses[0].setflag[f]);
+							sessionStats.setFlag(responses[whichResponse].setflag[f]);
+							debugFunc("set flag " + responses[whichResponse].setflag[f]);
 						}
 					}
 				}
@@ -726,24 +705,53 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Proactive selection...
 			var m = libraryData.moveset.length,
-				fC = agendaManager.getCurrentFilter("proactive");
+				fC = agendaManager.getCurrentFilter("proactive"),
+				mA = [];
 			debugFunc("filter proactive");
 			debugFunc(fC);
 			while (m) {
 				m -= 1;
 				if (fC(libraryData.moveset[m].tagging)) {
-					postRoom.push(libraryData.moveset[m].forward);
+					mA.push(libraryData.moveset[m]);
 				}
 			}
-				
+			
+			// Sort so array in order of most recently used (with least recent or never used at bottom).
+			mA.reverse().sort(function (a, b) {
+				var rtn = 0;
+				if (b.history && a.history) {
+					if (b.history[0] < a.history[0]) { // If `b` has lower date and is therefore older.
+						rtn = 1; // Sort `b` to lower index (more chance of being selected).
+					} else if (b.history[0] > a.history[0]) {
+						rtn = -1; // Else put `a` close to being picked as older.
+					}
+				} else {
+					if (b.history) { // If `b` has ever been used
+						rtn = -1; // Move it up.
+					} else if (a.history) {
+						rtn = 1; // `a` was used but not `b` so move `b` towards zero.
+					}
+				}
+				return rtn;
+			});
+
+			debugFunc("filtered moveSet array");
+			debugFunc(mA);
+			
+			if (mA.length) {
+				whichAction = selectIndex(0, (mA.length - 1));
+				postRoom.push(mA[whichAction].forward);
+				mA[whichAction].history = mA[whichAction].history || [];
+				mA[whichAction].history.unshift(datetime);
+			}
+
 			// Check if any responses are waiting to go out.
 			if (postRoom.length) {
 				postMsg(postRoom.shift());
 				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
 				sessionStats.updateBotSent();
 			}
-				
-			
+
 		},
 		interval,
 		deactivate = function () {

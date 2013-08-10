@@ -696,24 +696,28 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Proactive selection...
 			var m = libraryData.moveset.length,
-				fC = agendaManager.getCurrentFilter("proactive");
+				fC = agendaManager.getCurrentFilter("proactive"),
+				mA = [];
 			debugFunc("filter proactive");
 			debugFunc(fC);
 			while (m) {
 				m -= 1;
 				if (fC(libraryData.moveset[m].tagging)) {
-					postRoom.push(libraryData.moveset[m].forward);
+					mA.push(libraryData.moveset[m].forward);
 				}
 			}
-				
+
+			if (mA.length) {
+				postRoom.push(mA[0]);
+			}
+
 			// Check if any responses are waiting to go out.
 			if (postRoom.length) {
 				postMsg(postRoom.shift());
 				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
 				sessionStats.updateBotSent();
 			}
-				
-			
+
 		},
 		interval,
 		deactivate = function () {

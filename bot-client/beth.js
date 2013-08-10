@@ -474,70 +474,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						}
 					}
 				},
-				resetStatus = function (address, itemNum) {
-					debugFunc("Reset status called. Agenda being reset to address " + address + " and item number " + itemNum);
-					debugFunc("Current status object:");
-					debugFunc(agendaStack);
-					
-					var a = agendaStack.length,
-						agendaLevel = agendas; // Set agenda level at top and work down.
-
-					// Loop until we have a pointer to the agenda item at the relevant level.
-					while (a && a > (address + 1) && agendaLevel[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
-						a -= 1;
-						agendaLevel = agendaLevel[agendaStack[a].agendaItemNum].agendas;
-					}
-					a -= 1;
-					debugFunc("Level " + a  + ", address: " + address);
-					debugFunc(agendaLevel);
-					
-					// Remove all child items (those preceding the current address).
-					agendaStack = agendaStack.slice(address);
-					// Bottom item should now be current address.
-					
-					// If there is no next item on this level of the agenda.
-					if (!agendaLevel.hasOwnProperty(itemNum)) {
-						debugFunc("Level " + address + " had no item #" + itemNum);
-						
-						// If there is a level above this one...
-						if (agendaStack.length > 1) {
-							
-							debugFunc("Level above deepest current item:");
-							debugFunc(agendaStack[1]);
-							
-							// Increment `iterate` in agenda level above
-							agendaStack[1].agendaIterate += 1;
-							
-							debugFunc("Level " + (1) + ": Current iterations " + agendaStack[1].agendaIterate + " ... Limit/quota: " + agendaStack[1].agendaItem.dountil.iterate);
-							
-							// If `iterate` actually exceeds dountil for this item in level above mark it complete and move up a level
-							if (isComplete(agendaStack[1])) {
-								debugFunc("Iterations complete... move on to next item at the higher level");
-								// Move on to next item at this higher level
-								resetStatus(1, (agendaStack[1].agendaItemNum + 1));
-							} else {
-								// Otherwise reset at this level...
-								debugFunc("Loop back to beginning of agenda level " + (1));
-								redoSnapshot(agendaLevel, 0);
-							}
-						} else {
-							// If there's no level above this one, we've presumably finished our agenda
-							// DISCONNECT
-							debugFunc("no further agenda items found; should disconnect now");
-							// If no agenda item exists, disconnect Beth.
-							clearInterval(agendaInterval); // Stop the timer which fetches currentItem...
-							exitSession();
-						}
-					} else {
-						redoSnapshot(agendaLevel, itemNum);
-					}
-					
-					// (re)do the snapshot for child
-
-					debugFunc("Status after reset:")
-					
-					debugFunc(agendaStack);
-				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
 					var whichMode = whichMode,
@@ -624,22 +560,53 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc(itrComp);
 						
 					if (usrComp || botComp || edrComp || flgComp || itrComp) {
-						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete!");
+						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
+						debugFunc(agendaSnapshot);
 						return true;
 					}
 					return rtn;
 				},
 				// TODO: see if this method can be removed or if it can be used for recursion
 				getCurrentItem = function () {
-					var a = agendaStack.length;
-					
-					// Loop through all currently active agenda items from top down; if any is complete, resetStatus.
+					var a = agendaStack.length,
+						agendaLevel = agendas,
+						getAgendaLevel = function (address) {
+							var a = agendaStack.length,
+								rtn = agendas;
+							while (a && a > (address) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+								a -= 1;
+								rtn = rtn[agendaStack[a].agendaItemNum].agendas;
+							}
+							return rtn;
+						},
+						itemNum,
+						redo = false;
 					while (a) {
 						a -= 1;
 						if (isComplete(agendaStack[a])) {
-							debugFunc("Item " + agendaStack[a].agendaItemNum + " on level " + a + " marked complete... Going to reset with item " + (agendaStack[a].agendaItemNum + 1));
-							resetStatus(a, agendaStack[a].agendaItemNum + 1);
-							a = false; // end loop as all children will be reset/adjusted anyway
+							itemNum = agendaStack[a].agendaItemNum + 1;
+							agendaStack = agendaStack.slice(a);
+							agendaLevel = getAgendaLevel(a);
+							if (agendaLevel.hasOwnProperty(itemNum)) {
+								redoSnapshot(agendaLevel, itemNum);
+								a = 0;
+							} else {
+								if (agendaStack.length > 1) {
+									agendaStack[1].agendaIterate += 1;
+									itemNum = 0;
+									a = 2;
+									redo = true;
+								} else {
+									a = 0;
+									clearInterval(agendaInterval);
+									exitSession();
+								}
+							}
+						} else {
+							if (redo) {
+								redoSnapshot(agendaLevel, itemNum);
+								a = 0;
+							}
 						}
 					}
 

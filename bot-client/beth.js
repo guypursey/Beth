@@ -652,7 +652,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
 				responses.sort(function (a, b) {
-					var rtn;
+					var rtn = 0;
 					if (b.nesting > a.nesting) {
 						rtn = 1;
 					} else if (b.nesting < a.nesting) {
@@ -660,6 +660,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					} else if (b.deferrd > a.deferrd) {
 						rtn = 1;
 					} else if (b.deferrd < a.deferrd) {
+						rtn = -1;
+					} else if (b.origobj.history[0] > a.origobj.history[0]) {
+						rtn = 1;
+					} else if (b.origobj.history[0] < a.origobj.history[0]) {
 						rtn = -1;
 					}
 					return rtn;
@@ -675,7 +679,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					// Record use of this object on the original database if possible.
 					if (responses[0].origobj) {
 						responses[0].origobj.history = responses[0].origobj.history || [];
-						responses[0].origobj.history.push(datetime);
+						responses[0].origobj.history.unshift(datetime);
 					}
 					
 					// Set any flags mentioned to true.
@@ -703,12 +707,36 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			while (m) {
 				m -= 1;
 				if (fC(libraryData.moveset[m].tagging)) {
-					mA.push(libraryData.moveset[m].forward);
+					mA.push(libraryData.moveset[m]);
 				}
 			}
+			
+			// Sort so array in order of most recently used (with least recent or never used at bottom).
+			mA.reverse().sort(function (a, b) {
+				var rtn = 0;
+				if (b.history && a.history) {
+					if (b.history[0] < a.history[0]) { // If `b` has lower date and is therefore older.
+						rtn = 1; // Sort `b` to lower index (more chance of being selected).
+					} else if (b.history[0] > a.history[0]) {
+						rtn = -1; // Else put `a` close to being picked as older.
+					}
+				} else {
+					if (b.history) { // If `b` has ever been used
+						rtn = -1; // Move it up.
+					} else if (a.history) {
+						rtn = 1; // `a` was used but not `b` so move `b` towards zero.
+					}
+				}
+				return rtn;
+			});
 
+			debugFunc("filtered moveSet array");
+			debugFunc(mA);
+			
 			if (mA.length) {
-				postRoom.push(mA[0]);
+				postRoom.push(mA[0].forward);
+				mA[0].history = mA[0].history || [];
+				mA[0].history.unshift(datetime);
 			}
 
 			// Check if any responses are waiting to go out.

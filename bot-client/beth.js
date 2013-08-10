@@ -17,6 +17,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		},
 		
+		selectIndex = function (min, max) {
+			return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
+		},
+
 		// Declare imported library data locally.
 		libraryData = libraryData,
 		
@@ -668,29 +672,31 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					return rtn;
 				});
-				
+
 				if (responses.length) {
+
+					var whichResponse = selectIndex(0, (responses.length - 1));
 					
-					if (responses[0].respond) {
+					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).
-						postRoom.push(responses[0].respond);
+						postRoom.push(responses[whichResponse].respond);
 					}
 					
 					// Record use of this object on the original database if possible.
-					if (responses[0].origobj) {
-						responses[0].origobj.history = responses[0].origobj.history || [];
-						responses[0].origobj.history.unshift(datetime);
+					if (responses[whichResponse].origobj) {
+						responses[whichResponse].origobj.history = responses[whichResponse].origobj.history || [];
+						responses[whichResponse].origobj.history.unshift(datetime);
 					}
 					
 					// Set any flags mentioned to true.
 					// TODO; Should these be set regardless of which response is returned?
-					if (typeof responses[0].setflag === 'object') {
+					if (typeof responses[whichResponse].setflag === 'object') {
 						debugFunc("setting flags");
-						f = responses[0].setflag.length;
+						f = responses[whichResponse].setflag.length;
 						while (f) {
 							f -= 1;
-							sessionStats.setFlag(responses[0].setflag[f]);
-							debugFunc("set flag " + responses[0].setflag[f]);
+							sessionStats.setFlag(responses[whichResponse].setflag[f]);
+							debugFunc("set flag " + responses[whichResponse].setflag[f]);
 						}
 					}
 				}
@@ -734,9 +740,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc(mA);
 			
 			if (mA.length) {
-				postRoom.push(mA[0].forward);
-				mA[0].history = mA[0].history || [];
-				mA[0].history.unshift(datetime);
+				whichAction = selectIndex(0, (mA.length - 1));
+				postRoom.push(mA[whichAction].forward);
+				mA[whichAction].history = mA[whichAction].history || [];
+				mA[whichAction].history.unshift(datetime);
 			}
 
 			// Check if any responses are waiting to go out.

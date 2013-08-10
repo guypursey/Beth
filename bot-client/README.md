@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.3.9##
+##CODE DOCUMENTATION for v0.3.10##
 
 ###NODE JS COMPATIBILITY###
 
@@ -188,8 +188,6 @@ Maybe more to come.
 *IIFE closure.* Currently the closure returns an object whose only property is an exposed function for getting the current filter. The current filter is composed within the closure based on the particular agenda item Beth is on and the conditions set therein.
 
 Has interval timer which checks what the current item should be. If any current agenda item is complete (including any parent items), it finds the next one. In the event that the item is the last one on the agenda, the parent item is iterated and checked for completion.
-
-[This code needs refactoring, as it is not particularly elegant at the moment; efficiencies could be made.]
 
 ###`timedcheck`###
 

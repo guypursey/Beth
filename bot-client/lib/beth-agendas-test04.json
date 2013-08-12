@@ -68,20 +68,6 @@
 				]
 			}
 		],
-		
-		"gambits": [
-			"How do you do.  Please tell me your problem.",
-			"Please tell me what's been bothering you.",
-			"Is something troubling you ?"
-		],
-
-		"farewells": [
-			"Goodbye.  It was nice talking to you.",
-			"Goodbye.  This was really a nice talk.",
-			"Goodbye.  I'm looking forward to our next session.",
-			"This was a good session, wasn't it -- but time is over now.   Goodbye.",
-			"Maybe we could discuss this moreover in our next session ?   Goodbye."
-		],
 
 		"quits": [
 			"bye",
@@ -91,7 +77,7 @@
 			"quit"
 		],
 
-		"substitutions": {
+		"stndrds": {
 			"dont": "don't",
 			"cant": "can't",
 			"wont": "won't",
@@ -124,15 +110,7 @@
 			"i'm": "you are"
 		},
 
-		"synonyms": {
-			"be": ["am", "is", "are", "was"],
-			"belief": ["feel", "think", "believe", "wish"],
-			"cannot": ["can't"],
-			"desire": ["want", "need"],
-			"everyone": ["everybody", "nobody", "noone"],
-			"family": ["mother", "mom", "father", "dad", "sister", "brother", "wife", "children", "child"],
-			"happy": ["elated", "glad", "better"],
-			"sad": ["unhappy", "depressed", "sick"]
+		"variables": {
 		},
 		
 		"moveset": [
@@ -183,7 +161,8 @@
 		{
 			"i": "hello",
 			"o": [
-				"You say hello"
+				"You say hello",
+				"Hello world!"
 			]
 		},
 		{
@@ -195,7 +174,8 @@
 		{
 			"i": "you seem fairly set in your ways",
 			"o": [
-				"You say I seem fairly set in my ways"
+				"You say I seem fairly set in my ways",
+				"Hello world!"
 			]
 		},
 		{
@@ -207,7 +187,8 @@
 		{
 			"i": "I am not sure this conversation is going anywhere.",
 			"o": [
-				"You say you are not sure this conversation is going anywhere."
+				"You say you are not sure this conversation is going anywhere.",
+				"Hello world!"
 			]
 		},
 		{
@@ -219,7 +200,8 @@
 		{
 			"i": "That illustrates my point exactly.",
 			"o": [
-				"You say That illustrates your point exactly."
+				"You say That illustrates your point exactly.",
+				"Hello world!"
 			]
 		},
 		{
@@ -231,7 +213,8 @@
 		{
 			"i": "That illustrates my point exactly.",
 			"o": [
-				"You say That illustrates your point exactly."
+				"You say That illustrates your point exactly.",
+				"Hello world!"
 			]
 		},
 		{

@@ -49,8 +49,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		
 		// Variables for identifying synonyms. Other markers will be used.
 		// TODO: Work out way to systematise this.
-		synonymMarker = '@',
-		synonymPattern = /@(\S+)/,
+		variablesMarker = '@',
+		variablesPattern = /@(\S+)/,
 		
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
@@ -74,8 +74,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						ruleobj.pattern = r;
 						
 						// Substitute synonyms.
-						ruleobj.pattern = ruleobj.pattern.replace(synonymPattern, function (a0, a1) {
-							return libraryData.synonyms[a1] || a1; 
+						ruleobj.pattern = ruleobj.pattern.replace(variablesPattern, function (a0, a1) {
+							return "(" + libraryData.variables[a1].join("|") + ")" || a1;
+							// TODO: throw initialisation error if array not found?
 						});
 						
 						ruleobj.pattern = ruleobj.pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
@@ -162,7 +163,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Maintain a history of these substitutions.
 			
 			var rtn,
-				sub = libraryData.substitutions, // local reference to relevant data
+				sub = libraryData.stndrds, // local reference to relevant data
 				key, // key for data
 				arr = [],
 				rex;
@@ -654,7 +655,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					d.address.unshift(d.todefer);
 				}
 				
-				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
+				// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
 				responses.sort(function (a, b) {
 					var rtn = 0;
 					if (b.nesting > a.nesting) {

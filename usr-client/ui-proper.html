@@ -207,8 +207,7 @@ window.onload = function () {
 };
 </script>
 <script>
-	//var socket = io.connect('http://192.168.0.3:8374');
-	var socket = io.connect('http://localhost:8374');
+	var socket = io.connect(location.href);
 
 	// on connection to server, ask for user's name with an anonymous callback
 	socket.on('connect', function(){

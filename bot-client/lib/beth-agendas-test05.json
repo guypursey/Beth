@@ -1,0 +1,244 @@
+{
+	"data": {
+	
+		"agendas": [
+			{
+				"comment": "root",
+				"dountil": {
+					"iterate": 1
+				},
+				"agendas": [
+					{
+						"comment": "say hello",
+						"dountil": {
+							"botsent": 2
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["initial"]
+							}
+						}
+					},
+					{
+						"comment": "alternate between echo and flat, breaking every two cycles",
+						"dountil": {
+							"flagset": ["quit"],
+							"iterate": 2
+						},
+						"agendas": [
+							{
+								"comment": "echo then flat",
+								"dountil": {
+									"iterate": 2
+								},
+								"agendas": [
+									{	
+										"comment": "echo",
+										"dountil": {
+											"botsent": 1
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["echo"]
+											}
+										}
+									},
+									{
+										"comment": "flat",
+										"dountil": {
+											"botsent": 1
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["flat"]
+											}
+										}
+									}
+								]
+							},
+							{
+								"comment": "break in loop",
+								"dountil": {
+									"botsent": 1
+								},
+								"reactive": {
+									"filters": {
+										"HAS": ["break"]
+									}
+								}
+							}
+						]
+					},
+					{
+						"comment": "final item",
+						"dountil": {
+							"botsent": 1
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["farewell"]
+							}
+						}
+					}
+				]
+			}
+		],
+
+		"substitutions": {
+			"dont": "don't",
+			"cant": "can't",
+			"wont": "won't",
+			"recollect": "remember",
+			"recall": "remember",
+			"dreamt": "dreamed",
+			"dreams": "dream",
+			"maybe": "perhaps",
+			"certainly": "yes",
+			"machine": "computer",
+			"machines": "computer",
+			"computers": "computer",
+			"were": "was",
+			"you're": "you are",
+			"i'm": "i am",
+			"same": "alike",
+			"identical": "alike",
+			"equivalent": "alike"
+		},
+
+		"intoout": {
+			"am": "are",
+			"your": "my",
+			"me": "you",
+			"myself": "yourself",
+			"yourself": "myself",
+			"i": "you",
+			"you": "I",
+			"my": "your",
+			"i'm": "you are"
+		},
+
+		"synonyms": {
+		},
+		
+		"moveset": [
+			{	
+				"forward": "Hello world!",
+				"tagging": [
+					"initial"
+				]
+			},
+			{	
+				"forward": "My name is Beth.",
+				"tagging": [
+					"initial"
+				]
+			},
+			{
+				"forward": "Bye then!",
+				"tagging": [
+					"farewell"
+				]
+			}
+		],
+		
+		"ruleset": {
+			"*": {
+				"pattern": "*",
+				"ranking": 0,
+				"comment": "Top-level. Will match anything the user inputs.",
+				"results": [
+					{
+						"respond": "You say (1)",
+						"ranking": 0,
+						"tagging": [
+							"echo"
+						]
+					},
+					{
+						"respond": "I would have said this regardless of what you said.",
+						"ranking": 0,
+						"tagging": [
+							"flat"
+						]
+					},
+					{
+						"respond": "I've echoed what you said and responded flatly two times since I last said anything myself.",
+						"ranking": 0,
+						"tagging": [
+							"break"
+						]
+					}
+				]
+			}
+		}
+	},
+	"test": [
+		{
+			"o": [
+				"Hello world!",
+				"My name is Beth."
+			]
+		},
+		{
+			"i": "hello",
+			"o": [
+				"You say hello"
+			]
+		},
+		{
+			"i": "that's right",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "you seem fairly set in your ways",
+			"o": [
+				"You say I seem fairly set in my ways"
+			]
+		},
+		{
+			"i": "and repetitive",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "This isn't going anywhere.",
+			"o": [
+				"I've echoed what you said and responded flatly two times since I last said anything myself."
+			]
+		},
+				{
+			"i": "But what has that achieved?",
+			"o": [
+				"You say But what has that achieved?"
+			]
+		},
+		{
+			"i": "This seems pointless.",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "Do you have anything else to say?",
+			"o": [
+				"You say Do I have anything else to say?"
+			]
+		},
+		{
+			"i": "I guess not then.",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "Again, this isn't going anywhere.",
+			"o": [
+				"I've echoed what you said and responded flatly two times since I last said anything myself.",
+				"Bye then!"
+			]
+		}
+	]
+}

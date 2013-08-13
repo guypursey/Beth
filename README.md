@@ -1,15 +1,8 @@
 #BETH#
 
-##v0.3.10##
+##v0.3.11##
 
-LATEST: Fixed several issues in this release:
-
- - [#13](https://github.com/guypursey/Beth/issues/13): Made a decision for predictable behaviour.
- - [#18](https://github.com/guypursey/Beth/issues/18): Made `agendaManager` much more concise and efficient, though further refactoring/commenting may be required.
- - [#31](https://github.com/guypursey/Beth/issues/31): Introduced sorting by historical usage to both responses and actions.
- - [#33](https://github.com/guypursey/Beth/issues/33): Ensured that only one action or response was being posted per interval, thus helping `agendaManager` judge the `sessionStats` correctly.
-
-Also started work towards randomisation as a last resort with reference to issue [#34](https://github.com/guypursey/Beth/issues/34).
+LATEST: Fixed issue [#35](https://github.com/guypursey/Beth/issues/35) with deep nested agendas.
 
 This is all very much a work in progress.
 
@@ -82,6 +75,7 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 			|___ beth-agendas-test02.json
 			|___ beth-agendas-test03.json
 			|___ beth-agendas-test04.json
+			|___ beth-agendas-test05.json
         |___ beth.js
 		|___ eliza-node.js
 		|___ ui-console.html

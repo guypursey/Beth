@@ -32,7 +32,7 @@ app.use('/lib', express.static(__dirname + '/usr-client/lib'));
 io.sockets.on('connection', function (socket) {
 	
 	var bot = require('./bot-client/beth.js'), // load Beth file
-		lib = require('./bot-client/lib/beth-agendas-test03.json'), // load the library
+		lib = require('./bot-client/lib/beth-agendas-test05.json'), // load the library
 		nme = 'Beth', // name of Beth in chat
 		lgi = false, // a flag to say whether or not Beth is logged in
 		debugFn = function (msg) {

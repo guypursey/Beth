@@ -471,12 +471,16 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							agendaStack.unshift({ // Add status object to bottom of the stack, so that next loop round we always access the newest.
 								agendaItem: agendaLevel[0],
 								agendaItemNum: 0,
+								agendaIterate: 0, // To be incremented, currently by this function
 								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
 								agendaBotSent: getBotSent(), // number of messages user sent at start of item
 								agendaTimeStarted: new Date().getTime() // date and time at start of item
 							});
 						}
-					}
+					};
+					
+					debugFunc("Snapshot retaken!");
+					debugFunc(agendaStack);
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
@@ -557,11 +561,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							: false
 						;
 					
-					debugFunc(usrComp);
-					debugFunc(botComp);
-					debugFunc(edrComp);
-					debugFunc(flgComp);
-					debugFunc(itrComp);
+					debugFunc("Snapshot being checked:");
+					debugFunc(agendaSnapshot);
+					debugFunc("Met quota of user messages?: " + usrComp);
+					debugFunc("Met quota of bot messages?: " + botComp);
+					debugFunc("Reached end of time limit?: " + edrComp);
+					debugFunc("Flags completed?: " + flgComp);
+					debugFunc("Number of iterations completed?: " + itrComp);
 						
 					if (usrComp || botComp || edrComp || flgComp || itrComp) {
 						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
@@ -570,18 +576,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					return rtn;
 				},
+				getAgendaLevel = function (address) {
+					var a = agendaStack.length,
+						rtn = agendas;
+					while (a && a > (address) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+						a -= 1;
+						rtn = rtn[agendaStack[a].agendaItemNum].agendas;
+					}
+					debugFunc("Agenda Level returned...");
+					debugFunc(rtn);
+					return rtn;
+				},
 				getCurrentItem = function () {
 					var a = agendaStack.length,
 						agendaLevel = agendas,
-						getAgendaLevel = function (address) {
-							var a = agendaStack.length,
-								rtn = agendas;
-							while (a && a > (address) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
-								a -= 1;
-								rtn = rtn[agendaStack[a].agendaItemNum].agendas;
-							}
-							return rtn;
-						},
 						itemNum,
 						redo = false;
 					while (a) {
@@ -596,6 +604,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							} else {
 								if (agendaStack.length > 1) {
 									agendaStack[1].agendaIterate += 1;
+										// TODO: should be moved to session Stats
+										debugFunc("Stack item iterated!");
+										debugFunc(agendaStack[1]);
 									itemNum = 0;
 									a = 2;
 									redo = true;
@@ -620,7 +631,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			redoSnapshot(agendas, 0); // Important for initialisation
 			
 			// update time every second	
-			agendaInterval = setInterval(function () { debugFunc(getCurrentItem()); }, 1000);
+			agendaInterval = setInterval(function () { getCurrentItem(); }, 1000);
 			return {
 				getCurrentFilter: getCurrentFilter
 			};

@@ -56,7 +56,7 @@
 			}
 		],
 
-		"stndrds": {
+		"convert": {
 			"dont": "don't",
 			"cant": "can't",
 			"wont": "won't",
@@ -77,7 +77,7 @@
 			"equivalent": "alike"
 		},
 
-		"intoout": {
+		"inflect": {
 			"am": "are",
 			"your": "my",
 			"me": "you",
@@ -89,7 +89,7 @@
 			"i'm": "you are"
 		},
 
-		"variables": {
+		"lookfor": {
 		},
 		
 		"moveset": [

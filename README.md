@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.3.11##
+##v0.4.0##
 
-LATEST: Fixed issue [#35](https://github.com/guypursey/Beth/issues/35) with deep nested agendas.
+LATEST: Tidied up conventions, did some refactoring and closed [#21](https://github.com/guypursey/Beth/issues/21) with introduction of the `lookfor` object in the data object, replacing `synonyms`.
 
 This is all very much a work in progress.
 
@@ -76,6 +76,8 @@ Ignoring the folder `node-modules` which will need importing and maintaing via N
 			|___ beth-agendas-test03.json
 			|___ beth-agendas-test04.json
 			|___ beth-agendas-test05.json
+			|___ beth-agendas-var-test01.json
+			|___ beth-agendas-var-test01.json
         |___ beth.js
 		|___ eliza-node.js
 		|___ ui-console.html

@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.3.11##
+##CODE DOCUMENTATION for v0.4.0##
 
 ###NODE JS COMPATIBILITY###
 
@@ -27,7 +27,7 @@ The Beth constructor takes five parameters, namely:
 Their purposes are as follows:
 
 ### `noRandomFlag` ###
-Boolean value. A legacy from Eliza, on which Beth is based. This can be set to whatever and will have no effect.
+Boolean value. Allows random selection of responses, if set to `false`.
 
 ### `libraryData` ###
 Object. This is the data that Beth should work with, normally imported from another file (.json or .js format), including agenda, rulesets, synonyms, substitions, etc.
@@ -55,19 +55,19 @@ The variables in the Beth constructor are as follows:
  - `postMsg`
  - `severFn`
  - `wildcardPattern`
- - `synonymMarker`
- - `synonymPattern`
+ - `lookforMarker`
+ - `lookforPattern`
  - `parseRuleset`
- - `ioregex`
- - `parseIo`
- - `getInitial`
  - `loginput`
  - `preprocess`
  - `process`
  - `readlog`
  - `sessionStats`
+ - `util`
  - `agendaManager`
  - `timedcheck`
+ - `interval`
+ - `deactivate`
 
 
 ###`debugFlag`###
@@ -81,15 +81,6 @@ The variables in the Beth constructor are as follows:
 ###`debugFunc`###
 
 *Function.* If `debugFlag` is true then set call `debugFn` or (if `debugFn`) is null log the message in the console.
-
-*API Documentation:*
-
-    /**
-     * Do something with a single message, ideally logging.
-     *
-     * @param {String} input String to log.
-     * @return Nothing?
-     */
 
 ###`libraryData`###
 
@@ -115,31 +106,19 @@ The variables in the Beth constructor are as follows:
 
 *String.* To be used as a regular expression later for searching for any characters.
 
-###`synonymMarker`###
+###`lookforMarker`###
 
-*String.* The symbol for synonyms. Anything following the character included in this string will be considered a synonym to be replaced by the various search patterns outlined in the synonyms property of `libraryData`.
+*String.* The symbol for synonyms. Anything following the character included in this string will be considered a key to be replaced by the various search patterns outlined in the `lookfor` property of `libraryData`.
 
-###`synonymPattern`###
+###`lookforPattern`###
 
-*RegExp.* A search for the synonym symbol and any non-space charcters that follow it.
+*RegExp.* A search for the `lookfor` symbol and any non-space charcters that follow it.
 
 ###`parseRuleset`###
 
 *Function.* Given a ruleset as a parameter, this function will initialise it by changing each `pattern` property into a string that can be used to create a regular expression.
 
 Calls itself recursively, in that it can then be used to parse rulesets of greater depth (i.e., rulesets within rulesets).
-
-###`ioregex`###
-
-*Variable. (Holding for RegExp.)* See `parseIo`.
-
-###`parseIo`###
-
-*Function.* Stores in `ioregex` a Regular Expression to search for all the words in reassembled parts of the user's input that need to be substituted in order to maintain sense in the conversation.
-
-###`getInitial`###
-
-*Function.* Returns the string "Hello World!" [May now be redundant with the agenda and appropriate data in place.]
 
 ###`loginput`###
 
@@ -153,7 +132,7 @@ Calls itself recursively, in that it can then be used to parse rulesets of great
  
 ###`process`###
 
-*Function.* The main function for forming responses to the user. Receives input from user, a ruleset, the order of depth (beginning at zero) and a filter within which to sift results. Returns an object containing `responses` and `deferrals` properties, based on the reassembly rules of the provided ruleset.
+*Function.* The main function for forming responses to the user. Receives input from user, a ruleset, a regular expression for `lookfor` keys, the `lookfor` object, the order of depth (beginning at zero) and a filter within which to sift results. Returns an object containing `responses` and `deferrals` properties, based on the reassembly rules of the provided ruleset.
 
 If the ruleset has a ruleset, this function is called recursively and the returned results are then concatenated.
 
@@ -175,11 +154,12 @@ Results are then concatenated to any previous results (i.e. from successful recu
 
 *IIFE closure.* The closure returns an object whose properties are references to functions within the closure. This means that the stats themselves are private variables and should not be changeable from the outside. The functions provided can be used to increment the number of messages the user has sent or the bot has sent or the total overall messages sent. There is also a function for setting flags. In addition to these setters, getter properties can be used to retrieve the latest statistics.
 
-###`utilities`###
+###`utils`###
 
 *IIFE closure.* Contains generally useful functions, like:
 
  - `convertBethTimeToMS`
+ - `copyObject`
 
 Maybe more to come.
 
@@ -191,7 +171,7 @@ Has interval timer which checks what the current item should be. If any current 
 
 ###`timedcheck`###
 
-*Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent first to `preprocess` and then with other appropriate parameters to `process`.
+*Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent first to `preprocess` and then with other appropriate parameters to `process`. One of the parameters is `ioregex` which is created here based on `libraryData.inflect`.
 
 Results returned by `process` feature `responses` and `deferrals`. `Deferrals` are looped through and each object is placed back in the listed place of `libraryData`.
 
@@ -221,14 +201,10 @@ A function for deactivating Beth by clearing the time interval set as `interval`
 
 After all variable declarations, the `ruleset` in `libraryData` is parsed with `parseRuleset()` (see above). This basically involves going through each ruleset and turning keys into pattern values that can be used as regular expressions.
 
-The `intoout` values are parsed with `parseIo()`.
-
 Finally the function `timedCheck` is set to be called every two seconds with an interval timer set to `interval`. 
 
 ###API EXPOSURE###
 
-Currently, the function `getInitial` is exposed with `this.getInitial`. [no longer required]
+The `process` function is exposed with `this.transform`, the public name being a legacy of the old Eliza code. [this may be changed]
 
-Most importantly, the `process` function is exposed with `this.transform`, the public name being a legacy of the old Eliza code. [this may be changed]
-
-Finally, the function `deactivate` is exposed with `this.deactivate` to allow the server to stop Beth processing, particularly on a disconnect or a page refresh.
+The function `deactivate` is exposed with `this.deactivate` to allow the server to stop Beth processing, particularly on a disconnect or a page refresh.

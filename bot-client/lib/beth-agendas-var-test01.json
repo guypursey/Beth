@@ -1,0 +1,227 @@
+{
+	"data": {
+	
+		"agendas": [
+			{
+				"comment": "root",
+				"dountil": {
+					"iterate": 1
+				},
+				"agendas": [
+					{
+						"comment": "say hello",
+						"dountil": {
+							"botsent": 1
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["initial"]
+							}
+						}
+					},
+					{
+						"comment": "alterate between echo and flat",
+						"dountil": {
+							"flagset": ["quit"],
+							"iterate": 5
+						},
+						"agendas": [
+							{	
+								"comment": "echo",
+								"dountil": {
+									"botsent": 1
+								},
+								"reactive": {
+									"filters": {
+										"HAS": ["echo"]
+									}
+								}
+							},
+							{
+								"comment": "flat",
+								"dountil": {
+									"botsent": 1
+								},
+								"reactive": {
+									"filters": {
+										"HAS": ["flat"]
+									}
+								}
+							}
+						]
+					},			
+					{
+						"dountil": {
+							"botsent": 1
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["farewell"]
+							}
+						}
+					}
+				]
+			}
+		],
+
+		"convert": {
+			"dont": "don't",
+			"cant": "can't",
+			"wont": "won't",
+			"recollect": "remember",
+			"recall": "remember",
+			"dreamt": "dreamed",
+			"dreams": "dream",
+			"maybe": "perhaps",
+			"certainly": "yes",
+			"machine": "computer",
+			"machines": "computer",
+			"computers": "computer",
+			"were": "was",
+			"you're": "you are",
+			"i'm": "i am",
+			"same": "alike",
+			"identical": "alike",
+			"equivalent": "alike"
+		},
+
+		"inflect": {
+			"am": "are",
+			"your": "my",
+			"me": "you",
+			"myself": "yourself",
+			"yourself": "myself",
+			"i": "you",
+			"you": "I",
+			"my": "your",
+			"i'm": "you are"
+		},
+
+		"lookfor": {
+			"bye": [ "bye", "goodbye", "done", "exit", "quit" ]
+		},
+		
+		"moveset": [
+			{	
+				"forward": "Hello world!",
+				"tagging": [
+					"initial"
+				]
+			},
+			{
+				"forward": "Bye then!",
+				"tagging": [
+					"farewell"
+				]
+			}
+		],
+		
+		"ruleset": {
+			"*": {
+				"pattern": "*",
+				"ranking": 0,
+				"comment": "Top-level. Will match anything the user inputs.",
+				"results": [
+					{
+						"respond": "You say (1)",
+						"ranking": 0,
+						"tagging": [
+							"echo"
+						]
+					},
+					{
+						"respond": "I would have said this regardless of what you said.",
+						"ranking": 0,
+						"tagging": [
+							"flat"
+						]
+					}
+				],
+				"ruleset": {
+					"@bye": {
+						"pattern": "bye",
+						"results": [
+							{
+								"respond": "I guess that brings this conversation to a close then.",
+								"ranking": 0,
+								"tagging": [
+									"echo", "flat"
+								],
+								"setflag": ["quit"],
+								"comment": "Quits the conversation."
+							}
+						]
+					}
+				}
+			}
+		}
+	},
+	"test": [
+		{
+			"o": [
+				"Hello world!"
+			]
+		},
+		{
+			"i": "hello",
+			"o": [
+				"You say hello"
+			]
+		},
+		{
+			"i": "that's right",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "you seem fairly set in your ways",
+			"o": [
+				"You say I seem fairly set in my ways"
+			]
+		},
+		{
+			"i": "and repetitive",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "I am not sure this conversation is going anywhere.",
+			"o": [
+				"You say you are not sure this conversation is going anywhere."
+			]
+		},
+		{
+			"i": "Do you?",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "That illustrates my point exactly.",
+			"o": [
+				"You say That illustrates your point exactly."
+			]
+		},
+		{
+			"i": "Yes.",
+			"o": [
+				"I would have said this regardless of what you said."
+			]
+		},
+		{
+			"i": "That illustrates my point exactly.",
+			"o": [
+				"You say That illustrates your point exactly."
+			]
+		},
+		{
+			"i": "Yes.",
+			"o": [
+				"I would have said this regardless of what you said.",
+				"Bye then!"
+			]
+		}
+	]
+}

@@ -84,7 +84,8 @@
 			}
 		],
 
-		"substitutions": {
+
+		"convert": {
 			"dont": "don't",
 			"cant": "can't",
 			"wont": "won't",
@@ -105,7 +106,7 @@
 			"equivalent": "alike"
 		},
 
-		"intoout": {
+		"inflect": {
 			"am": "are",
 			"your": "my",
 			"me": "you",
@@ -117,7 +118,7 @@
 			"i'm": "you are"
 		},
 
-		"synonyms": {
+		"lookfor": {
 		},
 		
 		"moveset": [

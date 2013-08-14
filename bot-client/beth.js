@@ -47,10 +47,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
 		wildcardPattern = '\\s*(.*)\\s*',
 		
-		// Variables for identifying synonyms. Other markers will be used.
+		// What Beth should use to identify keys for the `lookfor` object.
 		// TODO: Work out way to systematise this.
-		synonymMarker = '@',
-		synonymPattern = /@(\S+)/,
+		lookforMarker = '@',
+		lookforPattern = /@(\S+)/,
 		
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
@@ -74,8 +74,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						ruleobj.pattern = r;
 						
 						// Substitute synonyms.
-						ruleobj.pattern = ruleobj.pattern.replace(synonymPattern, function (a0, a1) {
-							return libraryData.synonyms[a1] || a1; 
+						ruleobj.pattern = ruleobj.pattern.replace(lookforPattern, function (a0, a1) {
+							return "(" + libraryData.lookfor[a1].join("|") + ")" || a1;
+							// TODO: throw initialisation error if array not found?
 						});
 						
 						ruleobj.pattern = ruleobj.pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
@@ -125,29 +126,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				}
 			}
 		},
-		
-		// A variable to hold the regular expression combining all the keys.
-		ioregex,
-		
-		parseIo = function (intoout) {
-			var i,
-				
-				// An array to store all the keys.
-				ioarray = [];				
-				
-			// Loop through keys in object an push to array.
-			for (i in intoout) {
-				ioarray.push(i);
-			}
-			
-			// Create a regex from this array to search any input for any of the keys.
-			// Variable declared at higher level.
-			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "gi");
-		},
-		getInitial = function () {
-			// Return the first statement of the conversation.
-			return "Hello World!";
-		},
+
 		loginput = function (input) {
 		// Accepts user's input, puts it on a stack which is then regularly checked.
 		// Do we here check who the input is from and whether it needs responding to?
@@ -162,7 +141,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Maintain a history of these substitutions.
 			
 			var rtn,
-				sub = libraryData.substitutions, // local reference to relevant data
+				sub = libraryData.convert, // local reference to relevant data
 				key, // key for data
 				arr = [],
 				rex;
@@ -183,18 +162,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			return rtn;
 		},
-		process = function (input, rules, order, filter) {
+		process = function (input, rules, ioregex, inflect, order, filter) {
 		// Parse input using rulesets, dealing with deference en route.
 		// Order indicates, for now, the level of depth -- though this might happen at initialisation rather than dynamically.
 		// Filter can cut down on loops we run later by pre-emptively removing certain responses from the returned results.
-			debugFunc('starting process', order);
-			debugFunc('received input', input);
-			debugFunc('received rules', rules);
+			debugFunc('Starting process function ', order);
+			debugFunc('Received input: ', input);
+			debugFunc('Received rules: ', rules);
 		    var input = input,
 				rules = rules,
+				ioregex = ioregex,
+				inflect = inflect,
 				filter = (typeof filter === "function")
 					? filter
-					: function () { console.log("No filter found."); return true },
+					: function () { debugFunc("No filter found."); return true },
 				i,
 				j,
 			    rex,	// for storing regular expression
@@ -213,19 +194,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				d,
 				deferarray = [], // for storing pointers and objects for final deferral loop
 				origobj, // reference to the original object
-				objcopy, // copy of the object
-				copyObj = function (obj) {
-					var i,
-						copy = (typeof obj === "object") ? ((obj instanceof Array) ? [] : {}) : obj;
-					for (i in obj) {
-						if (typeof obj[i] === "object") {
-							copy[i] = copyObj(obj[i]);
-						} else {
-							copy[i] = obj[i];
-						}
-					}
-					return copy;
-				};
+				objcopy;
 				
 			for (i = 0; i < order; i += 1) {
 				tabbing += '\t';
@@ -244,7 +213,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (rules[i].hasOwnProperty('ruleset')) {
 						console.log(tabbing, "Exploring further...");
 						// Recursively call this function for nested rulesets.
-						recursive = process(input, rules[i].ruleset, order + 1, filter);
+						recursive = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
 						rtn.responses = rtn.responses.concat(recursive.responses);
 						rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
 					}
@@ -258,7 +227,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									"respond": origobj.respond,
 									"tagging": origobj.tagging,
 									"setflag": origobj.setflag,
-									"deferto": copyObj(origobj.deferto),
+									"deferto": utils.copyObject(origobj.deferto),
 									"deferrd": origobj.deferrd,
 									"covered": m[0].length,
 									// need a percentage?
@@ -270,7 +239,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								goto = objcopy.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
 									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.respond.substring(5));
-									recursive = process(input, libraryData.ruleset["*"].ruleset[goto], order + 1, filter);
+									recursive = process(input, libraryData.ruleset["*"].ruleset[goto], ioregex, libraryData.inflect, order + 1, filter);
 									rtn.responses = rtn.responses.concat(recursive.responses);
 									rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
 								}
@@ -290,13 +259,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										} else {
 											// use number to get relevant part of earlier match with user input
 											rtn = m[parseInt($2, 10)];
-											debugFunc("Return, pre-intoout");
+											debugFunc("Return, pre-inflection");
 											debugFunc(rtn);
 											// process part of user input and run inflections
 											rtn = rtn.replace(ioregex, function (match, $1) {
-												debugFunc("intoout sub");
-												debugFunc(libraryData.intoout[$1]);
-												return libraryData.intoout[$1.toLowerCase()];
+												debugFunc("Inflection");
+												debugFunc(libraryData.inflect[$1]);
+												return libraryData.inflect[$1.toLowerCase()];
 											});
 										};
 										return rtn;
@@ -433,7 +402,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 		})(),
 
-		utilities = (function () {
+		utils = (function () {
 			var convertBethTimeToMS = function (itemTime) {
 					// expects one string argument "hh:mm:ss"
 					var timeArr = itemTime.split(":"),
@@ -444,9 +413,18 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 					// returns argument provided as number of milliseconds
 					return timeMsc;
+				},
+				copyObject = function (obj) {
+					var i,
+						copy = (typeof obj === "object") ? ((obj instanceof Array) ? [] : {}) : obj;
+					for (i in obj) {
+						copy[i] = (typeof obj[i] === "object") ? copyObject(obj[i]) : obj[i]
+					}
+					return copy;
 				};
 			return {
-				convertBethTimeToMS: convertBethTimeToMS
+				convertBethTimeToMS: convertBethTimeToMS,
+				copyObject: copyObject
 			};
 		})(),
 		
@@ -541,7 +519,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							? (getBotSent() >= agendaSnapshot.agendaBotSent + bot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
-							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utilities.convertBethTimeToMS(edr))
+							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utils.convertBethTimeToMS(edr))
 							: false,
 						flgComp = (agendaItem.dountil.hasOwnProperty('flagset'))
 							?
@@ -649,12 +627,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				d,
 				r, // counter
 				datetime = new Date(),
-				f; // flag counter
-				
+				f, // flag counter
+				ioarray = [],
+				ioregex;
+			
+			for (i in libraryData.inflect) {
+				ioarray.push(i);
+			}
+			
+			// Create a regex from this array to search any input for any of the keys.
+			ioregex = new RegExp("\\b(" + ioarray.join("|") + ")\\b", "gi");
+			
 			// Sort responses to deliver to user via mediator [if staggered, then add to queue].
 			if (input) {
 				input = preprocess(input);
-				results = process(input, libraryData.ruleset, 0, filterCallback);
+				results = process(input, libraryData.ruleset, ioregex, libraryData.inflect, 0, filterCallback);
 				debugFunc("results!");
 				debugFunc(results);
 				responses = results.responses;
@@ -665,7 +652,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					d.address.unshift(d.todefer);
 				}
 				
-				// sort responses by nesting, so highest nesting comes first (i.e, closer to zero)
+				// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
 				responses.sort(function (a, b) {
 					var rtn = 0;
 					if (b.nesting > a.nesting) {
@@ -773,10 +760,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
 	parseRuleset(libraryData.ruleset);
 	
-	// Io in this case refering to the object of how certain input words should be treated.
-	// TODO: Should this be initialised or dynamic?
-	parseIo(libraryData.intoout);
-	
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
 	
@@ -785,7 +768,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 	
 	// Finally, expose private variables to public API.
-	this.getInitial = getInitial;
+
 	this.transform = loginput;
 	this.deactivate = deactivate;
 	

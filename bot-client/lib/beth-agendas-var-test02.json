@@ -31,11 +31,6 @@
 								"dountil": {
 									"botsent": 1
 								},
-								"proactive": {
-									"filters": {
-										"HAS": ["initial"]
-									}
-								},
 								"reactive": {
 									"filters": {
 										"HAS": ["echo"]
@@ -67,14 +62,6 @@
 					}
 				]
 			}
-		],
-
-		"quits": [
-			"bye",
-			"goodbye",
-			"done",
-			"exit",
-			"quit"
 		],
 
 		"convert": {
@@ -111,6 +98,7 @@
 		},
 
 		"lookfor": {
+			"bye": [ "bye", "goodbye", "done", "exit", "quit" ]
 		},
 		
 		"moveset": [
@@ -148,7 +136,23 @@
 							"flat"
 						]
 					}
-				]
+				],
+				"ruleset": {
+					"@bye": {
+						"pattern": "bye",
+						"results": [
+							{
+								"respond": "You say (1). I guess that brings this conversation to a close then.",
+								"ranking": 0,
+								"tagging": [
+									"echo", "flat"
+								],
+								"setflag": ["quit"],
+								"comment": "Mirros what they say and quits the conversation."
+							}
+						]
+					}
+				}
 			}
 		}
 	},
@@ -161,8 +165,7 @@
 		{
 			"i": "hello",
 			"o": [
-				"You say hello",
-				"Hello world!"
+				"You say hello"
 			]
 		},
 		{
@@ -174,8 +177,7 @@
 		{
 			"i": "you seem fairly set in your ways",
 			"o": [
-				"You say I seem fairly set in my ways",
-				"Hello world!"
+				"You say I seem fairly set in my ways"
 			]
 		},
 		{
@@ -187,8 +189,7 @@
 		{
 			"i": "I am not sure this conversation is going anywhere.",
 			"o": [
-				"You say you are not sure this conversation is going anywhere.",
-				"Hello world!"
+				"You say you are not sure this conversation is going anywhere."
 			]
 		},
 		{
@@ -200,8 +201,7 @@
 		{
 			"i": "That illustrates my point exactly.",
 			"o": [
-				"You say That illustrates your point exactly.",
-				"Hello world!"
+				"You say That illustrates your point exactly."
 			]
 		},
 		{
@@ -213,8 +213,7 @@
 		{
 			"i": "That illustrates my point exactly.",
 			"o": [
-				"You say That illustrates your point exactly.",
-				"Hello world!"
+				"You say That illustrates your point exactly."
 			]
 		},
 		{

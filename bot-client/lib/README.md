@@ -1,6 +1,6 @@
 #BETH DATA CONVENTIONS#
 
-##v0.3.11##
+##v0.4.0##
 
 ###ABOUT###
 
@@ -10,16 +10,12 @@ Beth accepts a JSON file containing the data it needs to operate. This document 
 
 Within the JSON file should be a single object containing a single property called `data`. There is an option for a `test` property as well for use with testing units.
 
-`data` itself should be an object containing a number of different properties needed by Beth to perform:
+`data` itself should be an object containing six of different properties needed by Beth to perform:
 
  - `agendas`
- - `gambits`
- - `farewells`
- - `quits`
- - `standardisations`
- - `intoout`
- - `synonyms`
- - `substitutions`
+ - `convert`
+ - `inflect`
+ - `lookfor`
  - `moveset`
  - `ruleset`
 
@@ -65,39 +61,19 @@ Object. As with `proactive` but applied to `ruleset` `respond` properties.
 
 Array. See all the properties listed above. Sub-agendas are looped over according to the `iterate` property of `dountil` in their parents.
 
-###`gambits`###
-
-Array. Contains opening statements. [No longer necessary. Replaced by `moveset` convention.]
-
-###`farewells`###
-
-Array. Contains closing statements. [No longer necessary. Replaced by `moveset` convention.]
-
-###`quits`###
-
-Array. Contains words Beth should look for to ascertain whether the user is finished the conversation or not. [Legacy from Eliza. May no longer be necessary.]
-
-###`substitutions`###
+###`convert`###
 
 Object. Words that we can consider safe to replace within a user's input. Includes contractions (e.g., replace `dont` with `don't`) and synonyms. It is important not to confuse this with the `synonyms` object however, which specifies a search range and does not alter the user's input. (Should be `standardisations` in future minor release.)
 
-###`intoout`###
+###`inflect`###
 
-Object. Words that should be changed for any part of the user's input that is used to form a response. These would mostly be inflections. [Perhaps change name to `inflections`.]
+Object. The keys are words that should be changed for any part of the user's input that is used to form a response. The values are what they should be changed to. For example, if using `because I am hungry` from the user's input, Beth would use this object to change the `I` to `you` and the `am` to `are`.
 
-###`synonyms`###
+###`lookfor`###
 
-Object. Each property of the object has an array. Both the key and the value of the property form a search pattern that Beth uses on the users' input.
+Object. Each property of the object has an array. Within the `ruleset` keys if Beth finds an `@` symbol directly followed by a word it will ensure that the pattern for that the key's object searches for all the words specified under the relevant array in the `variables` object.
 
-Within the `ruleset` if Beth finds an `@` symbol directly followed by word it will replace the whole phrase with all the words specified in the `synonyms` object.
-
-For example, `@be` in a ruleset pattern indicates the pattern should search for `be` or any words in the array that forms the value for that key. With `"be": ["am", "is", "are", "was"]` for instance, Beth will look for `be`, `am`, `is`, `are` and `was` by replacing `@be` with the regular expression `\b(be|am|is|are|was)\b`.
-
-###`substitutions`###
-
-[Work in progress.] Object. Like `synonyms` but where the substitution is total. The value `quit` for example, will search only the words or phrases in the array that forms the value of the property with that key and not the word `quit` itself--unless, it is included in the array.
-
-[Could eventually replace synonyms?]
+For example, `@bye` in a ruleset key indicates the pattern should search for any words in the array that forms the value for that key. With `"bye": ["bye", "quit", "done", "goodbye", "exit"]` for instance, Beth will look for `bye` (because it is in the array), `quit`, `done`, `goodbye` and `exit` by replacing `@be` with the regular expression `\b(bye|quit|done|goodbye|exit)\b` in the initialised pattern.
 
 ###`moveset`###
 
@@ -138,6 +114,7 @@ Each object in the array should consist of at least two properties (extra option
  - `tagging`
  - `ranking`*
  - `deferto`
+ - `setflag`
  
 Details below.
 
@@ -162,3 +139,7 @@ Array. Contains arrays. Each of these subarrays contains strings. The strings in
 This property generally indicates that a result should not be used straight away. Instead it should be processed, with parts of user's input being substituted where appropriate, and then deferred for a later part of the conversation. Each sub-array of strings indicates a place within the ruleset where the processed result should go, so that Beth knows when to pull up the result next.
 
 The number of sub-arrays indicates the number of deferrals Beth should perform, meaning that a user may have to say a number of things before the deferred result comes up.
+
+#####`setflag`#####
+
+Array. Contains a list of which should be set to `true` in the session Beth is running. Every flag starts at `false` at the beginning of a session. So if a `results` object has `setflag` of "quit" then the quit flag will be created if it does not already exist and then set to `true`.

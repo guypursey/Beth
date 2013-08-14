@@ -85,19 +85,11 @@ Object. Words that we can consider safe to replace within a user's input. Includ
 
 Object. Words that should be changed for any part of the user's input that is used to form a response. These would mostly be inflections. [Perhaps change name to `inflections`.]
 
-###`synonyms`###
+###`variables`###
 
-Object. Each property of the object has an array. Both the key and the value of the property form a search pattern that Beth uses on the users' input.
+Object. Each property of the object has an array. Within the `ruleset` keys if Beth finds an `@` symbol directly followed by a word it will ensure that the pattern for that the key's object searches for all the words specified under the relevant array in the `variables` object.
 
-Within the `ruleset` if Beth finds an `@` symbol directly followed by word it will replace the whole phrase with all the words specified in the `synonyms` object.
-
-For example, `@be` in a ruleset pattern indicates the pattern should search for `be` or any words in the array that forms the value for that key. With `"be": ["am", "is", "are", "was"]` for instance, Beth will look for `be`, `am`, `is`, `are` and `was` by replacing `@be` with the regular expression `\b(be|am|is|are|was)\b`.
-
-###`substitutions`###
-
-[Work in progress.] Object. Like `synonyms` but where the substitution is total. The value `quit` for example, will search only the words or phrases in the array that forms the value of the property with that key and not the word `quit` itself--unless, it is included in the array.
-
-[Could eventually replace synonyms?]
+For example, `@be` in a ruleset key indicates the pattern should search for any words in the array that forms the value for that key. With `"be": ["be", "am", "is", "are", "was"]` for instance, Beth will look for `be`, `am`, `is`, `are` and `was` by replacing `@be` with the regular expression `\b(be|am|is|are|was)\b` in the initialised pattern.
 
 ###`moveset`###
 

@@ -6,7 +6,7 @@ var express = require('express'),
 server.listen(8374); // 8374 === BETH || BETA
 
 app.get('/', function (req, res) {
-	res.sendfile(__dirname + '/usr-client/ui-simple.html');
+	res.sendfile(__dirname + '/usr-client/ui-proper.html');
 });
 
 app.use('/lib', express.static(__dirname + '/usr-client/lib'));

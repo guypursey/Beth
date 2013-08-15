@@ -46,8 +46,6 @@ Function. This callback should contain the code necessary for Beth to log what i
 
 The variables in the Beth constructor are as follows:
 
- - `debugFlag`
- - `debugFn`
  - `debugFunc`
  - `libraryData`
  - `logData`

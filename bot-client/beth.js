@@ -5,15 +5,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	// I am preparing the two for use in tandem.
 	// For now, the first argument is defunct. I will ignore it.
 	
-	var debugFlag = true,
-		debugFn = debugFn,
-		debugFunc = function (msg) {
-			if (debugFlag) {
-				if (debugFn) {
-					debugFn(msg);
-				} else {
-					console.log(msg);
-				}
+	var debugFunc = function (msg) {
+			if (debugFn) {
+				debugFn(msg);
+			} else {
+				console.log(msg);
 			}
 		},
 		

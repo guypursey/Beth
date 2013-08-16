@@ -274,20 +274,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						results = [];
 						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < rules[i].results.length; j += 1) {
-							var origobj = rules[i].results[j],
-								objcopy = {
-									"respond": origobj.respond,
-									"tagging": origobj.tagging,
-									"setflag": origobj.setflag,
-									"deferto": utils.copyObject(origobj.deferto),
-									"deferrd": origobj.deferrd,
-									"covered": m[0].length,
-									// need a percentage?
-									"indexof": m.index,
-									"origobj": origobj
-								}; // could be a loop through obj properties
+							var objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
+							objcopy.covered = m[0].length; // Add properties.
+							objcopy.indexof = m.index;
+							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
 							if (objcopy.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
-								
 								goto = objcopy.respond.substring(5);     // get the key we should go to,
 								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
 									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.respond.substring(5));
@@ -295,7 +286,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									rtn.responses = rtn.responses.concat(recursive.responses);
 									rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
 								}
-								
 							} else {
 								// Check that the results conform to the filter.
 								if (filter(objcopy.tagging)) {

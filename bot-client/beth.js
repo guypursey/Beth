@@ -429,7 +429,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			};
 		})(),
 		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag, debugFunc) {
 			var agendaStack = [], // An array to store all the current agenda items.
 				redoSnapshot = function (agendaLevel, itemNum) {
 					
@@ -620,7 +620,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag, function () {}),
 		
 		timedcheck = function () {
 			

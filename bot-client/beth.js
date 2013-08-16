@@ -5,44 +5,106 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	// I am preparing the two for use in tandem.
 	// For now, the first argument is defunct. I will ignore it.
 	
-	var debugFlag = true,
-		debugFn = debugFn,
-		debugFunc = function (msg) {
-			if (debugFlag) {
-				if (debugFn) {
-					debugFn(msg);
-				} else {
-					console.log(msg);
-				}
+	var debugFunc = function (msg) {
+			if (debugFn) {
+				debugFn(msg);
+			} else {
+				console.log(msg);
 			}
 		},
 		
-		selectIndex = function (min, max) {
-			return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
-		},
-
-		// Declare imported library data locally.
-		libraryData = libraryData,
+		sessionStats = (function () {
+			var sessionStatus = {
+					usrsent: 0,
+					botsent: 0,
+					totsent: 0,
+					flagset: {}
+				},
+				updateUsrSent = function () {
+					sessionStatus.usrsent += 1;
+				},
+				updateBotSent = function () {
+					sessionStatus.botsent += 1;
+				},
+				updateTotSent = function () {
+					sessionStatus.totsent += 1;
+				},
+				setFlag = function (flag) {
+					sessionStatus.flagset[flag] = true;
+				},
+				getUsrSent = function (){
+					return sessionStatus.usrsent;
+				},
+				getBotSent = function (){
+					return sessionStatus.botsent;
+				},
+				getTotSent = function (){
+					return sessionStatus.totsent;
+				},
+				getFlag = function (flag) {
+					return sessionStatus.flagset[flag] || false;
+				};
+				
+			return {
+				updateUsrSent: updateUsrSent,
+				updateBotSent: updateBotSent,
+				updateTotSent: updateTotSent,
+				setFlag: setFlag,
+				getUsrSent: getUsrSent,
+				getBotSent: getBotSent,
+				getTotSent: getTotSent,
+				getFlag: getFlag
+			};
+			
+		})(),
 		
+		logManager = (function (updateUsrSent) {
 		// Set up log for storing inputs, both process and unprocessed.
-		// Should also log what Beth herself has said, so as not to get too repetitive.
-		logData = {
-			toprocess: [],
-			processed: [],
-			autograph: []
-			// Autograph may in fact need to be an object, whose keys are statements put to the user.
-			// Each property would be an array logging all the times the statement has been said.
-			// Every so often, the arrays could be shifted so that repetition is allowed over time and memory saved.
-		},
+			var logData = {
+					toprocess: [],
+					processed: [],
+				},
+				readlog = function () {
+					return (logData.toprocess.length) ? logData.toprocess.shift() : '';
+				},
+				loginput = function (input) {
+					// Accepts user's input, puts it on a stack, which is then regularly checked.
+					logData.toprocess.push(input);
+					// Update number of items received from user in sessionStats.
+					updateUsrSent();
+				};
+			return {
+				takeUnprocessedMessage: readlog,
+				addUnprocessedMessage: loginput
+			}
+		})(sessionStats.updateUsrSent),
 		
-		// Set up object for storing responses to be sent out.
-		postRoom = [],
-		
-		// Localise post message callback function.
-		postMsg = postMsg,
-		
-		// Localise connection severance function.
-		severFn = severFn,
+		postManager = (function (updateBotSent) {
+			var postRoom = [],
+				addToStack = function (msg) {
+					postRoom.push(msg);
+				},
+				sendFromStack = function () {
+					// Check if any responses are waiting to go out.
+					if (postRoom.length) {
+						postMsg(postRoom.shift());
+						// Update number of items sent out.
+						updateBotSent();
+					}
+				},
+				postInterval,
+				activate = function (interval) {
+					postInterval = setInterval(sendFromStack, interval);
+				},
+				deactivate = function () {
+					clearInterval(postInterval);
+				};
+			return {
+				sendWhenReady: addToStack,
+				activate: activate,
+				deactivate: deactivate
+			}
+		})(sessionStats.updateBotSent),
 		
 		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
 		wildcardPattern = '\\s*(.*)\\s*',
@@ -125,16 +187,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 				}
 			}
-		},
-
-		loginput = function (input) {
-		// Accepts user's input, puts it on a stack which is then regularly checked.
-		// Do we here check who the input is from and whether it needs responding to?
-			logData.toprocess.push(input);
-			
-		// Update number of items received from user in sessionStats.
-		// TODO: There may be a more efficient/elegant way to do this than just calling the stats method directly.
-			sessionStats.updateUsrSent();
 		},
 		preprocess = function (input) {
 		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
@@ -222,117 +274,97 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						results = [];
 						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < rules[i].results.length; j += 1) {
-							var origobj = rules[i].results[j],
-								objcopy = {
-									"respond": origobj.respond,
-									"tagging": origobj.tagging,
-									"setflag": origobj.setflag,
-									"deferto": utils.copyObject(origobj.deferto),
-									"deferrd": origobj.deferrd,
-									"covered": m[0].length,
-									// need a percentage?
-									"indexof": m.index,
-									"origobj": origobj
-								}; // could be a loop through obj properties
-							if (objcopy.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
+							var objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
+							objcopy.covered = m[0].length; // Add properties.
+							objcopy.indexof = m.index;
+							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
+							// Check that the results conform to the filter.
+							if (filter(objcopy.tagging)) {
+								// If the tags in this result match the ones specified, use it.
+								objcopy.nesting = order;
 								
-								goto = objcopy.respond.substring(5);     // get the key we should go to,
-								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.respond.substring(5));
-									recursive = process(input, libraryData.ruleset["*"].ruleset[goto], ioregex, libraryData.inflect, order + 1, filter);
-									rtn.responses = rtn.responses.concat(recursive.responses);
-									rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
-								}
-								
-							} else {
-								// Check that the results conform to the filter.
-								if (filter(objcopy.tagging)) {
-									// If the tags in this result match the ones specified, use it.
-									objcopy.nesting = order;
-									
-									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
-										var rtn;
-										if ($1) {
-											// if first capture found, ignore--surrounded my more than one pair of parentheses
-											rtn = $1;
-										} else {
-											// use number to get relevant part of earlier match with user input
-											rtn = m[parseInt($2, 10)];
-											debugFunc("Return, pre-inflection");
-											debugFunc(rtn);
-											// process part of user input and run inflections
-											rtn = rtn.replace(ioregex, function (match, $1) {
-												debugFunc("Inflection");
-												debugFunc(libraryData.inflect[$1]);
-												return libraryData.inflect[$1.toLowerCase()];
-											});
-										};
-										return rtn;
-									});
-									
-									// remove single pair of outer parentheses from any future substitution markers
-									objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
-										return a1;
-									});
-									
-									// Sift out deferred options first.
-									if (objcopy.deferto) {
-									// TODO: could also check for nested parentheses as a condition of deferral?
-									// TODO: check not just that deferto exists but that is also an array and not empty
-										deferwhere = libraryData;
-										// Set up deferwhere to start looking at libraryData.
-										
-										// Take just the first element of deferto.
-										deferpath = objcopy.deferto.shift();
-										//TODO: check this is also an array
-										
-										// If array is empty, change value to false, so that this item is not eternally deferred.
-										if (objcopy.deferto.length === 0) {
-											objcopy.deferto = false;
-										}
-										// TODO: could refactor this so the emptiness of the array is checked upfront
-										
-										if (deferpath) {
-										// TODO: need a better check that this is an array -- this whole section to be refactored
-											d = 0;
-											while (d < deferpath.length && typeof deferpath[d] === "string") {
-											// Check the element in the array can be a valid key value.
-												
-												// If the path does not current exist, create it.
-												if (!(deferwhere.hasOwnProperty("ruleset"))) {
-													deferwhere.ruleset = {};
-												}
-												if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
-													deferwhere.ruleset[deferpath[d]] = {};
-												}
-												
-												deferwhere = deferwhere.ruleset[deferpath[d]];
-												debugFunc("defer loc: " + d);
-												debugFunc(deferwhere);
-												d += 1;
-											}							
-										}
-										
-										// Record that this item is not part of the original ruleset but deferred.
-										objcopy.deferrd = true;
-										
-										// If the deferral location does not have a results array create one.
-										if (!(deferwhere.hasOwnProperty("results"))) {
-											deferwhere.results = [];
-										}
-										
-										// Set up the deferral for later.
-										deferarray.push({
-											"address": deferwhere.results,
-											"todefer": objcopy
-										});
-										
+								// Make necessary substitutions in the response.
+								objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
+									var rtn;
+									if ($1) {
+										// if first capture found, ignore--surrounded my more than one pair of parentheses
+										rtn = $1;
 									} else {
-										// This result is good to use.
-										results.push(objcopy);
+										// use number to get relevant part of earlier match with user input
+										rtn = m[parseInt($2, 10)];
+										debugFunc("Return, pre-inflection");
+										debugFunc(rtn);
+										// process part of user input and run inflections
+										rtn = rtn.replace(ioregex, function (match, $1) {
+											debugFunc("Inflection");
+											debugFunc(libraryData.inflect[$1]);
+											return libraryData.inflect[$1.toLowerCase()];
+										});
+									};
+									return rtn;
+								});
+								
+								// remove single pair of outer parentheses from any future substitution markers
+								objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
+									return a1;
+								});
+								
+								// Sift out deferred options first.
+								if (objcopy.deferto) {
+								// TODO: could also check for nested parentheses as a condition of deferral?
+								// TODO: check not just that deferto exists but that is also an array and not empty
+									deferwhere = libraryData;
+									// Set up deferwhere to start looking at libraryData.
 									
+									// Take just the first element of deferto.
+									deferpath = objcopy.deferto.shift();
+									//TODO: check this is also an array
+									
+									// If array is empty, change value to false, so that this item is not eternally deferred.
+									if (objcopy.deferto.length === 0) {
+										objcopy.deferto = false;
 									}
+									// TODO: could refactor this so the emptiness of the array is checked upfront
+									
+									if (deferpath) {
+									// TODO: need a better check that this is an array -- this whole section to be refactored
+										d = 0;
+										while (d < deferpath.length && typeof deferpath[d] === "string") {
+										// Check the element in the array can be a valid key value.
+											
+											// If the path does not current exist, create it.
+											if (!(deferwhere.hasOwnProperty("ruleset"))) {
+												deferwhere.ruleset = {};
+											}
+											if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+												deferwhere.ruleset[deferpath[d]] = {};
+											}
+											
+											deferwhere = deferwhere.ruleset[deferpath[d]];
+											debugFunc("defer loc: " + d);
+											debugFunc(deferwhere);
+											d += 1;
+										}							
+									}
+									
+									// Record that this item is not part of the original ruleset but deferred.
+									objcopy.deferrd = true;
+									
+									// If the deferral location does not have a results array create one.
+									if (!(deferwhere.hasOwnProperty("results"))) {
+										deferwhere.results = [];
+									}
+									
+									// Set up the deferral for later.
+									deferarray.push({
+										"address": deferwhere.results,
+										"todefer": objcopy
+									});
+									
+								} else {
+									// This result is good to use.
+									results.push(objcopy);
+								
 								}
 							}
 						}
@@ -346,61 +378,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return rtn;
 
 		},
-		readlog = function () {
-			var rtn;
-			if (logData.toprocess.length) {
-				rtn = logData.toprocess.shift();
-			} else {
-				rtn = '';
-				// Currently just dealing with strings, though objects may be required.
-			}
-			return rtn;
-		},
-		
-		sessionStats = (function () {
-			var sessionStatus = {
-					usrsent: 0,
-					botsent: 0,
-					totsent: 0,
-					flagset: {}
-				},
-				updateUsrSent = function () {
-					sessionStatus.usrsent += 1;
-				},
-				updateBotSent = function () {
-					sessionStatus.botsent += 1;
-				},
-				updateTotSent = function () {
-					sessionStatus.totsent += 1;
-				},
-				setFlag = function (flag) {
-					sessionStatus.flagset[flag] = true;
-				},
-				getUsrSent = function (){
-					return sessionStatus.usrsent;
-				},
-				getBotSent = function (){
-					return sessionStatus.botsent;
-				},
-				getTotSent = function (){
-					return sessionStatus.totsent;
-				},
-				getFlag = function (flag) {
-					return sessionStatus.flagset[flag] || false;
-				};
-				
-			return {
-				updateUsrSent: updateUsrSent,
-				updateBotSent: updateBotSent,
-				updateTotSent: updateTotSent,
-				setFlag: setFlag,
-				getUsrSent: getUsrSent,
-				getBotSent: getBotSent,
-				getTotSent: getTotSent,
-				getFlag: getFlag
-			};
-			
-		})(),
 
 		utils = (function () {
 			var convertBethTimeToMS = function (itemTime) {
@@ -421,14 +398,18 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						copy[i] = (typeof obj[i] === "object") ? copyObject(obj[i]) : obj[i]
 					}
 					return copy;
+				},
+				selectIndex = function (min, max) {
+					return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
 				};
 			return {
 				convertBethTimeToMS: convertBethTimeToMS,
-				copyObject: copyObject
+				copyObject: copyObject,
+				selectIndex: selectIndex
 			};
 		})(),
 		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag) {
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag, debugFunc) {
 			var agendaStack = [], // An array to store all the current agenda items.
 				redoSnapshot = function (agendaLevel, itemNum) {
 					
@@ -604,21 +585,27 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 					return agendaStack[0].agendaItem;
 				},
-				agendaInterval;
+				agendaInterval,
+				activate = function (interval) {
+					agendaInterval = setInterval(function () { getCurrentItem(); }, interval);
+				},
+				deactivate = function () {
+					clearInterval(agendaInterval);
+				};
 				
 			redoSnapshot(agendas, 0); // Important for initialisation
 			
-			// update time every second	
-			agendaInterval = setInterval(function () { getCurrentItem(); }, 1000);
 			return {
-				getCurrentFilter: getCurrentFilter
+				getCurrentFilter: getCurrentFilter,
+				activate: activate,
+				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag, function () {}),
 		
 		timedcheck = function () {
 			
 			// Check if the user has said anything recently and process it. [REACTIVE]
-			var input = readlog(),
+			var input = logManager.takeUnprocessedMessage(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
 				results,
@@ -642,7 +629,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			if (input) {
 				input = preprocess(input);
 				results = process(input, libraryData.ruleset, ioregex, libraryData.inflect, 0, filterCallback);
-				debugFunc("results!");
+				debugFunc("Results are in:");
 				debugFunc(results);
 				responses = results.responses;
 				deferrals = results.deferrals;
@@ -654,7 +641,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 				// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
 				responses.sort(function (a, b) {
-					var rtn = 0;
+					var rtn = 0,
+						a_date = (a.history) ? (a.history[0] || 0) : 0,
+						b_date = (b.history) ? (b.history[0] || 0) : 0;
 					if (b.nesting > a.nesting) {
 						rtn = 1;
 					} else if (b.nesting < a.nesting) {
@@ -663,21 +652,19 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						rtn = 1;
 					} else if (b.deferrd < a.deferrd) {
 						rtn = -1;
-					} else if (b.origobj.history[0] > a.origobj.history[0]) {
-						rtn = 1;
-					} else if (b.origobj.history[0] < a.origobj.history[0]) {
-						rtn = -1;
+					} else {
+						rtn = a_date - b_date;
 					}
 					return rtn;
 				});
 
 				if (responses.length) {
 
-					var whichResponse = selectIndex(0, (responses.length - 1));
+					var whichResponse = utils.selectIndex(0, (responses.length - 1));
 					
 					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).
-						postRoom.push(responses[whichResponse].respond);
+						postManager.sendWhenReady(responses[whichResponse].respond);
 					}
 					
 					// Record use of this object on the original database if possible.
@@ -716,60 +703,41 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Sort so array in order of most recently used (with least recent or never used at bottom).
 			mA.reverse().sort(function (a, b) {
-				var rtn = 0;
-				if (b.history && a.history) {
-					if (b.history[0] < a.history[0]) { // If `b` has lower date and is therefore older.
-						rtn = 1; // Sort `b` to lower index (more chance of being selected).
-					} else if (b.history[0] > a.history[0]) {
-						rtn = -1; // Else put `a` close to being picked as older.
-					}
-				} else {
-					if (b.history) { // If `b` has ever been used
-						rtn = -1; // Move it up.
-					} else if (a.history) {
-						rtn = 1; // `a` was used but not `b` so move `b` towards zero.
-					}
-				}
-				return rtn;
+				var a_date = (a.history) ? (a.history[0] || 0) : 0,
+					b_date = (b.history) ? (b.history[0] || 0) : 0;
+				return a_date - b_date;
 			});
 
 			debugFunc("filtered moveSet array");
 			debugFunc(mA);
 			
 			if (mA.length) {
-				whichAction = selectIndex(0, (mA.length - 1));
-				postRoom.push(mA[whichAction].forward);
+				whichAction = utils.selectIndex(0, (mA.length - 1));
+				postManager.sendWhenReady(mA[whichAction].forward);
 				mA[whichAction].history = mA[whichAction].history || [];
 				mA[whichAction].history.unshift(datetime);
 			}
-
-			// Check if any responses are waiting to go out.
-			if (postRoom.length) {
-				postMsg(postRoom.shift());
-				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
-				sessionStats.updateBotSent();
-			}
-
 		},
 		interval,
+		agendaInterval = agendaManager.activate(1000),
+		postInterval = postManager.activate(1000),
 		deactivate = function () {
 			clearInterval(interval);
+			clearInterval(postInterval);
+			clearInterval(agendaInterval);
 		}; //eof variable declarations
-		
 
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
 	parseRuleset(libraryData.ruleset);
-	
+
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
 	
 	// Set interval to check agenda and log every 2 seconds.
 	interval = setInterval(timedcheck, 2000);
 
-	
 	// Finally, expose private variables to public API.
-
-	this.transform = loginput;
+	this.transform = logManager.addUnprocessedMessage;
 	this.deactivate = deactivate;
 	
 },

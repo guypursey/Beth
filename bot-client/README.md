@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.4.0##
+##CODE DOCUMENTATION for v0.4.1##
 
 ###NODE JS COMPATIBILITY###
 
@@ -46,8 +46,6 @@ Function. This callback should contain the code necessary for Beth to log what i
 
 The variables in the Beth constructor are as follows:
 
- - `debugFlag`
- - `debugFn`
  - `debugFunc`
  - `libraryData`
  - `logData`
@@ -70,37 +68,21 @@ The variables in the Beth constructor are as follows:
  - `deactivate`
 
 
-###`debugFlag`###
-
-*Boolean value.* An internally set variable that enables/disables the debugging that Beth produces. [May not actually be required as the callback parameter can be provided as empty or false to produce the same effect.]
-
-###`debugFn`###
-
-*Parameter. (Should be a function.)* Simply inherits whatever callback is provided as a parameter to Beth.
-
 ###`debugFunc`###
 
 *Function.* If `debugFlag` is true then set call `debugFn` or (if `debugFn`) is null log the message in the console.
 
-###`libraryData`###
+ ###`sessionStats`###
 
-*Parameter. (Should be an object.)* Contains the rulesets, movesets and other data that Beth should follow in a conversation.
- 
-###`logData`###
+*IIFE closure.* The closure returns an object whose properties are references to functions within the closure. This means that the stats themselves are private variables and should not be changeable from the outside. The functions provided can be used to increment the number of messages the user has sent or the bot has sent or the total overall messages sent. There is also a function for setting flags. In addition to these setters, getter properties can be used to retrieve the latest statistics.
 
-*Object.* A collection of arrays to store what the user has said which needs processing, what has already been processed, and what Beth has said. [Encapsulation may be required.]
+###`logManager`###
 
-###`postRoom`###
+*IIFE closure.* The closure returns an object whose properties are references to functions within the closure. Enables adding of user's input to the appropriate `logData` property and calls the method in `sessionStats` (plugged into the closure) for incrementing the number of messages sent by the user.
 
-*Array.* A storing array for responses to be sent out by Beth at certain intervals.
+###postManager###
 
-###`postMsg`###
-
-*Parameter. (Should be a function.)* A localisation of the `postMsg` argument which should be a callback function.
-
-###`severFn`###
-
-*Parameter. (Should be a function.)* A localisation of the `severFn` argument which should be a callback function.
+*IIFE closure.* The closure returns an object whose properties are references to functions within the closure. Enables adding of messages t go out to conversation. Has interval timer which checks if there is anything on the local stack and sends it out.
 
 ###`wildcardPattern`###
 
@@ -119,12 +101,6 @@ The variables in the Beth constructor are as follows:
 *Function.* Given a ruleset as a parameter, this function will initialise it by changing each `pattern` property into a string that can be used to create a regular expression.
 
 Calls itself recursively, in that it can then be used to parse rulesets of greater depth (i.e., rulesets within rulesets).
-
-###`loginput`###
-
-*Function.* Adds user's input to the appropriate `logData` property and calls the method in sessionStats for incrementing the number of messages sent by the user.
-
-[Might also fit within a closure.]
 
 ###`preprocess`###
 
@@ -145,14 +121,6 @@ The response of each result is filled out with the required part of the user's i
 Since the introduction of a memory convention, results with `deferto` values are put aside so that they can be actually placed back into the `libraryData` for later use. Some variables within the reassembly rule (`respond`) may be further deferred according to the convention.
 
 Results are then concatenated to any previous results (i.e. from successful recursive calls) and returned.
-
-###`readlog`###
-
-*Function.* Removes the input at the beginning of the `logData` and returns it.
-
-###`sessionStats`###
-
-*IIFE closure.* The closure returns an object whose properties are references to functions within the closure. This means that the stats themselves are private variables and should not be changeable from the outside. The functions provided can be used to increment the number of messages the user has sent or the bot has sent or the total overall messages sent. There is also a function for setting flags. In addition to these setters, getter properties can be used to retrieve the latest statistics.
 
 ###`utils`###
 

@@ -13,32 +13,98 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		},
 		
-		selectIndex = function (min, max) {
-			return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
-		},
-
-		// Declare imported library data locally.
-		libraryData = libraryData,
+		sessionStats = (function () {
+			var sessionStatus = {
+					usrsent: 0,
+					botsent: 0,
+					totsent: 0,
+					flagset: {}
+				},
+				updateUsrSent = function () {
+					sessionStatus.usrsent += 1;
+				},
+				updateBotSent = function () {
+					sessionStatus.botsent += 1;
+				},
+				updateTotSent = function () {
+					sessionStatus.totsent += 1;
+				},
+				setFlag = function (flag) {
+					sessionStatus.flagset[flag] = true;
+				},
+				getUsrSent = function (){
+					return sessionStatus.usrsent;
+				},
+				getBotSent = function (){
+					return sessionStatus.botsent;
+				},
+				getTotSent = function (){
+					return sessionStatus.totsent;
+				},
+				getFlag = function (flag) {
+					return sessionStatus.flagset[flag] || false;
+				};
+				
+			return {
+				updateUsrSent: updateUsrSent,
+				updateBotSent: updateBotSent,
+				updateTotSent: updateTotSent,
+				setFlag: setFlag,
+				getUsrSent: getUsrSent,
+				getBotSent: getBotSent,
+				getTotSent: getTotSent,
+				getFlag: getFlag
+			};
+			
+		})(),
 		
+		logManager = (function (updateUsrSent) {
 		// Set up log for storing inputs, both process and unprocessed.
-		// Should also log what Beth herself has said, so as not to get too repetitive.
-		logData = {
-			toprocess: [],
-			processed: [],
-			autograph: []
-			// Autograph may in fact need to be an object, whose keys are statements put to the user.
-			// Each property would be an array logging all the times the statement has been said.
-			// Every so often, the arrays could be shifted so that repetition is allowed over time and memory saved.
-		},
+			var logData = {
+					toprocess: [],
+					processed: [],
+				},
+				readlog = function () {
+					return (logData.toprocess.length) ? logData.toprocess.shift() : '';
+				},
+				loginput = function (input) {
+					// Accepts user's input, puts it on a stack, which is then regularly checked.
+					logData.toprocess.push(input);
+					// Update number of items received from user in sessionStats.
+					updateUsrSent();
+				};
+			return {
+				takeUnprocessedMessage: readlog,
+				addUnprocessedMessage: loginput
+			}
+		})(sessionStats.updateUsrSent),
 		
-		// Set up object for storing responses to be sent out.
-		postRoom = [],
-		
-		// Localise post message callback function.
-		postMsg = postMsg,
-		
-		// Localise connection severance function.
-		severFn = severFn,
+		postManager = (function (updateBotSent) {
+			var postRoom = [],
+				addToStack = function (msg) {
+					postRoom.push(msg);
+				},
+				sendFromStack = function () {
+					// Check if any responses are waiting to go out.
+					if (postRoom.length) {
+						postMsg(postRoom.shift());
+						// Update number of items sent out.
+						updateBotSent();
+					}
+				},
+				postInterval,
+				activate = function (interval) {
+					postInterval = setInterval(sendFromStack, interval);
+				},
+				deactivate = function () {
+					clearInterval(postInterval);
+				};
+			return {
+				sendWhenReady: addToStack,
+				activate: activate,
+				deactivate: deactivate
+			}
+		})(sessionStats.updateBotSent),
 		
 		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
 		wildcardPattern = '\\s*(.*)\\s*',
@@ -121,16 +187,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 				}
 			}
-		},
-
-		loginput = function (input) {
-		// Accepts user's input, puts it on a stack which is then regularly checked.
-		// Do we here check who the input is from and whether it needs responding to?
-			logData.toprocess.push(input);
-			
-		// Update number of items received from user in sessionStats.
-		// TODO: There may be a more efficient/elegant way to do this than just calling the stats method directly.
-			sessionStats.updateUsrSent();
 		},
 		preprocess = function (input) {
 		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
@@ -342,61 +398,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return rtn;
 
 		},
-		readlog = function () {
-			var rtn;
-			if (logData.toprocess.length) {
-				rtn = logData.toprocess.shift();
-			} else {
-				rtn = '';
-				// Currently just dealing with strings, though objects may be required.
-			}
-			return rtn;
-		},
-		
-		sessionStats = (function () {
-			var sessionStatus = {
-					usrsent: 0,
-					botsent: 0,
-					totsent: 0,
-					flagset: {}
-				},
-				updateUsrSent = function () {
-					sessionStatus.usrsent += 1;
-				},
-				updateBotSent = function () {
-					sessionStatus.botsent += 1;
-				},
-				updateTotSent = function () {
-					sessionStatus.totsent += 1;
-				},
-				setFlag = function (flag) {
-					sessionStatus.flagset[flag] = true;
-				},
-				getUsrSent = function (){
-					return sessionStatus.usrsent;
-				},
-				getBotSent = function (){
-					return sessionStatus.botsent;
-				},
-				getTotSent = function (){
-					return sessionStatus.totsent;
-				},
-				getFlag = function (flag) {
-					return sessionStatus.flagset[flag] || false;
-				};
-				
-			return {
-				updateUsrSent: updateUsrSent,
-				updateBotSent: updateBotSent,
-				updateTotSent: updateTotSent,
-				setFlag: setFlag,
-				getUsrSent: getUsrSent,
-				getBotSent: getBotSent,
-				getTotSent: getTotSent,
-				getFlag: getFlag
-			};
-			
-		})(),
 
 		utils = (function () {
 			var convertBethTimeToMS = function (itemTime) {
@@ -417,10 +418,14 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						copy[i] = (typeof obj[i] === "object") ? copyObject(obj[i]) : obj[i]
 					}
 					return copy;
+				},
+				selectIndex = function (min, max) {
+					return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
 				};
 			return {
 				convertBethTimeToMS: convertBethTimeToMS,
-				copyObject: copyObject
+				copyObject: copyObject,
+				selectIndex: selectIndex
 			};
 		})(),
 		
@@ -600,21 +605,27 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 					return agendaStack[0].agendaItem;
 				},
-				agendaInterval;
+				agendaInterval,
+				activate = function (interval) {
+					agendaInterval = setInterval(function () { getCurrentItem(); }, interval);
+				},
+				deactivate = function () {
+					clearInterval(agendaInterval);
+				};
 				
 			redoSnapshot(agendas, 0); // Important for initialisation
 			
-			// update time every second	
-			agendaInterval = setInterval(function () { getCurrentItem(); }, 1000);
 			return {
-				getCurrentFilter: getCurrentFilter
+				getCurrentFilter: getCurrentFilter,
+				activate: activate,
+				deactivate: deactivate
 			};
 		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag),
 		
 		timedcheck = function () {
 			
 			// Check if the user has said anything recently and process it. [REACTIVE]
-			var input = readlog(),
+			var input = logManager.takeUnprocessedMessage(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
 				filterCallback = agendaManager.getCurrentFilter("reactive"),
 				results,
@@ -669,11 +680,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 				if (responses.length) {
 
-					var whichResponse = selectIndex(0, (responses.length - 1));
+					var whichResponse = utils.selectIndex(0, (responses.length - 1));
 					
 					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).
-						postRoom.push(responses[whichResponse].respond);
+						postManager.sendWhenReady(responses[whichResponse].respond);
 					}
 					
 					// Record use of this object on the original database if possible.
@@ -733,39 +744,32 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc(mA);
 			
 			if (mA.length) {
-				whichAction = selectIndex(0, (mA.length - 1));
-				postRoom.push(mA[whichAction].forward);
+				whichAction = utils.selectIndex(0, (mA.length - 1));
+				postManager.sendWhenReady(mA[whichAction].forward);
 				mA[whichAction].history = mA[whichAction].history || [];
 				mA[whichAction].history.unshift(datetime);
 			}
-
-			// Check if any responses are waiting to go out.
-			if (postRoom.length) {
-				postMsg(postRoom.shift());
-				// TODO: Must be way to bundle this in with postMsg, so it doesn't have to appear everywhere (or so it don't have to forget to put it where it's needed.)
-				sessionStats.updateBotSent();
-			}
-
 		},
 		interval,
+		agendaInterval = agendaManager.activate(1000),
+		postInterval = postManager.activate(1000),
 		deactivate = function () {
 			clearInterval(interval);
+			clearInterval(postInterval);
+			clearInterval(agendaInterval);
 		}; //eof variable declarations
-		
 
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.
 	parseRuleset(libraryData.ruleset);
-	
+
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
 	
 	// Set interval to check agenda and log every 2 seconds.
 	interval = setInterval(timedcheck, 2000);
 
-	
 	// Finally, expose private variables to public API.
-
-	this.transform = loginput;
+	this.transform = logManager.addUnprocessedMessage;
 	this.deactivate = deactivate;
 	
 },

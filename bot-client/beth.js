@@ -278,103 +278,93 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							objcopy.covered = m[0].length; // Add properties.
 							objcopy.indexof = m.index;
 							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
-							if (objcopy.respond.search('^goto ', 'i') === 0) {					// If the reply contains a `^goto` tag,
-								goto = objcopy.respond.substring(5);     // get the key we should go to,
-								if (libraryData.ruleset["*"].ruleset.hasOwnProperty(goto)) {										// and assuming the key exists in the keyword array,
-									console.log(tabbing, 'Going to ruleset ' + goto + ':', objcopy.respond.substring(5));
-									recursive = process(input, libraryData.ruleset["*"].ruleset[goto], ioregex, libraryData.inflect, order + 1, filter);
-									rtn.responses = rtn.responses.concat(recursive.responses);
-									rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
-								}
-							} else {
-								// Check that the results conform to the filter.
-								if (filter(objcopy.tagging)) {
-									// If the tags in this result match the ones specified, use it.
-									objcopy.nesting = order;
-									
-									// Make necessary substitutions in the response.
-									objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
-										var rtn;
-										if ($1) {
-											// if first capture found, ignore--surrounded my more than one pair of parentheses
-											rtn = $1;
-										} else {
-											// use number to get relevant part of earlier match with user input
-											rtn = m[parseInt($2, 10)];
-											debugFunc("Return, pre-inflection");
-											debugFunc(rtn);
-											// process part of user input and run inflections
-											rtn = rtn.replace(ioregex, function (match, $1) {
-												debugFunc("Inflection");
-												debugFunc(libraryData.inflect[$1]);
-												return libraryData.inflect[$1.toLowerCase()];
-											});
-										};
-										return rtn;
-									});
-									
-									// remove single pair of outer parentheses from any future substitution markers
-									objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
-										return a1;
-									});
-									
-									// Sift out deferred options first.
-									if (objcopy.deferto) {
-									// TODO: could also check for nested parentheses as a condition of deferral?
-									// TODO: check not just that deferto exists but that is also an array and not empty
-										deferwhere = libraryData;
-										// Set up deferwhere to start looking at libraryData.
-										
-										// Take just the first element of deferto.
-										deferpath = objcopy.deferto.shift();
-										//TODO: check this is also an array
-										
-										// If array is empty, change value to false, so that this item is not eternally deferred.
-										if (objcopy.deferto.length === 0) {
-											objcopy.deferto = false;
-										}
-										// TODO: could refactor this so the emptiness of the array is checked upfront
-										
-										if (deferpath) {
-										// TODO: need a better check that this is an array -- this whole section to be refactored
-											d = 0;
-											while (d < deferpath.length && typeof deferpath[d] === "string") {
-											// Check the element in the array can be a valid key value.
-												
-												// If the path does not current exist, create it.
-												if (!(deferwhere.hasOwnProperty("ruleset"))) {
-													deferwhere.ruleset = {};
-												}
-												if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
-													deferwhere.ruleset[deferpath[d]] = {};
-												}
-												
-												deferwhere = deferwhere.ruleset[deferpath[d]];
-												debugFunc("defer loc: " + d);
-												debugFunc(deferwhere);
-												d += 1;
-											}							
-										}
-										
-										// Record that this item is not part of the original ruleset but deferred.
-										objcopy.deferrd = true;
-										
-										// If the deferral location does not have a results array create one.
-										if (!(deferwhere.hasOwnProperty("results"))) {
-											deferwhere.results = [];
-										}
-										
-										// Set up the deferral for later.
-										deferarray.push({
-											"address": deferwhere.results,
-											"todefer": objcopy
-										});
-										
+							// Check that the results conform to the filter.
+							if (filter(objcopy.tagging)) {
+								// If the tags in this result match the ones specified, use it.
+								objcopy.nesting = order;
+								
+								// Make necessary substitutions in the response.
+								objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
+									var rtn;
+									if ($1) {
+										// if first capture found, ignore--surrounded my more than one pair of parentheses
+										rtn = $1;
 									} else {
-										// This result is good to use.
-										results.push(objcopy);
+										// use number to get relevant part of earlier match with user input
+										rtn = m[parseInt($2, 10)];
+										debugFunc("Return, pre-inflection");
+										debugFunc(rtn);
+										// process part of user input and run inflections
+										rtn = rtn.replace(ioregex, function (match, $1) {
+											debugFunc("Inflection");
+											debugFunc(libraryData.inflect[$1]);
+											return libraryData.inflect[$1.toLowerCase()];
+										});
+									};
+									return rtn;
+								});
+								
+								// remove single pair of outer parentheses from any future substitution markers
+								objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
+									return a1;
+								});
+								
+								// Sift out deferred options first.
+								if (objcopy.deferto) {
+								// TODO: could also check for nested parentheses as a condition of deferral?
+								// TODO: check not just that deferto exists but that is also an array and not empty
+									deferwhere = libraryData;
+									// Set up deferwhere to start looking at libraryData.
 									
+									// Take just the first element of deferto.
+									deferpath = objcopy.deferto.shift();
+									//TODO: check this is also an array
+									
+									// If array is empty, change value to false, so that this item is not eternally deferred.
+									if (objcopy.deferto.length === 0) {
+										objcopy.deferto = false;
 									}
+									// TODO: could refactor this so the emptiness of the array is checked upfront
+									
+									if (deferpath) {
+									// TODO: need a better check that this is an array -- this whole section to be refactored
+										d = 0;
+										while (d < deferpath.length && typeof deferpath[d] === "string") {
+										// Check the element in the array can be a valid key value.
+											
+											// If the path does not current exist, create it.
+											if (!(deferwhere.hasOwnProperty("ruleset"))) {
+												deferwhere.ruleset = {};
+											}
+											if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+												deferwhere.ruleset[deferpath[d]] = {};
+											}
+											
+											deferwhere = deferwhere.ruleset[deferpath[d]];
+											debugFunc("defer loc: " + d);
+											debugFunc(deferwhere);
+											d += 1;
+										}							
+									}
+									
+									// Record that this item is not part of the original ruleset but deferred.
+									objcopy.deferrd = true;
+									
+									// If the deferral location does not have a results array create one.
+									if (!(deferwhere.hasOwnProperty("results"))) {
+										deferwhere.results = [];
+									}
+									
+									// Set up the deferral for later.
+									deferarray.push({
+										"address": deferwhere.results,
+										"todefer": objcopy
+									});
+									
+								} else {
+									// This result is good to use.
+									results.push(objcopy);
+								
 								}
 							}
 						}

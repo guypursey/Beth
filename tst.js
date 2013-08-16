@@ -38,16 +38,19 @@ io.sockets.on('connection', function (socket) {
 		debugFn = function (msg) {
 			io.sockets.emit("report", msg);
 		},
-		postMsg = function (input) {
-			var debug;
-			io.sockets.emit('updatedisplay', nme, input, new Date());
-			if (input === (debug = expectation.shift())) {
+		postResult = function (input) {
+			var debugMsg = expectation.shift()
+			if (input === debugMsg) {
 				io.sockets.emit('updatedisplay', "SERVER", "*** Test " + results.tested + " PASSED!", new Date());
 				results.passed += 1;
 			} else {
-				io.sockets.emit('updatedisplay', "SERVER", "*** Test " + results.tested + " FAILED: Expected -- " + debug, new Date());
+				io.sockets.emit('updatedisplay', "SERVER", "*** Test " + results.tested + " FAILED: Expected -- " + debugMsg, new Date());
 				results.failed += 1;
 			}
+		},
+		postMsg = function (input) {
+			io.sockets.emit('updatedisplay', nme, input, new Date());
+			postResult(input);
 			results.tested += 1;
 			if (!(expectation.length)) {
 				i += 1

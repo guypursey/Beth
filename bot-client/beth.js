@@ -649,7 +649,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			if (input) {
 				input = preprocess(input);
 				results = process(input, libraryData.ruleset, ioregex, libraryData.inflect, 0, filterCallback);
-				debugFunc("results!");
+				debugFunc("Results are in:");
 				debugFunc(results);
 				responses = results.responses;
 				deferrals = results.deferrals;
@@ -661,7 +661,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 				// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
 				responses.sort(function (a, b) {
-					var rtn = 0;
+					var rtn = 0,
+						a_date = (a.history) ? (a.history[0] || 0) : 0,
+						b_date = (b.history) ? (b.history[0] || 0) : 0;
 					if (b.nesting > a.nesting) {
 						rtn = 1;
 					} else if (b.nesting < a.nesting) {
@@ -670,10 +672,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						rtn = 1;
 					} else if (b.deferrd < a.deferrd) {
 						rtn = -1;
-					} else if (b.origobj.history[0] > a.origobj.history[0]) {
-						rtn = 1;
-					} else if (b.origobj.history[0] < a.origobj.history[0]) {
-						rtn = -1;
+					} else {
+						rtn = a_date - b_date;
 					}
 					return rtn;
 				});
@@ -723,21 +723,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Sort so array in order of most recently used (with least recent or never used at bottom).
 			mA.reverse().sort(function (a, b) {
-				var rtn = 0;
-				if (b.history && a.history) {
-					if (b.history[0] < a.history[0]) { // If `b` has lower date and is therefore older.
-						rtn = 1; // Sort `b` to lower index (more chance of being selected).
-					} else if (b.history[0] > a.history[0]) {
-						rtn = -1; // Else put `a` close to being picked as older.
-					}
-				} else {
-					if (b.history) { // If `b` has ever been used
-						rtn = -1; // Move it up.
-					} else if (a.history) {
-						rtn = 1; // `a` was used but not `b` so move `b` towards zero.
-					}
-				}
-				return rtn;
+				var a_date = (a.history) ? (a.history[0] || 0) : 0,
+					b_date = (b.history) ? (b.history[0] || 0) : 0;
+				return a_date - b_date;
 			});
 
 			debugFunc("filtered moveSet array");

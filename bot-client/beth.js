@@ -304,9 +304,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				// If a match is found.
 			    if (m) {
 					(tabbing, "Examined:", rex);
-					console.log(tabbing, "Found:", m[0]);
+					debugFunc(tabbing, "Found:", m[0]);
 					if (rules[i].hasOwnProperty('ruleset')) {
-						console.log(tabbing, "Exploring further...");
+						debugFunc(tabbing, "Exploring further...");
 						// Recursively call this function for nested rulesets.
 						recursive = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
 						rtn.responses = rtn.responses.concat(recursive.responses);
@@ -315,7 +315,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (typeof rules[i].results === 'object') {
 						// Take a copy of all the results in the array.
 						results = [];
-						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
+						debugFunc(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < rules[i].results.length; j += 1) {
 							var objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
 							objcopy.covered = m[0].length; // Add properties.
@@ -325,12 +325,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							if (filter(objcopy.tagging)) {
 								// If the tags in this result match the ones specified, use it.
 								objcopy.nesting = order;
-								
+								debugFunc("Response currently being processed.");
+								debugFunc(objcopy.respond);
 								// Make necessary substitutions in the response.
 								objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
 									var rtn;
 									if ($1) {
-										// if first capture found, ignore--surrounded my more than one pair of parentheses
+										// if first capture found, ignore--surrounded by more than one pair of parentheses
 										rtn = $1;
 									} else {
 										// use number to get relevant part of earlier match with user input

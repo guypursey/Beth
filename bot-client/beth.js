@@ -413,7 +413,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					return copy;
 				},
 				selectIndex = function (min, max) {
-					return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
+					return (noRandomFlag) ? min : Math.floor(Math.random() * (max - min + 1)) + min;
 				};
 			return {
 				convertBethTimeToMS: convertBethTimeToMS,

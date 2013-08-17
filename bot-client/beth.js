@@ -106,9 +106,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		})(sessionStats.updateBotSent),
 		
-		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
-		wildcardPattern = '\\s*(.*)\\s*',
-		
 		// What Beth should use to identify keys for the `lookfor` object.
 		// TODO: Work out way to systematise this.
 		lookforMarker = '@',
@@ -118,22 +115,23 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
 			
 			// Create a variable holder for each rule in the set.
-			var ruleobj;
+			var ruleobj,
+				rule_key,
+				wildcardPattern = '\\s*(.*)\\s*';
 			
 			// Loop through all the objects in the set.
-			for (r in ruleset) {
+			for (rule_key in ruleset) {
 				
 				// Ensure this object is one we actually want to work on, and not inherited.
-				if (ruleset.hasOwnProperty(r)) {
-					console.log(r);
+				if (ruleset.hasOwnProperty(rule_key)) {
 					// Make our holder variable `ruleobj` refer to the current object.
-					ruleobj = ruleset[r];
+					ruleobj = ruleset[rule_key];
 					
 					// Check to see if object key is merely a wildcard.
-					if (/^\s*\*\s*$/.test(r)) {
+					if (/^\s*\*\s*$/.test(rule_key)) {
 						ruleobj.pattern = wildcardPattern;
 					} else {
-						ruleobj.pattern = r;
+						ruleobj.pattern = rule_key;
 						
 						// Substitute synonyms.
 						ruleobj.pattern = ruleobj.pattern.replace(lookforPattern, function (a0, a1) {
@@ -141,9 +139,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// TODO: throw initialisation error if array not found?
 						});
 						
+						// Substitute asterisks with appropriate wildcard pattern.
 						ruleobj.pattern = ruleobj.pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
 							var rtn = "";
-							if ($3) { // escape character check
+							if ($3) { // Check for extra asterisk which acts as escape character.
 								rtn = $1 + $2 + $3 + $4 + $5;
 							} else {
 								if ($1) {

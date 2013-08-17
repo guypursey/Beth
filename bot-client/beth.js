@@ -189,7 +189,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 			return pattern;
 		},
-		
+
 		parseResults = function (results) {
 			var result_index = (results) ? (results.length) || 0 : 0,
 				clean_results_array = [];
@@ -242,7 +242,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// For now, create substitution regular expression on the fly rather than as part of initialisation, so it can be dynamic.
 			for (key in sub) {
-				arr.push(key);
+				if (sub.hasOwnProperty(key)) {
+					arr.push(key);
+				}
 			}
 			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "gi");
 			
@@ -264,14 +266,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc('Starting process function ', order);
 			debugFunc('Received input: ', input);
 			debugFunc('Received rules: ', rules);
-		    var input = input,
-				rules = rules,
-				ioregex = ioregex,
-				inflect = inflect,
-				filter = (typeof filter === "function")
-					? filter
-					: function () { debugFunc("No filter found."); return true },
-				i,
+		    var i,
 				j,
 			    rex,	// for storing regular expression
 			    rtn = {
@@ -281,8 +276,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				recursive, // for collecting up returns from recursive calls
 				results,
 			    m,		// matching string
-			    goto,		// for goto
-			    order = order || 0,
 			    tabbing = '',	// for debugging	
 				deferwhere,
 				deferpath,
@@ -290,12 +283,19 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				deferarray = [], // for storing pointers and objects for final deferral loop
 				origobj, // reference to the original object
 				objcopy;
-				
+			
+			order = order || 0;
+			
 			for (i = 0; i < order; i += 1) {
 				tabbing += '\t';
 			}
 			
 			tabbing += order + ':';
+			
+			// If filter parameter is not a function, define it as true so responses can be passed.
+			filter = (typeof filter === "function")
+					? filter
+					: function () { debugFunc("No filter found."); return true; };
 			
 			for (i in rules) {
 			    rex = new RegExp(rules[i].pattern, 'i');
@@ -303,7 +303,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 				// If a match is found.
 			    if (m) {
-					(tabbing, "Examined:", rex);
+					debugFunc(tabbing, "Examined:", rex);
 					debugFunc(tabbing, "Found:", m[0]);
 					if (rules[i].hasOwnProperty('ruleset')) {
 						debugFunc(tabbing, "Exploring further...");
@@ -317,7 +317,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						results = [];
 						debugFunc(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < rules[i].results.length; j += 1) {
-							var objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
+							objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
 							objcopy.covered = m[0].length; // Add properties.
 							objcopy.indexof = m.index;
 							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
@@ -489,9 +489,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
-					var whichMode = whichMode,
-						agendaItem = agendaStack[0].agendaItem, // get most childish item
-						mode = agendaItem[whichMode];
+					var agendaItem = agendaStack[0].agendaItem, // get most childish item
+						mode = agendaItem[whichMode],
 						rtn = (mode)
 							? function(tagging) {
 									var	has = mode.filters.HAS || [],
@@ -532,7 +531,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				isComplete = function (agendaSnapshot) {
 					var rtn = false,
-						agendaSnapshot = agendaSnapshot, // localisation
 						agendaItem = agendaSnapshot.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
@@ -617,7 +615,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									redo = true;
 								} else {
 									a = 0;
-									clearInterval(agendaInterval);
+									deactivate();
 									exitSession();
 								}
 							}
@@ -662,7 +660,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				datetime = new Date(),
 				f, // flag counter
 				ioarray = [],
-				ioregex;
+				ioregex,
+				i,
+				whichAction,
+				whichResponse;
 			
 			for (i in libraryData.inflect) {
 				ioarray.push(i);
@@ -706,7 +707,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 				if (responses.length) {
 
-					var whichResponse = utils.selectIndex(0, (responses.length - 1));
+					whichResponse = utils.selectIndex(0, (responses.length - 1));
 					
 					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).

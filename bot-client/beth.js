@@ -131,6 +131,65 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		lookforMarker = '@',
 		lookforPattern = /@(\S+)/,
 		
+		preparePattern = function (rule_key) {
+		// Takes a rule string and prepares it as a pattern.
+			var pattern,
+				wildcardPattern = "\\s*(.*)\\s*";
+
+			// Check to see if object key is merely a wildcard.
+			if (/^\s*\*\s*$/.test(rule_key)) {
+				pattern = wildcardPattern;
+			} else {
+				pattern = rule_key;
+
+				// Substitute synonyms.
+				pattern = pattern.replace(lookforPattern, function (a0, a1) {
+					return "(" + libraryData.lookfor[a1].join("|") + ")" || a1;
+					// TODO: throw initialisation error if array not found?
+				});
+
+				// Substitute asterisks with appropriate wildcard pattern.
+				pattern = pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
+					var rtn = "";
+					if ($3) { // Check for extra asterisk which acts as escape character.
+						rtn = $1 + $2 + $3 + $4 + $5;
+					} else {
+						if ($1) {
+							rtn += $1;
+							if ($2) {
+								rtn += "\\b";
+							}
+						}
+						if ($2 && !$4 && $5) {
+							rtn += "\\s+";
+						}
+						rtn += (($1 && !$2) || (!$4 && $5)) ? "\\S*" : "\\s*(.*)\\s*";
+						if ($4 && !$2 && $1) {
+							rtn += "\\s+";
+						}
+						if ($5) {
+							if ($4) {
+								rtn += "\\b";
+							}
+							rtn += $5;
+						}
+					}
+					return rtn;
+				});
+
+				// If the string begins with a word boundary put this in the regex pattern.
+				pattern = pattern.replace(/^\b/g, "\\b");
+
+				// If the string ends with a word boundary put this in the regex pattern.
+				pattern = pattern.replace(/\b$/g, "\\b");
+			}
+
+			// Replace multiple spaces with single spaces.
+			pattern = pattern.replace(/\s+/g, '\\s+');
+
+			return pattern;
+		},
+		
 		parseResults = function (results) {
 			var result_index = (results) ? (results.length) || 0 : 0,
 				clean_results_array = [];
@@ -148,8 +207,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// Create a variable holder for each rule in the set.
 			var ruleobj,
-				rule_key,
-				wildcardPattern = '\\s*(.*)\\s*';
+				rule_key;
 			
 			// Loop through all the objects in the set.
 			for (rule_key in ruleset) {
@@ -159,57 +217,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					// Make our holder variable `ruleobj` refer to the current object.
 					ruleobj = ruleset[rule_key];
 					
-					// Check to see if object key is merely a wildcard.
-					if (/^\s*\*\s*$/.test(rule_key)) {
-						ruleobj.pattern = wildcardPattern;
-					} else {
-						ruleobj.pattern = rule_key;
-						
-						// Substitute synonyms.
-						ruleobj.pattern = ruleobj.pattern.replace(lookforPattern, function (a0, a1) {
-							return "(" + libraryData.lookfor[a1].join("|") + ")" || a1;
-							// TODO: throw initialisation error if array not found?
-						});
-						
-						// Substitute asterisks with appropriate wildcard pattern.
-						ruleobj.pattern = ruleobj.pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
-							var rtn = "";
-							if ($3) { // Check for extra asterisk which acts as escape character.
-								rtn = $1 + $2 + $3 + $4 + $5;
-							} else {
-								if ($1) {
-									rtn += $1;
-									if ($2) {
-										rtn += "\\b";
-									}
-								}
-								if ($2 && !$4 && $5) {
-									rtn += "\\s+";
-								}
-								rtn += (($1 && !$2) || (!$4 && $5)) ? "\\S*" : "\\s*(.*)\\s*";
-								if ($4 && !$2 && $1) {
-									rtn += "\\s+";
-								}
-								if ($5) {
-									if ($4) {
-										rtn += "\\b";
-									}
-									rtn += $5;
-								}
-							}
-							return rtn;
-						});
-												
-						// If the string begins with a word boundary put this in the regex pattern.
-						ruleobj.pattern = ruleobj.pattern.replace(/^\b/g, "\\b");
-						
-						// If the string ends with a word boundary put this in the regex pattern.
-						ruleobj.pattern = ruleobj.pattern.replace(/\b$/g, "\\b");
-						
-					}
-					
-					// Replace multiple spaces with single spaces.
-					ruleobj.pattern = ruleobj.pattern.replace(/\s+/g, '\\s+');
+					// Produce a search pattern based on the key.
+					ruleobj.pattern = preparePattern(rule_key);
 					
 					// Strip out any results with blank respond values.
 					ruleobj.results = parseResults(ruleobj.results);

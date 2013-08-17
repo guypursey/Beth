@@ -58,7 +58,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 		})(),
 		
-		logManager = (function (updateUsrSent) {
+		logManager = (function (updateUsrSent, debugFunc) {
 		// Set up log for storing inputs, both process and unprocessed.
 			var logData = {
 					toprocess: [],
@@ -68,8 +68,28 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					return (logData.toprocess.length) ? logData.toprocess.shift() : '';
 				},
 				loginput = function (input) {
-					// Accepts user's input, puts it on a stack, which is then regularly checked.
-					logData.toprocess.push(input);
+					var input_parts,
+						input_holder;
+					// Break input down into parts.
+					if (typeof input === "string") {
+						input_parts = input.split(".");
+						debugFunc("Input logging.");
+						debugFunc(input_parts);
+						while (input_parts.length) {
+							input_holder = input_parts.shift();
+							// Check the part is actually worth responding to!
+							if (/\w/.test(input_holder)) {
+								// Accepts user's input, puts it on a stack, which is then regularly checked.
+								logData.toprocess.push(input_holder);
+							} else {
+								debugFunc("Part of input discarded: " + input_holder)
+							}
+						}
+					} else {
+						// Discard input if not string and print error.
+						debugFunc("Input not valid. Discarded:");
+						debugFunc(input);
+					}
 					// Update number of items received from user in sessionStats.
 					updateUsrSent();
 				};
@@ -77,7 +97,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				takeUnprocessedMessage: readlog,
 				addUnprocessedMessage: loginput
 			}
-		})(sessionStats.updateUsrSent),
+		})(sessionStats.updateUsrSent, debugFunc),
 		
 		postManager = (function (updateBotSent) {
 			var postRoom = [],

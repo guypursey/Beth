@@ -382,10 +382,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 											}
 											if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
 												deferwhere.ruleset[deferpath[d]] = {};
+												// Create pattern based on key.
+												deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
 											}
 											
 											deferwhere = deferwhere.ruleset[deferpath[d]];
-											debugFunc("defer loc: " + d);
+											debugFunc("Deferral location: " + d);
 											debugFunc(deferwhere);
 											d += 1;
 										}							

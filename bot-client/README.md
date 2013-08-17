@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.4.1##
+##CODE DOCUMENTATION for v0.4.2##
 
 ###NODE JS COMPATIBILITY###
 
@@ -78,15 +78,11 @@ The variables in the Beth constructor are as follows:
 
 ###`logManager`###
 
-*IIFE closure.* The closure returns an object whose properties are references to functions within the closure. Enables adding of user's input to the appropriate `logData` property and calls the method in `sessionStats` (plugged into the closure) for incrementing the number of messages sent by the user.
+*IIFE closure.* The closure returns an object whose properties are references to functions within the closure. Enables adding of user's input to the appropriate `logData` stack and calls the method in `sessionStats` (plugged into the closure) for incrementing the number of messages sent by the user. When a user's input first arrives it is chunked into sentences (split by full-stops) before each individual part is checked for worthiness of a response (i.e., it contains letters or digits) and added to the stack. 
 
-###postManager###
+###`postManager`###
 
 *IIFE closure.* The closure returns an object whose properties are references to functions within the closure. Enables adding of messages t go out to conversation. Has interval timer which checks if there is anything on the local stack and sends it out.
-
-###`wildcardPattern`###
-
-*String.* To be used as a regular expression later for searching for any characters.
 
 ###`lookforMarker`###
 
@@ -96,9 +92,17 @@ The variables in the Beth constructor are as follows:
 
 *RegExp.* A search for the `lookfor` symbol and any non-space charcters that follow it.
 
+###`preparePattern`###
+
+*Function.* Takes a string as an argument, expecting a key from a `ruleset`. Returns it as a string primed to become a regular expression, with asterisks replaced by wildcard patterns.
+
+###`parseResults`###
+
+*Function.* Takes an array (expecting a `results` array), and checks the `respond` property inside each object to ensure it is not blank. Returns an array cleaned of `respond`-free objects. (This was created so test files could be set up with provisional objects in place but with the `respond`s left to be written at a later date.) 
+
 ###`parseRuleset`###
 
-*Function.* Given a ruleset as a parameter, this function will initialise it by changing each `pattern` property into a string that can be used to create a regular expression.
+*Function.* Given a ruleset as a parameter, this function will initialise it by changing each `pattern` property into a string that can be used to create a regular expression. Calls `preparePattern` and `parseResults`. Also handles deferrals and filtering.
 
 Calls itself recursively, in that it can then be used to parse rulesets of greater depth (i.e., rulesets within rulesets).
 
@@ -128,6 +132,7 @@ Results are then concatenated to any previous results (i.e. from successful recu
 
  - `convertBethTimeToMS`
  - `copyObject`
+ - `selectIndex`
 
 Maybe more to come.
 

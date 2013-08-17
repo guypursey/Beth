@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.1##
+##v0.4.2##
 
-LATEST: Refactored beth.js.
+LATEST: Refactored to correct some errors that had not been picked up properly through testing. The `logManager` now chunks incoming messages from user, arguably adding some nuance to the responses.
 
 This is all very much a work in progress.
 

@@ -340,9 +340,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										debugFunc(rtn);
 										// process part of user input and run inflections
 										rtn = rtn.replace(ioregex, function (match, $1) {
-											debugFunc("Inflection");
-											debugFunc(libraryData.inflect[$1]);
-											return libraryData.inflect[$1.toLowerCase()];
+											debugFunc("Inflection:");
+											debugFunc($1 + " --> " + libraryData.inflect[$1.toLowerCase()]);
+											return libraryData.inflect[$1.toLowerCase()] || $1;
 										});
 									};
 									return rtn;

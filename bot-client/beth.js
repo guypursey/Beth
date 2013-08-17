@@ -111,6 +111,18 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		lookforMarker = '@',
 		lookforPattern = /@(\S+)/,
 		
+		parseResults = function (results) {
+			var result_index = (results) ? (results.length) || 0 : 0,
+				clean_results_array = [];
+			while (result_index) {
+				result_index -= 1;
+				if (results[result_index].respond) {
+					clean_results_array.push(results[result_index]);
+				}
+			}
+			return clean_results_array;
+		},
+		
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
 			
@@ -179,10 +191,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					// Replace multiple spaces with single spaces.
 					ruleobj.pattern = ruleobj.pattern.replace(/\s+/g, '\\s+');
 					
+					// Strip out any results with blank respond values.
+					ruleobj.results = parseResults(ruleobj.results);
+					
 					// If the object itself contains a ruleset, parse this by recursively calling this same function.
 					if (typeof ruleobj.ruleset === 'object') {
 						parseRuleset(ruleobj.ruleset);
-						// TODO: Consider depth markers at this initialisation stage.
 					}
 				}
 			}

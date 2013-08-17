@@ -215,7 +215,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			for (key in sub) {
 				arr.push(key);
 			}
-			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "g");
+			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "gi");
 			
 			debugFunc("preprocess: " + input);
 			

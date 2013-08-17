@@ -58,7 +58,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 		})(),
 		
-		logManager = (function (updateUsrSent) {
+		logManager = (function (updateUsrSent, debugFunc) {
 		// Set up log for storing inputs, both process and unprocessed.
 			var logData = {
 					toprocess: [],
@@ -68,8 +68,28 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					return (logData.toprocess.length) ? logData.toprocess.shift() : '';
 				},
 				loginput = function (input) {
-					// Accepts user's input, puts it on a stack, which is then regularly checked.
-					logData.toprocess.push(input);
+					var input_parts,
+						input_holder;
+					// Break input down into parts.
+					if (typeof input === "string") {
+						input_parts = input.split(".");
+						debugFunc("Input logging.");
+						debugFunc(input_parts);
+						while (input_parts.length) {
+							input_holder = input_parts.shift();
+							// Check the part is actually worth responding to!
+							if (/\w/.test(input_holder)) {
+								// Accepts user's input, puts it on a stack, which is then regularly checked.
+								logData.toprocess.push(input_holder);
+							} else {
+								debugFunc("Part of input discarded: " + input_holder)
+							}
+						}
+					} else {
+						// Discard input if not string and print error.
+						debugFunc("Input not valid. Discarded:");
+						debugFunc(input);
+					}
 					// Update number of items received from user in sessionStats.
 					updateUsrSent();
 				};
@@ -77,7 +97,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				takeUnprocessedMessage: readlog,
 				addUnprocessedMessage: loginput
 			}
-		})(sessionStats.updateUsrSent),
+		})(sessionStats.updateUsrSent, debugFunc),
 		
 		postManager = (function (updateBotSent) {
 			var postRoom = [],
@@ -106,84 +126,106 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		})(sessionStats.updateBotSent),
 		
-		// Set up a wildcard regex pattern, to look for anything, surrounded by zero or more spaces.
-		wildcardPattern = '\\s*(.*)\\s*',
-		
 		// What Beth should use to identify keys for the `lookfor` object.
 		// TODO: Work out way to systematise this.
 		lookforMarker = '@',
 		lookforPattern = /@(\S+)/,
 		
+		preparePattern = function (rule_key) {
+		// Takes a rule string and prepares it as a pattern.
+			var pattern,
+				wildcardPattern = "\\s*(.*)\\s*";
+
+			// Check to see if object key is merely a wildcard.
+			if (/^\s*\*\s*$/.test(rule_key)) {
+				pattern = wildcardPattern;
+			} else {
+				pattern = rule_key;
+
+				// Substitute synonyms.
+				pattern = pattern.replace(lookforPattern, function (a0, a1) {
+					return "(" + libraryData.lookfor[a1].join("|") + ")" || a1;
+					// TODO: throw initialisation error if array not found?
+				});
+
+				// Substitute asterisks with appropriate wildcard pattern.
+				pattern = pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
+					var rtn = "";
+					if ($3) { // Check for extra asterisk which acts as escape character.
+						rtn = $1 + $2 + $3 + $4 + $5;
+					} else {
+						if ($1) {
+							rtn += $1;
+							if ($2) {
+								rtn += "\\b";
+							}
+						}
+						if ($2 && !$4 && $5) {
+							rtn += "\\s+";
+						}
+						rtn += (($1 && !$2) || (!$4 && $5)) ? "\\S*" : "\\s*(.*)\\s*";
+						if ($4 && !$2 && $1) {
+							rtn += "\\s+";
+						}
+						if ($5) {
+							if ($4) {
+								rtn += "\\b";
+							}
+							rtn += $5;
+						}
+					}
+					return rtn;
+				});
+
+				// If the string begins with a word boundary put this in the regex pattern.
+				pattern = pattern.replace(/^\b/g, "\\b");
+
+				// If the string ends with a word boundary put this in the regex pattern.
+				pattern = pattern.replace(/\b$/g, "\\b");
+			}
+
+			// Replace multiple spaces with single spaces.
+			pattern = pattern.replace(/\s+/g, '\\s+');
+
+			return pattern;
+		},
+
+		parseResults = function (results) {
+			var result_index = (results) ? (results.length) || 0 : 0,
+				clean_results_array = [];
+			while (result_index) {
+				result_index -= 1;
+				if (results[result_index].respond) {
+					clean_results_array.push(results[result_index]);
+				}
+			}
+			return clean_results_array;
+		},
+		
 		parseRuleset = function (ruleset) {
 		// Take a ruleset and parse it, adding in regular expression patterns for search.
 			
 			// Create a variable holder for each rule in the set.
-			var ruleobj;
+			var ruleobj,
+				rule_key;
 			
 			// Loop through all the objects in the set.
-			for (r in ruleset) {
+			for (rule_key in ruleset) {
 				
 				// Ensure this object is one we actually want to work on, and not inherited.
-				if (ruleset.hasOwnProperty(r)) {
-					console.log(r);
+				if (ruleset.hasOwnProperty(rule_key)) {
 					// Make our holder variable `ruleobj` refer to the current object.
-					ruleobj = ruleset[r];
+					ruleobj = ruleset[rule_key];
 					
-					// Check to see if object key is merely a wildcard.
-					if (/^\s*\*\s*$/.test(r)) {
-						ruleobj.pattern = wildcardPattern;
-					} else {
-						ruleobj.pattern = r;
-						
-						// Substitute synonyms.
-						ruleobj.pattern = ruleobj.pattern.replace(lookforPattern, function (a0, a1) {
-							return "(" + libraryData.lookfor[a1].join("|") + ")" || a1;
-							// TODO: throw initialisation error if array not found?
-						});
-						
-						ruleobj.pattern = ruleobj.pattern.replace(/(\w?)(\s*)\*(\**)(\s*)(\w?)/g, function (m, $1, $2, $3, $4, $5) {
-							var rtn = "";
-							if ($3) { // escape character check
-								rtn = $1 + $2 + $3 + $4 + $5;
-							} else {
-								if ($1) {
-									rtn += $1;
-									if ($2) {
-										rtn += "\\b";
-									}
-								}
-								if ($2 && !$4 && $5) {
-									rtn += "\\s+";
-								}
-								rtn += (($1 && !$2) || (!$4 && $5)) ? "\\S*" : "\\s*(.*)\\s*";
-								if ($4 && !$2 && $1) {
-									rtn += "\\s+";
-								}
-								if ($5) {
-									if ($4) {
-										rtn += "\\b";
-									}
-									rtn += $5;
-								}
-							}
-							return rtn;
-						});
-												
-						// If the string begins with a word boundary put this in the regex pattern.
-						ruleobj.pattern = ruleobj.pattern.replace(/^\b/g, "\\b");
-						
-						// If the string ends with a word boundary put this in the regex pattern.
-						ruleobj.pattern = ruleobj.pattern.replace(/\b$/g, "\\b");
-						
-					}
+					// Produce a search pattern based on the key.
+					ruleobj.pattern = preparePattern(rule_key);
 					
-					// Replace multiple spaces with single spaces.
-					ruleobj.pattern = ruleobj.pattern.replace(/\s+/g, '\\s+');
+					// Strip out any results with blank respond values.
+					ruleobj.results = parseResults(ruleobj.results);
 					
 					// If the object itself contains a ruleset, parse this by recursively calling this same function.
 					if (typeof ruleobj.ruleset === 'object') {
 						parseRuleset(ruleobj.ruleset);
-						// TODO: Consider depth markers at this initialisation stage.
 					}
 				}
 			}
@@ -200,17 +242,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			// For now, create substitution regular expression on the fly rather than as part of initialisation, so it can be dynamic.
 			for (key in sub) {
-				arr.push(key);
+				if (sub.hasOwnProperty(key)) {
+					arr.push(key);
+				}
 			}
-			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "g");
+			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "gi");
 			
-			debugFunc("preprocess: " + input);
+			debugFunc("Preprocess: " + input);
 			
 			rtn = input.replace(rex, function (m, $1) {
-				return sub[$1];
+				debugFunc($1 + " --> " + sub[$1.toLowerCase()]);
+				return sub[$1.toLowerCase()];
 			});
 			
-			debugFunc("result: " + rtn);
+			debugFunc("Result: " + rtn);
 			
 			return rtn;
 		},
@@ -221,14 +266,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc('Starting process function ', order);
 			debugFunc('Received input: ', input);
 			debugFunc('Received rules: ', rules);
-		    var input = input,
-				rules = rules,
-				ioregex = ioregex,
-				inflect = inflect,
-				filter = (typeof filter === "function")
-					? filter
-					: function () { debugFunc("No filter found."); return true },
-				i,
+		    var i,
 				j,
 			    rex,	// for storing regular expression
 			    rtn = {
@@ -238,8 +276,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				recursive, // for collecting up returns from recursive calls
 				results,
 			    m,		// matching string
-			    goto,		// for goto
-			    order = order || 0,
 			    tabbing = '',	// for debugging	
 				deferwhere,
 				deferpath,
@@ -247,12 +283,19 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				deferarray = [], // for storing pointers and objects for final deferral loop
 				origobj, // reference to the original object
 				objcopy;
-				
+			
+			order = order || 0;
+			
 			for (i = 0; i < order; i += 1) {
 				tabbing += '\t';
 			}
 			
 			tabbing += order + ':';
+			
+			// If filter parameter is not a function, define it as true so responses can be passed.
+			filter = (typeof filter === "function")
+					? filter
+					: function () { debugFunc("No filter found."); return true; };
 			
 			for (i in rules) {
 			    rex = new RegExp(rules[i].pattern, 'i');
@@ -260,10 +303,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				
 				// If a match is found.
 			    if (m) {
-					(tabbing, "Examined:", rex);
-					console.log(tabbing, "Found:", m[0]);
+					debugFunc(tabbing, "Examined:", rex);
+					debugFunc(tabbing, "Found:", m[0]);
 					if (rules[i].hasOwnProperty('ruleset')) {
-						console.log(tabbing, "Exploring further...");
+						debugFunc(tabbing, "Exploring further...");
 						// Recursively call this function for nested rulesets.
 						recursive = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
 						rtn.responses = rtn.responses.concat(recursive.responses);
@@ -272,9 +315,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					if (typeof rules[i].results === 'object') {
 						// Take a copy of all the results in the array.
 						results = [];
-						console.log(tabbing, (results.length) ? "Results found." : "No direct results found.");
+						debugFunc(tabbing, (results.length) ? "Results found." : "No direct results found.");
 						for (j = 0; j < rules[i].results.length; j += 1) {
-							var objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
+							objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
 							objcopy.covered = m[0].length; // Add properties.
 							objcopy.indexof = m.index;
 							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
@@ -282,12 +325,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							if (filter(objcopy.tagging)) {
 								// If the tags in this result match the ones specified, use it.
 								objcopy.nesting = order;
-								
+								debugFunc("Response currently being processed.");
+								debugFunc(objcopy.respond);
 								// Make necessary substitutions in the response.
 								objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
 									var rtn;
 									if ($1) {
-										// if first capture found, ignore--surrounded my more than one pair of parentheses
+										// if first capture found, ignore--surrounded by more than one pair of parentheses
 										rtn = $1;
 									} else {
 										// use number to get relevant part of earlier match with user input
@@ -296,9 +340,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										debugFunc(rtn);
 										// process part of user input and run inflections
 										rtn = rtn.replace(ioregex, function (match, $1) {
-											debugFunc("Inflection");
-											debugFunc(libraryData.inflect[$1]);
-											return libraryData.inflect[$1.toLowerCase()];
+											debugFunc("Inflection:");
+											debugFunc($1 + " --> " + libraryData.inflect[$1.toLowerCase()]);
+											return libraryData.inflect[$1.toLowerCase()] || $1;
 										});
 									};
 									return rtn;
@@ -338,10 +382,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 											}
 											if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
 												deferwhere.ruleset[deferpath[d]] = {};
+												// Create pattern based on key.
+												deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
 											}
 											
 											deferwhere = deferwhere.ruleset[deferpath[d]];
-											debugFunc("defer loc: " + d);
+											debugFunc("Deferral location: " + d);
 											debugFunc(deferwhere);
 											d += 1;
 										}							
@@ -400,7 +446,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					return copy;
 				},
 				selectIndex = function (min, max) {
-					return (noRandomFlag) ? 0 : Math.floor(Math.random() * (max - min + 1)) + min;
+					return (noRandomFlag) ? min : Math.floor(Math.random() * (max - min + 1)) + min;
 				};
 			return {
 				convertBethTimeToMS: convertBethTimeToMS,
@@ -443,9 +489,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
-					var whichMode = whichMode,
-						agendaItem = agendaStack[0].agendaItem, // get most childish item
-						mode = agendaItem[whichMode];
+					var agendaItem = agendaStack[0].agendaItem, // get most childish item
+						mode = agendaItem[whichMode],
 						rtn = (mode)
 							? function(tagging) {
 									var	has = mode.filters.HAS || [],
@@ -486,7 +531,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				isComplete = function (agendaSnapshot) {
 					var rtn = false,
-						agendaSnapshot = agendaSnapshot, // localisation
 						agendaItem = agendaSnapshot.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
@@ -571,7 +615,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									redo = true;
 								} else {
 									a = 0;
-									clearInterval(agendaInterval);
+									deactivate();
 									exitSession();
 								}
 							}
@@ -616,7 +660,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				datetime = new Date(),
 				f, // flag counter
 				ioarray = [],
-				ioregex;
+				ioregex,
+				i,
+				whichAction,
+				whichResponse;
 			
 			for (i in libraryData.inflect) {
 				ioarray.push(i);
@@ -660,7 +707,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 				if (responses.length) {
 
-					var whichResponse = utils.selectIndex(0, (responses.length - 1));
+					whichResponse = utils.selectIndex(0, (responses.length - 1));
 					
 					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).

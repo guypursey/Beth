@@ -246,13 +246,14 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 			rex = new RegExp("\\b(" + arr.join("|") + ")\\b", "gi");
 			
-			debugFunc("preprocess: " + input);
+			debugFunc("Preprocess: " + input);
 			
 			rtn = input.replace(rex, function (m, $1) {
-				return sub[$1];
+				debugFunc($1 + " --> " + sub[$1.toLowerCase()]);
+				return sub[$1.toLowerCase()];
 			});
 			
-			debugFunc("result: " + rtn);
+			debugFunc("Result: " + rtn);
 			
 			return rtn;
 		},

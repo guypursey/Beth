@@ -261,14 +261,17 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		},
 
 		fillTemplate = function (template, input, ioregex, inflections) {
+			// TODO: Look at refactoring regex; not all squared brackets necessary?
 			template = template.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
 				var rtn;
 				if ($1) {
-					// if first capture found, ignore--surrounded by more than one pair of parentheses
+					// If there's more than one pair of parentheses around the digit, ignore it for now.
 					rtn = $1;
 				} else {
-					// use number to get relevant part of earlier match with user input
+					// Use number to get relevant part of earlier match with user input.
 					rtn = input[parseInt($2, 10)];
+					// TODO: Check that this part of the match actually exists!
+					
 					debugFunc("Return, pre-inflection");
 					debugFunc(rtn);
 					// process part of user input and run inflections
@@ -280,7 +283,18 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				};
 				return rtn;
 			});
+			
+			// Remove single pair of outer parentheses from any future substitution markers (i.e. those with more than one pair).
+			template = template.replace(/\((\(+\d+\)+)\)/g, function (a0, a1) {
+				return a1;
+			});
+			
 			return template;
+		},
+		
+		checkTemplate = function (template) {
+			// Check if anything needs processing, or if template is ready to go.
+			return !(/\(\d+\)/g.test(template));
 		},
 
 		process = function (input, rules, ioregex, inflect, order, filter) {
@@ -340,6 +354,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						// Take a copy of all the results in the array.
 						results = [];
 						debugFunc(tabbing, (results.length) ? "Results found." : "No direct results found.");
+						
+						// Loop through all results.
 						for (j = 0; j < rules[i].results.length; j += 1) {
 							objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
 							objcopy.covered = m[0].length; // Add properties.
@@ -354,11 +370,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 								// Make necessary substitutions in the response.
 								objcopy.respond = fillTemplate(objcopy.respond, m, ioregex, libraryData.inflect);
-								
-								// remove single pair of outer parentheses from any future substitution markers
-								objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
-									return a1;
-								});
 								
 								// Sift out deferred options first.
 								if (objcopy.deferto) {
@@ -415,9 +426,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									});
 									
 								} else {
-									// This result is good to use.
-									results.push(objcopy);
-								
+									if (checkTemplate(objcopy.respond)) {
+										// This result is good to use.
+										results.push(objcopy);
+									} else {
+										debugFunc("Response discarded: " + objcopy.respond);
+									}
 								}
 							}
 						}

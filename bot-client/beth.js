@@ -259,6 +259,30 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			return rtn;
 		},
+
+		fillTemplate = function (template, input, ioregex, inflections) {
+			template = template.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
+				var rtn;
+				if ($1) {
+					// if first capture found, ignore--surrounded by more than one pair of parentheses
+					rtn = $1;
+				} else {
+					// use number to get relevant part of earlier match with user input
+					rtn = input[parseInt($2, 10)];
+					debugFunc("Return, pre-inflection");
+					debugFunc(rtn);
+					// process part of user input and run inflections
+					rtn = rtn.replace(ioregex, function (match, $1) {
+						debugFunc("Inflection:");
+						debugFunc($1 + " --> " + inflections[$1.toLowerCase()]);
+						return inflections[$1.toLowerCase()] || $1;
+					});
+				};
+				return rtn;
+			});
+			return template;
+		},
+
 		process = function (input, rules, ioregex, inflect, order, filter) {
 		// Parse input using rulesets, dealing with deference en route.
 		// Order indicates, for now, the level of depth -- though this might happen at initialisation rather than dynamically.
@@ -327,26 +351,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								objcopy.nesting = order;
 								debugFunc("Response currently being processed.");
 								debugFunc(objcopy.respond);
+
 								// Make necessary substitutions in the response.
-								objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
-									var rtn;
-									if ($1) {
-										// if first capture found, ignore--surrounded by more than one pair of parentheses
-										rtn = $1;
-									} else {
-										// use number to get relevant part of earlier match with user input
-										rtn = m[parseInt($2, 10)];
-										debugFunc("Return, pre-inflection");
-										debugFunc(rtn);
-										// process part of user input and run inflections
-										rtn = rtn.replace(ioregex, function (match, $1) {
-											debugFunc("Inflection:");
-											debugFunc($1 + " --> " + libraryData.inflect[$1.toLowerCase()]);
-											return libraryData.inflect[$1.toLowerCase()] || $1;
-										});
-									};
-									return rtn;
-								});
+								objcopy.respond = fillTemplate(objcopy.respond, m, ioregex, libraryData.inflect);
 								
 								// remove single pair of outer parentheses from any future substitution markers
 								objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {

@@ -262,6 +262,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 		fillTemplate = function (template, input, ioregex, inflections) {
 			// TODO: Look at refactoring regex; not all squared brackets necessary?
+			var isValid = true;
 			template = template.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
 				var rtn;
 				if ($1) {
@@ -271,15 +272,19 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					// Use number to get relevant part of earlier match with user input.
 					rtn = input[parseInt($2, 10)];
 					// TODO: Check that this part of the match actually exists!
-					
-					debugFunc("Return, pre-inflection");
-					debugFunc(rtn);
-					// process part of user input and run inflections
-					rtn = rtn.replace(ioregex, function (match, $1) {
-						debugFunc("Inflection:");
-						debugFunc($1 + " --> " + inflections[$1.toLowerCase()]);
-						return inflections[$1.toLowerCase()] || $1;
-					});
+					if (rtn) {
+						debugFunc("Return, pre-inflection:");
+						debugFunc(rtn);
+						// process part of user input and run inflections
+						rtn = rtn.replace(ioregex, function (match, $1) {
+							debugFunc("Inflection:");
+							debugFunc($1 + " --> " + inflections[$1.toLowerCase()]);
+							return inflections[$1.toLowerCase()] || $1;
+						});
+					} else {
+						debugFunc("Faulty template. Template is `" + template + "` but there is no: " + $2 + "in wildcard.");
+						isValid = false;
+					}
 				};
 				return rtn;
 			});
@@ -289,7 +294,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				return a1;
 			});
 			
-			return template;
+			// If response was invalidated at any point, return false, else return the template.
+			return isValid && template;
 		},
 		
 		checkTemplate = function (template) {

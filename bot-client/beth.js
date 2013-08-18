@@ -351,62 +351,49 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		},
 
 		process = function (input, rules, ioregex, inflect, order, filter) {
-		// Parse input using rulesets, dealing with deference en route.
-		// Order indicates, for now, the level of depth -- though this might happen at initialisation rather than dynamically.
-		// Filter can cut down on loops we run later by pre-emptively removing certain responses from the returned results.
-			debugFunc('Starting process function ', order);
-			debugFunc('Received input: ', input);
-			debugFunc('Received rules: ', rules);
+		// Parse input using rulesets, dealing with deference en route and applying filter.
+			debugFunc("Starting process function: " + order);
+			debugFunc("Received input: " + input);
 		    var i,
 				j,
-			    rex,	// for storing regular expression
-			    rtn = {
+			    regex,
+				nested_rtn, // For collecting up returns from recursive calls
+				approved_responses,
+			    match,
+				objcopy,
+				deferarray = [], // for storing pointers and objects for final deferral loop
+				deferobj,
+				rtn = {
 					responses: [],
 					deferrals: []
-				},	// for storing results
-				recursive, // for collecting up returns from recursive calls
-				results,
-			    m,		// matching string
-			    tabbing = '',	// for debugging	
-				deferwhere,
-				deferpath,
-				d,
-				deferarray = [], // for storing pointers and objects for final deferral loop
-				origobj, // reference to the original object
-				objcopy;
-			
-			order = order || 0;
-			
-			for (i = 0; i < order; i += 1) {
-				tabbing += '\t';
-			}
-			
-			tabbing += order + ':';
-			
-			// If filter parameter is not a function, define it as true so responses can be passed.
-			filter = (typeof filter === "function")
-					? filter
-					: function () { debugFunc("No filter found."); return true; };
+				};
+
+			// If `filter` is not a function, define a function which returns true so responses can be passed.
+			filter = (typeof filter === "function") ? filter : function () { return true; };
 			
 			for (i in rules) {
-			    rex = new RegExp(rules[i].pattern, 'i');
-			    m = (rex).exec(input);
+			    regex = new RegExp(rules[i].pattern, 'i');
+			    match = (regex).exec(input);
 				
-				// If a match is found.
-			    if (m) {
-					debugFunc(tabbing, "Examined:", rex);
-					debugFunc(tabbing, "Found:", m[0]);
+			    if (match) {
+					debugFunc("Examined:");
+					debugFunc(regex);
+					debugFunc("Found:");
+					debugFunc(match[0]);
+					
+					// Deal with ruleset within matching object.
 					if (rules[i].hasOwnProperty('ruleset')) {
-						debugFunc(tabbing, "Exploring further...");
+						debugFunc("Going one level down...");
 						// Recursively call this function for nested rulesets.
-						recursive = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
-						rtn.responses = rtn.responses.concat(recursive.responses);
-						rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
+						nested_rtn = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
+						rtn.responses = rtn.responses.concat(nested_rtn.responses);
+						rtn.deferrals = rtn.deferrals.concat(nested_rtn.deferrals);
 					}
+					
+					// Deal with results within matching object.
 					if (typeof rules[i].results === 'object') {
-						// Take a copy of all the results in the array.
-						results = [];
-						debugFunc(tabbing, (results.length) ? "Results found." : "No direct results found.");
+						debugFunc((rules[i].results.length) ? "Results found." : "No direct results found.");
+						approved_responses = [];
 						
 						// Loop through all results.
 						for (j = 0; j < rules[i].results.length; j += 1) {
@@ -414,88 +401,47 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// Make a copy of the result object.
 							objcopy = utils.copyObject(rules[i].results[j]);
 
-							// Add extra properties based on match data.
-							objcopy.covered = m[0].length; // Add properties.
-							objcopy.indexof = m.index;
-							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
-							objcopy.nesting = order;
-							debugFunc("Response currently being processed.");
-
 							// Make necessary substitutions in the response.
-							objcopy.respond = fillTemplate(objcopy.respond, m, ioregex, libraryData.inflect);
-
-							// Sift out deferred options first.
-							if (objcopy.deferto) {
-							// TODO: could also check for nested parentheses as a condition of deferral?
-							// TODO: check not just that deferto exists but that is also an array and not empty
-								deferwhere = libraryData;
-								// Set up deferwhere to start looking at libraryData.
-								
-								// Take just the first element of deferto.
-								deferpath = objcopy.deferto.shift();
-								//TODO: Check this is also an array
-
-								// If array is empty, change value to false, so that this item is not eternally deferred.
-								if (objcopy.deferto.length === 0) {
-									objcopy.deferto = false;
-								}
-								// TODO: could refactor this so the emptiness of the array is checked upfront
-
-								if (deferpath) {
-								// TODO: need a better check that this is an array -- this whole section to be refactored
-									d = 0;
-									while (d < deferpath.length && typeof deferpath[d] === "string") {
-									// Check the element in the array can be a valid key value.
-
-										// If the path does not current exist, create it.
-										if (!(deferwhere.hasOwnProperty("ruleset"))) {
-											deferwhere.ruleset = {};
+							objcopy.respond = fillTemplate(objcopy.respond, match, ioregex, libraryData.inflect);
+							
+							// Make sure response is still valid.
+							if (objcopy.respond) {
+								// Add extra properties based on match data.
+								objcopy.covered = match[0].length; // Add properties.
+								objcopy.indexof = match.index;
+								objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
+								objcopy.nesting = order;
+								debugFunc("Response currently being processed.");
+							
+								if (objcopy.deferto && objcopy.deferto.length) {
+									// Set up the deferral for later.
+									deferobj = createDeferObj(objcopy, match, ioregex, libraryData.inflect);
+									if (deferobj) {
+										deferarray.push(deferobj);
+									} else {
+										debugFunc("Faulty deferral.");
+									}
+								} else {
+									if (checkTemplate(objcopy.respond)) {
+										if (filter(objcopy.tagging)) {
+										// This result is good to use.
+											approved_responses.push(objcopy);
 										}
-										if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
-											deferwhere.ruleset[deferpath[d]] = {};
-											// Create pattern based on key.
-											deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
-										}
-
-										deferwhere = deferwhere.ruleset[deferpath[d]];
-										debugFunc("Deferral location: " + d);
-										debugFunc(deferwhere);
-										d += 1;
+									} else {
+										debugFunc("Error: number of parentheses exceeds number of defers.");
 									}
 								}
-
-								// Record that this item is not part of the original ruleset but deferred.
-								objcopy.deferrd = true;
-
-								// If the deferral location does not have a results array create one.
-								if (!(deferwhere.hasOwnProperty("results"))) {
-									deferwhere.results = [];
-								}
-
-								// Set up the deferral for later.
-								deferarray.push({
-									"address": deferwhere.results,
-									"todefer": objcopy
-								});
-
 							} else {
-								if (checkTemplate(objcopy.respond)) {
-									if (filter(objcopy.tagging)) {
-									// This result is good to use.
-										results.push(objcopy);
-									}
-								}
+								debugFunc("Warning: object `respond` property nullified.");
+								debugFunc(objcopy);
 							}
 						}
-						rtn.responses = rtn.responses.concat(results);
+						rtn.responses = rtn.responses.concat(approved_responses);
 						rtn.deferrals = rtn.deferrals.concat(deferarray);
 					}
 			    }
 			}
-
-			//console.log(tabbing, "Returning result:", rtn);
 			return rtn;
-
 		},
 
 		utils = (function () {

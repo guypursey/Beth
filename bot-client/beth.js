@@ -296,6 +296,59 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			// Check if anything needs processing, or if template is ready to go.
 			return !(/\(\d+\)/g.test(template));
 		},
+		
+		createDeferObj = function (obj, match, ioregex, inflections) {
+			var deferwhere = libraryData,
+				deferpath = obj.deferto.shift().reverse(),
+				d = deferpath.length,
+				rtn_obj;
+
+			while (d) {
+				d -= 1;
+
+				// Create the path if it does not already exist.
+				if (!(deferwhere.hasOwnProperty("ruleset"))) {
+					deferwhere.ruleset = {};
+				}
+				
+				// Substitute any parentheticals in the defer path.
+				deferpath[d] = fillTemplate(deferpath[d], match, ioregex, inflections);
+
+				// Check defer path no longer contains any parentheticals.
+				if (checkTemplate(deferpath[d])) {
+					if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+						deferwhere.ruleset[deferpath[d]] = {};
+						// Create pattern based on key.
+						deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
+						
+					}
+					deferwhere = deferwhere.ruleset[deferpath[d]];
+				} else {
+					debugFunc("Too many parentheses in defer path: " + deferpath[d]);
+					d = false;
+					deferwhere = false;
+				}
+			}
+			
+			if (deferwhere) {
+				// Record that this item is not part of the original ruleset but deferred.
+				obj.deferrd = true;
+				debugFunc("Object to be deferred to: ");
+				debugFunc(deferwhere);
+				
+				// If the deferral location does not have a results array create one.
+				if (!(deferwhere.hasOwnProperty("results"))) {
+					deferwhere.results = [];
+				}
+				
+				rtn_obj = {
+					address: deferwhere.results,
+					todefer: obj
+				}
+			}
+			
+			return rtn_obj;
+		},
 
 		process = function (input, rules, ioregex, inflect, order, filter) {
 		// Parse input using rulesets, dealing with deference en route.

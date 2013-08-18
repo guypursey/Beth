@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.4.2##
+##CODE DOCUMENTATION for v0.4.3##
 
 ###NODE JS COMPATIBILITY###
 
@@ -47,24 +47,25 @@ Function. This callback should contain the code necessary for Beth to log what i
 The variables in the Beth constructor are as follows:
 
  - `debugFunc`
- - `libraryData`
- - `logData`
- - `postRoom`
- - `postMsg`
- - `severFn`
- - `wildcardPattern`
+ - `sessionStats`
+ - `logManager`
+ - `postManager`
  - `lookforMarker`
  - `lookforPattern`
+ - `preparePattern`
+ - `parseResults`
  - `parseRuleset`
- - `loginput`
  - `preprocess`
+ - `fillTemplate`
+ - `checkTemplate`
+ - `createDeferObj`
  - `process`
- - `readlog`
- - `sessionStats`
- - `util`
+ - `utils`
  - `agendaManager`
  - `timedcheck`
  - `interval`
+ - `agendaInterval`
+ - `postInterval`
  - `deactivate`
 
 
@@ -109,6 +110,18 @@ Calls itself recursively, in that it can then be used to parse rulesets of great
 ###`preprocess`###
 
 *Function.* Checks user's input for any substitutions that need to be made and makes them. Returns amended input.
+
+###`fillTemplate`###
+
+*Function.* Takes a reassembly template, a match object from the user's input, a regex containing all the inflect keys and the inflections object. Replaces all singly parenthesised numerals with relevant part of user's input and takes care of inflections. Returns processed string if successful, or false if the string is nullified by faulty reference.
+
+###`checkTemplate`###
+
+*Function.* Takes reassembly template as argument and checks to see if it is ready to go or if it needs further processing by looking for numerals in parentheses. If ready, returns true. If not, returns false.
+
+###`createDeferObj`###
+
+*Function.* Takes a result object, match object from user's input, a regex of inflect keys and the inflections object. Processes the respond property of the result object with `fillTemplate`. Finds location in libraryData to which the zeroth defer path refers and packages that as an address with the result object itself to be processed later. Returns package or false.
  
 ###`process`###
 

@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.2##
+##v0.4.3##
 
-LATEST: Refactored to correct some errors that had not been picked up properly through testing. The `logManager` now chunks incoming messages from user, arguably adding some nuance to the responses.
+LATEST: Refactored `process`, doing a lot of outsourcing of operations, mainly to ensure that deferrals are processed regardless of filtering. Also added more checks and balances to prevent bugs.
 
 This is all very much a work in progress.
 

@@ -357,80 +357,79 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						
 						// Loop through all results.
 						for (j = 0; j < rules[i].results.length; j += 1) {
-							objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
+
+							// Make a copy of the result object.
+							objcopy = utils.copyObject(rules[i].results[j]);
+
+							// Add extra properties based on match data.
 							objcopy.covered = m[0].length; // Add properties.
 							objcopy.indexof = m.index;
 							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
-							// Check that the results conform to the filter.
-							if (filter(objcopy.tagging)) {
-								// If the tags in this result match the ones specified, use it.
-								objcopy.nesting = order;
-								debugFunc("Response currently being processed.");
-								debugFunc(objcopy.respond);
+							objcopy.nesting = order;
+							debugFunc("Response currently being processed.");
 
-								// Make necessary substitutions in the response.
-								objcopy.respond = fillTemplate(objcopy.respond, m, ioregex, libraryData.inflect);
+							// Make necessary substitutions in the response.
+							objcopy.respond = fillTemplate(objcopy.respond, m, ioregex, libraryData.inflect);
+
+							// Sift out deferred options first.
+							if (objcopy.deferto) {
+							// TODO: could also check for nested parentheses as a condition of deferral?
+							// TODO: check not just that deferto exists but that is also an array and not empty
+								deferwhere = libraryData;
+								// Set up deferwhere to start looking at libraryData.
 								
-								// Sift out deferred options first.
-								if (objcopy.deferto) {
-								// TODO: could also check for nested parentheses as a condition of deferral?
-								// TODO: check not just that deferto exists but that is also an array and not empty
-									deferwhere = libraryData;
-									// Set up deferwhere to start looking at libraryData.
-									
-									// Take just the first element of deferto.
-									deferpath = objcopy.deferto.shift();
-									//TODO: check this is also an array
-									
-									// If array is empty, change value to false, so that this item is not eternally deferred.
-									if (objcopy.deferto.length === 0) {
-										objcopy.deferto = false;
+								// Take just the first element of deferto.
+								deferpath = objcopy.deferto.shift();
+								//TODO: Check this is also an array
+
+								// If array is empty, change value to false, so that this item is not eternally deferred.
+								if (objcopy.deferto.length === 0) {
+									objcopy.deferto = false;
+								}
+								// TODO: could refactor this so the emptiness of the array is checked upfront
+
+								if (deferpath) {
+								// TODO: need a better check that this is an array -- this whole section to be refactored
+									d = 0;
+									while (d < deferpath.length && typeof deferpath[d] === "string") {
+									// Check the element in the array can be a valid key value.
+
+										// If the path does not current exist, create it.
+										if (!(deferwhere.hasOwnProperty("ruleset"))) {
+											deferwhere.ruleset = {};
+										}
+										if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+											deferwhere.ruleset[deferpath[d]] = {};
+											// Create pattern based on key.
+											deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
+										}
+
+										deferwhere = deferwhere.ruleset[deferpath[d]];
+										debugFunc("Deferral location: " + d);
+										debugFunc(deferwhere);
+										d += 1;
 									}
-									// TODO: could refactor this so the emptiness of the array is checked upfront
-									
-									if (deferpath) {
-									// TODO: need a better check that this is an array -- this whole section to be refactored
-										d = 0;
-										while (d < deferpath.length && typeof deferpath[d] === "string") {
-										// Check the element in the array can be a valid key value.
-											
-											// If the path does not current exist, create it.
-											if (!(deferwhere.hasOwnProperty("ruleset"))) {
-												deferwhere.ruleset = {};
-											}
-											if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
-												deferwhere.ruleset[deferpath[d]] = {};
-												// Create pattern based on key.
-												deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
-											}
-											
-											deferwhere = deferwhere.ruleset[deferpath[d]];
-											debugFunc("Deferral location: " + d);
-											debugFunc(deferwhere);
-											d += 1;
-										}							
-									}
-									
-									// Record that this item is not part of the original ruleset but deferred.
-									objcopy.deferrd = true;
-									
-									// If the deferral location does not have a results array create one.
-									if (!(deferwhere.hasOwnProperty("results"))) {
-										deferwhere.results = [];
-									}
-									
-									// Set up the deferral for later.
-									deferarray.push({
-										"address": deferwhere.results,
-										"todefer": objcopy
-									});
-									
-								} else {
-									if (checkTemplate(objcopy.respond)) {
-										// This result is good to use.
+								}
+
+								// Record that this item is not part of the original ruleset but deferred.
+								objcopy.deferrd = true;
+
+								// If the deferral location does not have a results array create one.
+								if (!(deferwhere.hasOwnProperty("results"))) {
+									deferwhere.results = [];
+								}
+
+								// Set up the deferral for later.
+								deferarray.push({
+									"address": deferwhere.results,
+									"todefer": objcopy
+								});
+
+							} else {
+								if (checkTemplate(objcopy.respond)) {
+									if (filter(objcopy.tagging)) {
+									// This result is good to use.
 										results.push(objcopy);
-									} else {
-										debugFunc("Response discarded: " + objcopy.respond);
 									}
 								}
 							}
@@ -440,7 +439,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 			    }
 			}
-						
+
 			//console.log(tabbing, "Returning result:", rtn);
 			return rtn;
 

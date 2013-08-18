@@ -701,11 +701,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			if (input) {
 				input = preprocess(input);
 				results = process(input, libraryData.ruleset, ioregex, libraryData.inflect, 0, filterCallback);
-				debugFunc("Results are in:");
-				debugFunc(results);
 				responses = results.responses;
 				deferrals = results.deferrals;
-				//deal with deferrals
+				// Deal with deferrals.
+				debugFunc("Deferrals");
+				debugFunc(deferrals);
 				while (deferrals.length) {
 					d = deferrals.shift();
 					d.address.unshift(d.todefer);
@@ -731,6 +731,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				});
 
 				if (responses.length) {
+					debugFunc("Responses in: ");
+					debugFunc(responses);
 
 					whichResponse = utils.selectIndex(0, (responses.length - 1));
 					

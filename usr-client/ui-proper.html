@@ -204,6 +204,8 @@ window.onload = function () {
 			}
 		}
 	})(CHATBOT_UI.indicate, function (msg) { socket.emit('sendchat', msg) }, CHATBOT_UI.clearInput);
+
+	CHATBOT_UI.userInputElement().focus();
 };
 </script>
 <script>

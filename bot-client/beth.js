@@ -259,170 +259,195 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			return rtn;
 		},
-		process = function (input, rules, ioregex, inflect, order, filter) {
-		// Parse input using rulesets, dealing with deference en route.
-		// Order indicates, for now, the level of depth -- though this might happen at initialisation rather than dynamically.
-		// Filter can cut down on loops we run later by pre-emptively removing certain responses from the returned results.
-			debugFunc('Starting process function ', order);
-			debugFunc('Received input: ', input);
-			debugFunc('Received rules: ', rules);
-		    var i,
-				j,
-			    rex,	// for storing regular expression
-			    rtn = {
-					responses: [],
-					deferrals: []
-				},	// for storing results
-				recursive, // for collecting up returns from recursive calls
-				results,
-			    m,		// matching string
-			    tabbing = '',	// for debugging	
-				deferwhere,
-				deferpath,
-				d,
-				deferarray = [], // for storing pointers and objects for final deferral loop
-				origobj, // reference to the original object
-				objcopy;
+
+		fillTemplate = function (template, input, ioregex, inflections) {
+			// TODO: Look at refactoring regex; not all squared brackets necessary?
+			var isValid = true;
+			template = template.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
+				var rtn;
+				if ($1) {
+					// If there's more than one pair of parentheses around the digit, ignore it for now.
+					rtn = $1;
+				} else {
+					// Use number to get relevant part of earlier match with user input.
+					rtn = input[parseInt($2, 10)];
+					// TODO: Check that this part of the match actually exists!
+					if (rtn) {
+						debugFunc("Return, pre-inflection:");
+						debugFunc(rtn);
+						// process part of user input and run inflections
+						rtn = rtn.replace(ioregex, function (match, $1) {
+							debugFunc("Inflection:");
+							debugFunc($1 + " --> " + inflections[$1.toLowerCase()]);
+							return inflections[$1.toLowerCase()] || $1;
+						});
+					} else {
+						debugFunc("Faulty template. Template is `" + template + "` but there is no: " + $2 + "in wildcard.");
+						isValid = false;
+					}
+				};
+				return rtn;
+			});
 			
-			order = order || 0;
+			// Remove single pair of outer parentheses from any future substitution markers (i.e. those with more than one pair).
+			template = template.replace(/\((\(+\d+\)+)\)/g, function (a0, a1) {
+				return a1;
+			});
 			
-			for (i = 0; i < order; i += 1) {
-				tabbing += '\t';
+			// If response was invalidated at any point, return false, else return the template.
+			return isValid && template;
+		},
+		
+		checkTemplate = function (template) {
+			// Check if anything needs processing, or if template is ready to go.
+			return !(/\(\d+\)/g.test(template));
+		},
+		
+		createDeferObj = function (obj, match, ioregex, inflections) {
+			var deferwhere = libraryData,
+				deferpath = obj.deferto.shift().reverse(),
+				d = deferpath.length,
+				rtn_obj;
+
+			while (d) {
+				d -= 1;
+
+				// Create the path if it does not already exist.
+				if (!(deferwhere.hasOwnProperty("ruleset"))) {
+					deferwhere.ruleset = {};
+				}
+				
+				// Substitute any parentheticals in the defer path.
+				deferpath[d] = fillTemplate(deferpath[d], match, ioregex, inflections);
+
+				// Check defer path no longer contains any parentheticals.
+				if (checkTemplate(deferpath[d])) {
+					if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
+						deferwhere.ruleset[deferpath[d]] = {};
+						// Create pattern based on key.
+						deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
+						
+					}
+					deferwhere = deferwhere.ruleset[deferpath[d]];
+				} else {
+					debugFunc("Too many parentheses in defer path: " + deferpath[d]);
+					d = false;
+					deferwhere = false;
+				}
 			}
 			
-			tabbing += order + ':';
+			if (deferwhere) {
+				// Record that this item is not part of the original ruleset but deferred.
+				obj.deferrd = true;
+				debugFunc("Object to be deferred to: ");
+				debugFunc(deferwhere);
+				
+				// If the deferral location does not have a results array create one.
+				if (!(deferwhere.hasOwnProperty("results"))) {
+					deferwhere.results = [];
+				}
+				
+				rtn_obj = {
+					address: deferwhere.results,
+					todefer: obj
+				}
+			}
 			
-			// If filter parameter is not a function, define it as true so responses can be passed.
-			filter = (typeof filter === "function")
-					? filter
-					: function () { debugFunc("No filter found."); return true; };
+			return rtn_obj;
+		},
+
+		process = function (input, rules, ioregex, inflect, order, filter) {
+		// Parse input using rulesets, dealing with deference en route and applying filter.
+			debugFunc("Starting process function: " + order);
+			debugFunc("Received input: " + input);
+		    var i,
+				j,
+			    regex,
+				nested_rtn, // For collecting up returns from recursive calls
+				approved_responses,
+			    match,
+				objcopy,
+				deferarray = [], // for storing pointers and objects for final deferral loop
+				deferobj,
+				rtn = {
+					responses: [],
+					deferrals: []
+				};
+
+			// If `filter` is not a function, define a function which returns true so responses can be passed.
+			filter = (typeof filter === "function") ? filter : function () { return true; };
 			
 			for (i in rules) {
-			    rex = new RegExp(rules[i].pattern, 'i');
-			    m = (rex).exec(input);
+			    regex = new RegExp(rules[i].pattern, 'i');
+			    match = (regex).exec(input);
 				
-				// If a match is found.
-			    if (m) {
-					debugFunc(tabbing, "Examined:", rex);
-					debugFunc(tabbing, "Found:", m[0]);
+			    if (match) {
+					debugFunc("Examined:");
+					debugFunc(regex);
+					debugFunc("Found:");
+					debugFunc(match[0]);
+					
+					// Deal with ruleset within matching object.
 					if (rules[i].hasOwnProperty('ruleset')) {
-						debugFunc(tabbing, "Exploring further...");
+						debugFunc("Going one level down...");
 						// Recursively call this function for nested rulesets.
-						recursive = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
-						rtn.responses = rtn.responses.concat(recursive.responses);
-						rtn.deferrals = rtn.deferrals.concat(recursive.deferrals);
+						nested_rtn = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
+						rtn.responses = rtn.responses.concat(nested_rtn.responses);
+						rtn.deferrals = rtn.deferrals.concat(nested_rtn.deferrals);
 					}
+					
+					// Deal with results within matching object.
 					if (typeof rules[i].results === 'object') {
-						// Take a copy of all the results in the array.
-						results = [];
-						debugFunc(tabbing, (results.length) ? "Results found." : "No direct results found.");
+						debugFunc((rules[i].results.length) ? "Results found." : "No direct results found.");
+						approved_responses = [];
+						
+						// Loop through all results.
 						for (j = 0; j < rules[i].results.length; j += 1) {
-							objcopy = utils.copyObject(rules[i].results[j]); // Make a copy of the result object.
-							objcopy.covered = m[0].length; // Add properties.
-							objcopy.indexof = m.index;
-							objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
-							// Check that the results conform to the filter.
-							if (filter(objcopy.tagging)) {
-								// If the tags in this result match the ones specified, use it.
+
+							// Make a copy of the result object.
+							objcopy = utils.copyObject(rules[i].results[j]);
+
+							// Make necessary substitutions in the response.
+							objcopy.respond = fillTemplate(objcopy.respond, match, ioregex, libraryData.inflect);
+							
+							// Make sure response is still valid.
+							if (objcopy.respond) {
+								// Add extra properties based on match data.
+								objcopy.covered = match[0].length; // Add properties.
+								objcopy.indexof = match.index;
+								objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
 								objcopy.nesting = order;
 								debugFunc("Response currently being processed.");
-								debugFunc(objcopy.respond);
-								// Make necessary substitutions in the response.
-								objcopy.respond = objcopy.respond.replace(/([(][(]\d+[)][)])|[(](\d+)[)]/g, function (match, $1, $2) {
-									var rtn;
-									if ($1) {
-										// if first capture found, ignore--surrounded by more than one pair of parentheses
-										rtn = $1;
-									} else {
-										// use number to get relevant part of earlier match with user input
-										rtn = m[parseInt($2, 10)];
-										debugFunc("Return, pre-inflection");
-										debugFunc(rtn);
-										// process part of user input and run inflections
-										rtn = rtn.replace(ioregex, function (match, $1) {
-											debugFunc("Inflection:");
-											debugFunc($1 + " --> " + libraryData.inflect[$1.toLowerCase()]);
-											return libraryData.inflect[$1.toLowerCase()] || $1;
-										});
-									};
-									return rtn;
-								});
-								
-								// remove single pair of outer parentheses from any future substitution markers
-								objcopy.respond = objcopy.respond.replace(/\((\(+[0-9]+\)+)\)/g, function (a0, a1) {
-									return a1;
-								});
-								
-								// Sift out deferred options first.
-								if (objcopy.deferto) {
-								// TODO: could also check for nested parentheses as a condition of deferral?
-								// TODO: check not just that deferto exists but that is also an array and not empty
-									deferwhere = libraryData;
-									// Set up deferwhere to start looking at libraryData.
-									
-									// Take just the first element of deferto.
-									deferpath = objcopy.deferto.shift();
-									//TODO: check this is also an array
-									
-									// If array is empty, change value to false, so that this item is not eternally deferred.
-									if (objcopy.deferto.length === 0) {
-										objcopy.deferto = false;
-									}
-									// TODO: could refactor this so the emptiness of the array is checked upfront
-									
-									if (deferpath) {
-									// TODO: need a better check that this is an array -- this whole section to be refactored
-										d = 0;
-										while (d < deferpath.length && typeof deferpath[d] === "string") {
-										// Check the element in the array can be a valid key value.
-											
-											// If the path does not current exist, create it.
-											if (!(deferwhere.hasOwnProperty("ruleset"))) {
-												deferwhere.ruleset = {};
-											}
-											if (!(deferwhere.ruleset.hasOwnProperty(deferpath[d]))) {
-												deferwhere.ruleset[deferpath[d]] = {};
-												// Create pattern based on key.
-												deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
-											}
-											
-											deferwhere = deferwhere.ruleset[deferpath[d]];
-											debugFunc("Deferral location: " + d);
-											debugFunc(deferwhere);
-											d += 1;
-										}							
-									}
-									
-									// Record that this item is not part of the original ruleset but deferred.
-									objcopy.deferrd = true;
-									
-									// If the deferral location does not have a results array create one.
-									if (!(deferwhere.hasOwnProperty("results"))) {
-										deferwhere.results = [];
-									}
-									
+							
+								if (objcopy.deferto && objcopy.deferto.length) {
 									// Set up the deferral for later.
-									deferarray.push({
-										"address": deferwhere.results,
-										"todefer": objcopy
-									});
-									
+									deferobj = createDeferObj(objcopy, match, ioregex, libraryData.inflect);
+									if (deferobj) {
+										deferarray.push(deferobj);
+									} else {
+										debugFunc("Faulty deferral.");
+									}
 								} else {
-									// This result is good to use.
-									results.push(objcopy);
-								
+									if (checkTemplate(objcopy.respond)) {
+										if (filter(objcopy.tagging)) {
+										// This result is good to use.
+											approved_responses.push(objcopy);
+										}
+									} else {
+										debugFunc("Error: number of parentheses exceeds number of defers.");
+									}
 								}
+							} else {
+								debugFunc("Warning: object `respond` property nullified.");
+								debugFunc(objcopy);
 							}
 						}
-						rtn.responses = rtn.responses.concat(results);
+						rtn.responses = rtn.responses.concat(approved_responses);
 						rtn.deferrals = rtn.deferrals.concat(deferarray);
 					}
 			    }
 			}
-						
-			//console.log(tabbing, "Returning result:", rtn);
 			return rtn;
-
 		},
 
 		utils = (function () {
@@ -676,11 +701,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			if (input) {
 				input = preprocess(input);
 				results = process(input, libraryData.ruleset, ioregex, libraryData.inflect, 0, filterCallback);
-				debugFunc("Results are in:");
-				debugFunc(results);
 				responses = results.responses;
 				deferrals = results.deferrals;
-				//deal with deferrals
+				// Deal with deferrals.
+				debugFunc("Deferrals");
+				debugFunc(deferrals);
 				while (deferrals.length) {
 					d = deferrals.shift();
 					d.address.unshift(d.todefer);
@@ -706,6 +731,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				});
 
 				if (responses.length) {
+					debugFunc("Responses in: ");
+					debugFunc(responses);
 
 					whichResponse = utils.selectIndex(0, (responses.length - 1));
 					

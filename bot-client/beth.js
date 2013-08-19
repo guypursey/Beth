@@ -17,14 +17,26 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			var sessionStatus = {
 					usrsent: 0,
 					botsent: 0,
+					fwdsent: 0,
+					rspsent: 0,
 					totsent: 0,
 					flagset: {}
 				},
 				updateUsrSent = function () {
 					sessionStatus.usrsent += 1;
+					updateTotSent();
 				},
 				updateBotSent = function () {
 					sessionStatus.botsent += 1;
+					updateTotSent();
+				},
+				updateFwdSent = function () {
+					sessionStatus.fwdsent += 1;
+					updateBotSent();
+				},
+				updateRspSent = function () {
+					sessionStatus.rspsent += 1;
+					updateBotSent();
 				},
 				updateTotSent = function () {
 					sessionStatus.totsent += 1;
@@ -32,11 +44,17 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				setFlag = function (flag) {
 					sessionStatus.flagset[flag] = true;
 				},
-				getUsrSent = function (){
+				getUsrSent = function () {
 					return sessionStatus.usrsent;
 				},
-				getBotSent = function (){
+				getBotSent = function () {
 					return sessionStatus.botsent;
+				},
+				getFwdSent = function () {
+					return sessionStatus.fwdsent;
+				},
+				getRspSent = function () {
+					return sessionStatus.rspsent;
 				},
 				getTotSent = function (){
 					return sessionStatus.totsent;
@@ -48,10 +66,14 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return {
 				updateUsrSent: updateUsrSent,
 				updateBotSent: updateBotSent,
+				updateFwdSent: updateFwdSent,
+				updateRspSent: updateRspSent,
 				updateTotSent: updateTotSent,
 				setFlag: setFlag,
 				getUsrSent: getUsrSent,
 				getBotSent: getBotSent,
+				getFwdSent: getFwdSent,
+				getRspSent: getRspSent,
 				getTotSent: getTotSent,
 				getFlag: getFlag
 			};
@@ -99,17 +121,22 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		})(sessionStats.updateUsrSent, debugFunc),
 		
-		postManager = (function (updateBotSent) {
+		postManager = (function () {
 			var postRoom = [],
-				addToStack = function (msg) {
+				dispatchActions = [],
+				addToStack = function (msg, callback) {
 					postRoom.push(msg);
+					dispatchActions.push(callback);
 				},
 				sendFromStack = function () {
+					var callback = dispatchActions.shift();
 					// Check if any responses are waiting to go out.
 					if (postRoom.length) {
 						postMsg(postRoom.shift());
-						// Update number of items sent out.
-						updateBotSent();
+						// Act on dispatch, if callback was provided.
+						if (typeof callback === "function") {
+							callback();
+						}
 					}
 				},
 				postInterval,
@@ -124,7 +151,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			}
-		})(sessionStats.updateBotSent),
+		})(),
 		
 		// What Beth should use to identify keys for the `lookfor` object.
 		// TODO: Work out way to systematise this.
@@ -230,9 +257,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				}
 			}
 		},
+
 		preprocess = function (input) {
-		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
-		// Maintain a history of these substitutions.
+		// Prepare input for processing by dealing with words that can be substituting and any special characters at beginning or end of string.
 			
 			var rtn,
 				sub = libraryData.convert, // local reference to relevant data
@@ -240,7 +267,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				arr = [],
 				rex;
 			
-			// For now, create substitution regular expression on the fly rather than as part of initialisation, so it can be dynamic.
+			// For now, create regular expression from `convert` keys.
 			for (key in sub) {
 				if (sub.hasOwnProperty(key)) {
 					arr.push(key);
@@ -250,9 +277,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			debugFunc("Preprocess: " + input);
 			
+			// Replace any candidates for conversion with their substitutes.
 			rtn = input.replace(rex, function (m, $1) {
 				debugFunc($1 + " --> " + sub[$1.toLowerCase()]);
 				return sub[$1.toLowerCase()];
+			});
+			
+			// Remove any punctuation, spacing or special characters from beginning or end of string.
+			rtn = rtn.replace(/^[\W]*(.*)[\W]*$/g, function (match, $1) {
+				return $1;
 			});
 			
 			debugFunc("Result: " + rtn);
@@ -316,7 +349,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				if (!(deferwhere.hasOwnProperty("ruleset"))) {
 					deferwhere.ruleset = {};
 				}
-				
+
 				// Substitute any parentheticals in the defer path.
 				deferpath[d] = fillTemplate(deferpath[d], match, ioregex, inflections);
 
@@ -326,7 +359,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						deferwhere.ruleset[deferpath[d]] = {};
 						// Create pattern based on key.
 						deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
-						
 					}
 					deferwhere = deferwhere.ruleset[deferpath[d]];
 				} else {
@@ -398,7 +430,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					
 					// Deal with results within matching object.
 					if (typeof rules[i].results === 'object') {
-						debugFunc((rules[i].results.length) ? "Results found." : "No direct results found.");
 						approved_responses = [];
 						
 						// Loop through all results.
@@ -413,11 +444,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// Make sure response is still valid.
 							if (objcopy.respond) {
 								// Add extra properties based on match data.
-								objcopy.covered = match[0].length; // Add properties.
+								objcopy.pattern = regex;
+								objcopy.portion = match[0];
+								objcopy.covered = match[0].length;
 								objcopy.indexof = match.index;
 								objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
 								objcopy.nesting = order;
-								debugFunc("Response currently being processed.");
 							
 								if (objcopy.deferto && objcopy.deferto.length) {
 									// Set up the deferral for later.
@@ -435,10 +467,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										}
 									} else {
 										debugFunc("Error: number of parentheses exceeds number of defers.");
+										debugFunc(objcopy);
 									}
 								}
 							} else {
-								debugFunc("Warning: object `respond` property nullified.");
+								debugFunc("Warning: object `respond` property nullified, most likely by `fillTemplate`.");
 								debugFunc(objcopy);
 							}
 						}
@@ -480,7 +513,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			};
 		})(),
 		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag, debugFunc) {
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFwdSent, getRspSent, getTotSent, getFlag, debugFunc) {
 			var agendaStack = [], // An array to store all the current agenda items.
 				redoSnapshot = function (agendaLevel, itemNum) {
 					
@@ -491,6 +524,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						agendaIterate: 0, // To be incremented, currently by this function
 						agendaUsrSent: getUsrSent(), // Number of messages user sent at start of item.
 						agendaBotSent: getBotSent(), // Number of messages user sent at start of item.
+						agendaFwdSent: getFwdSent(),
+						agendaRspSent: getRspSent(),
+						agendaTotSent: getTotSent(),
 						agendaTimeStarted: new Date().getTime() // Date and time at start of item.
 					};
 					
@@ -504,6 +540,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								agendaIterate: 0, // To be incremented, currently by this function
 								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
 								agendaBotSent: getBotSent(), // number of messages user sent at start of item
+								agendaFwdSent: getFwdSent(),
+								agendaRspSent: getRspSent(),
+								agendaTotSent: getTotSent(),
 								agendaTimeStarted: new Date().getTime() // date and time at start of item
 							});
 						}
@@ -559,6 +598,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						agendaItem = agendaSnapshot.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
+						fwd = agendaItem.dountil.fwdsent || 0,
+						rsp = agendaItem.dountil.rspsent || 0,
+						tot = agendaItem.dountil.totsent || 0,
 						edr = agendaItem.dountil.endured || "0",
 						itr = agendaItem.dountil.iterate || 0,
 						// if properties are on the agenda, check if conditions are met
@@ -567,6 +609,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							: false,
 						botComp = (agendaItem.dountil.hasOwnProperty('botsent'))
 							? (getBotSent() >= agendaSnapshot.agendaBotSent + bot)
+							: false,
+						fwdComp = (agendaItem.dountil.hasOwnProperty('fwdsent'))
+							? (getFwdSent() >= agendaSnapshot.agendaFwdSent + fwd)
+							: false,
+						rspComp = (agendaItem.dountil.hasOwnProperty('rspsent'))
+							? (getRspSent() >= agendaSnapshot.agendaRspSent + rsp)
+							: false,
+						totComp = (agendaItem.dountil.hasOwnProperty('totsent'))
+							? (getTotSent() >= agendaSnapshot.agendaTotSent + tot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
 							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utils.convertBethTimeToMS(edr))
@@ -597,7 +648,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc("Flags completed?: " + flgComp);
 					debugFunc("Number of iterations completed?: " + itrComp);
 						
-					if (usrComp || botComp || edrComp || flgComp || itrComp) {
+					if (usrComp || botComp || fwdComp || rspComp || totComp || edrComp || flgComp || itrComp) {
 						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
 						debugFunc(agendaSnapshot);
 						return true;
@@ -669,7 +720,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag, function () {}),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getFlag, function () {}),
 		
 		timedcheck = function () {
 			
@@ -688,7 +739,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				ioregex,
 				i,
 				whichAction,
-				whichResponse;
+				whichResponse,
+				shards,
+				s;
 			
 			for (i in libraryData.inflect) {
 				ioarray.push(i);
@@ -710,27 +763,28 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					d = deferrals.shift();
 					d.address.unshift(d.todefer);
 				}
-				
-				// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
-				responses.sort(function (a, b) {
-					var rtn = 0,
-						a_date = (a.history) ? (a.history[0] || 0) : 0,
-						b_date = (b.history) ? (b.history[0] || 0) : 0;
-					if (b.nesting > a.nesting) {
-						rtn = 1;
-					} else if (b.nesting < a.nesting) {
-						rtn = -1;
-					} else if (b.deferrd > a.deferrd) {
-						rtn = 1;
-					} else if (b.deferrd < a.deferrd) {
-						rtn = -1;
-					} else {
-						rtn = a_date - b_date;
-					}
-					return rtn;
-				});
 
 				if (responses.length) {
+
+					// Sort responses by nesting, so highest nesting comes first (i.e., closer to zero), then deference, then historical usage.
+					responses.sort(function (a, b) {
+						var rtn = 0,
+							a_date = (a.origobj.history) ? (a.origobj.history[0] || 0) : 0,
+							b_date = (b.origobj.history) ? (b.origobj.history[0] || 0) : 0;
+						if (b.nesting > a.nesting) {
+							rtn = 1;
+						} else if (b.nesting < a.nesting) {
+							rtn = -1;
+						} else if (b.deferrd > a.deferrd) {
+							rtn = 1;
+						} else if (b.deferrd < a.deferrd) {
+							rtn = -1;
+						} else {
+							rtn = a_date - b_date;
+						}
+						return rtn;
+					});
+
 					debugFunc("Responses in: ");
 					debugFunc(responses);
 
@@ -738,7 +792,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					
 					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).
-						postManager.sendWhenReady(responses[whichResponse].respond);
+						postManager.sendWhenReady(responses[whichResponse].respond, sessionStats.updateRspSent);
 					}
 					
 					// Record use of this object on the original database if possible.
@@ -757,11 +811,21 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							debugFunc("set flag " + responses[whichResponse].setflag[f]);
 						}
 					}
+					
+					// Split preprocessed input into anything that wasn't matched in process.
+					shards = input.split(input.substr(responses[whichResponse].indexof, responses[whichResponse].covered));
+					// Return these shards to the log stack for further processing.
+					for (s = 0; s < shards.length; s += 1) {
+						logManager.addUnprocessedMessage(shards[s]);
+					}
+					
 				}
 				
+				debugFunc("Current library data...");
 				debugFunc(libraryData);
+
 			}
-			
+
 			// Proactive selection...
 			var m = libraryData.moveset.length,
 				fC = agendaManager.getCurrentFilter("proactive"),
@@ -787,7 +851,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			if (mA.length) {
 				whichAction = utils.selectIndex(0, (mA.length - 1));
-				postManager.sendWhenReady(mA[whichAction].forward);
+				postManager.sendWhenReady(mA[whichAction].forward, sessionStats.updateFwdSent);
 				mA[whichAction].history = mA[whichAction].history || [];
 				mA[whichAction].history.unshift(datetime);
 			}
@@ -807,8 +871,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
 	
-	// Set interval to check agenda and log every 2 seconds.
-	interval = setInterval(timedcheck, 2000);
+	// Set interval to check agenda and log every 3 seconds.
+	interval = setInterval(timedcheck, 3000);
 
 	// Finally, expose private variables to public API.
 	this.transform = logManager.addUnprocessedMessage;

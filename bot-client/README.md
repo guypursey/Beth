@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.4.3##
+##CODE DOCUMENTATION for v0.4.4##
 
 ###NODE JS COMPATIBILITY###
 
@@ -73,7 +73,7 @@ The variables in the Beth constructor are as follows:
 
 *Function.* If `debugFlag` is true then set call `debugFn` or (if `debugFn`) is null log the message in the console.
 
- ###`sessionStats`###
+###`sessionStats`###
 
 *IIFE closure.* The closure returns an object whose properties are references to functions within the closure. This means that the stats themselves are private variables and should not be changeable from the outside. The functions provided can be used to increment the number of messages the user has sent or the bot has sent or the total overall messages sent. There is also a function for setting flags. In addition to these setters, getter properties can be used to retrieve the latest statistics.
 

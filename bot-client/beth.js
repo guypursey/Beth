@@ -232,8 +232,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		},
 
 		preprocess = function (input) {
-		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
-		// Maintain a history of these substitutions.
+		// Prepare input for processing by dealing with words that can be substituting and any special characters at beginning or end of string.
 			
 			var rtn,
 				sub = libraryData.convert, // local reference to relevant data
@@ -241,7 +240,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				arr = [],
 				rex;
 			
-			// For now, create substitution regular expression on the fly rather than as part of initialisation, so it can be dynamic.
+			// For now, create regular expression from `convert` keys.
 			for (key in sub) {
 				if (sub.hasOwnProperty(key)) {
 					arr.push(key);
@@ -251,9 +250,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			debugFunc("Preprocess: " + input);
 			
+			// Replace any candidates for conversion with their substitutes.
 			rtn = input.replace(rex, function (m, $1) {
 				debugFunc($1 + " --> " + sub[$1.toLowerCase()]);
 				return sub[$1.toLowerCase()];
+			});
+			
+			// Remove any punctuation, spacing or special characters from beginning or end of string.
+			rtn = rtn.replace(/^[\W]*(.*)[\W]*$/g, function (match, $1) {
+				return $1;
 			});
 			
 			debugFunc("Result: " + rtn);

@@ -524,6 +524,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						agendaIterate: 0, // To be incremented, currently by this function
 						agendaUsrSent: getUsrSent(), // Number of messages user sent at start of item.
 						agendaBotSent: getBotSent(), // Number of messages user sent at start of item.
+						agendaFwdSent: getFwdSent(),
+						agendaRspSent: getRspSent(),
+						agendaTotSent: getTotSent(),
 						agendaTimeStarted: new Date().getTime() // Date and time at start of item.
 					};
 					
@@ -537,6 +540,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 								agendaIterate: 0, // To be incremented, currently by this function
 								agendaUsrSent: getUsrSent(), // number of messages user sent at start of item
 								agendaBotSent: getBotSent(), // number of messages user sent at start of item
+								agendaFwdSent: getFwdSent(),
+								agendaRspSent: getRspSent(),
+								agendaTotSent: getTotSent(),
 								agendaTimeStarted: new Date().getTime() // date and time at start of item
 							});
 						}
@@ -642,7 +648,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc("Flags completed?: " + flgComp);
 					debugFunc("Number of iterations completed?: " + itrComp);
 						
-					if (usrComp || botComp || edrComp || flgComp || itrComp) {
+					if (usrComp || botComp || fwdComp || rspComp || totComp || edrComp || flgComp || itrComp) {
 						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
 						debugFunc(agendaSnapshot);
 						return true;
@@ -865,8 +871,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 	console.log("debug:", debugFn);
 	debugFunc(libraryData.ruleset);
 	
-	// Set interval to check agenda and log every 2 seconds.
-	interval = setInterval(timedcheck, 2000);
+	// Set interval to check agenda and log every 3 seconds.
+	interval = setInterval(timedcheck, 3000);
 
 	// Finally, expose private variables to public API.
 	this.transform = logManager.addUnprocessedMessage;

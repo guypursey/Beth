@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.3##
+##v0.4.4##
 
-LATEST: Refactored `process`, doing a lot of outsourcing of operations, mainly to ensure that deferrals are processed regardless of filtering. Also added more checks and balances to prevent bugs.
+LATEST: Beth now processes shards of input left uncovered by the first round of processing, by putting them back on the log stack. Issues-wise, this closes #28. Enabled callbacks through the `postManager`. Also, corrected error in historical sorting.
 
 This is all very much a work in progress.
 

@@ -230,6 +230,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				}
 			}
 		},
+
 		preprocess = function (input) {
 		// Take the user's input and substitute words as defined in the ruleset. (e.g. contractions)
 		// Maintain a history of these substitutions.
@@ -316,7 +317,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				if (!(deferwhere.hasOwnProperty("ruleset"))) {
 					deferwhere.ruleset = {};
 				}
-				
+
 				// Substitute any parentheticals in the defer path.
 				deferpath[d] = fillTemplate(deferpath[d], match, ioregex, inflections);
 
@@ -326,7 +327,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						deferwhere.ruleset[deferpath[d]] = {};
 						// Create pattern based on key.
 						deferwhere.ruleset[deferpath[d]].pattern = preparePattern(deferpath[d]);
-						
 					}
 					deferwhere = deferwhere.ruleset[deferpath[d]];
 				} else {
@@ -710,27 +710,28 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					d = deferrals.shift();
 					d.address.unshift(d.todefer);
 				}
-				
-				// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
-				responses.sort(function (a, b) {
-					var rtn = 0,
-						a_date = (a.history) ? (a.history[0] || 0) : 0,
-						b_date = (b.history) ? (b.history[0] || 0) : 0;
-					if (b.nesting > a.nesting) {
-						rtn = 1;
-					} else if (b.nesting < a.nesting) {
-						rtn = -1;
-					} else if (b.deferrd > a.deferrd) {
-						rtn = 1;
-					} else if (b.deferrd < a.deferrd) {
-						rtn = -1;
-					} else {
-						rtn = a_date - b_date;
-					}
-					return rtn;
-				});
 
 				if (responses.length) {
+
+					// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
+					responses.sort(function (a, b) {
+						var rtn = 0,
+							a_date = (a.history) ? (a.history[0] || 0) : 0,
+							b_date = (b.history) ? (b.history[0] || 0) : 0;
+						if (b.nesting > a.nesting) {
+							rtn = 1;
+						} else if (b.nesting < a.nesting) {
+							rtn = -1;
+						} else if (b.deferrd > a.deferrd) {
+							rtn = 1;
+						} else if (b.deferrd < a.deferrd) {
+							rtn = -1;
+						} else {
+							rtn = a_date - b_date;
+						}
+						return rtn;
+					});
+
 					debugFunc("Responses in: ");
 					debugFunc(responses);
 
@@ -759,9 +760,13 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					}
 				}
 				
+				debugFunc("Current library data...");
 				debugFunc(libraryData);
+
 			}
-			
+
+
+
 			// Proactive selection...
 			var m = libraryData.moveset.length,
 				fC = agendaManager.getCurrentFilter("proactive"),

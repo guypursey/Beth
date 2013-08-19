@@ -320,8 +320,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					rtn = input[parseInt($2, 10)];
 					// TODO: Check that this part of the match actually exists!
 					if (rtn) {
-						debugFunc("Return, pre-inflection:");
-						debugFunc(rtn);
 						// process part of user input and run inflections
 						rtn = rtn.replace(ioregex, function (match, $1) {
 							debugFunc("Inflection:");
@@ -404,8 +402,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 		process = function (input, rules, ioregex, inflect, order, filter) {
 		// Parse input using rulesets, dealing with deference en route and applying filter.
-			debugFunc("Starting process function: " + order);
-			debugFunc("Received input: " + input);
+			debugFunc("Starting process level " + order);
 		    var i,
 				j,
 			    regex,
@@ -428,14 +425,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			    match = (regex).exec(input);
 				
 			    if (match) {
-					debugFunc("Examined:");
-					debugFunc(regex);
-					debugFunc("Found:");
-					debugFunc(match[0]);
-					
+					debugFunc("Found: " + match[0]);
 					// Deal with ruleset within matching object.
 					if (rules[i].hasOwnProperty('ruleset')) {
-						debugFunc("Going one level down...");
 						// Recursively call this function for nested rulesets.
 						nested_rtn = process(input, rules[i].ruleset, ioregex, inflect, order + 1, filter);
 						rtn.responses = rtn.responses.concat(nested_rtn.responses);

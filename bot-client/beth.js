@@ -17,6 +17,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			var sessionStatus = {
 					usrsent: 0,
 					botsent: 0,
+					fwdsent: 0,
+					rspsent: 0,
 					totsent: 0,
 					flagset: {}
 				},
@@ -27,6 +29,14 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				updateBotSent = function () {
 					sessionStatus.botsent += 1;
 					updateTotSent();
+				},
+				updateFwdSent = function () {
+					sessionStatus.fwdsent += 1;
+					updateBotSent();
+				},
+				updateRspSent = function () {
+					sessionStatus.rspsent += 1;
+					updateBotSent();
 				},
 				updateTotSent = function () {
 					sessionStatus.totsent += 1;
@@ -40,6 +50,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				getBotSent = function () {
 					return sessionStatus.botsent;
 				},
+				getFwdSent = function () {
+					return sessionStatus.fwdsent;
+				},
+				getRspSent = function () {
+					return sessionStatus.rspsent;
+				},
 				getTotSent = function (){
 					return sessionStatus.totsent;
 				},
@@ -50,10 +66,14 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			return {
 				updateUsrSent: updateUsrSent,
 				updateBotSent: updateBotSent,
+				updateFwdSent: updateFwdSent,
+				updateRspSent: updateRspSent,
 				updateTotSent: updateTotSent,
 				setFlag: setFlag,
 				getUsrSent: getUsrSent,
 				getBotSent: getBotSent,
+				getFwdSent: getFwdSent,
+				getRspSent: getRspSent,
 				getTotSent: getTotSent,
 				getFlag: getFlag
 			};

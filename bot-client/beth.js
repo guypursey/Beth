@@ -121,17 +121,22 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		})(sessionStats.updateUsrSent, debugFunc),
 		
-		postManager = (function (updateBotSent) {
+		postManager = (function () {
 			var postRoom = [],
-				addToStack = function (msg) {
+				dispatchActions = [],
+				addToStack = function (msg, callback) {
 					postRoom.push(msg);
+					dispatchActions.push(callback);
 				},
 				sendFromStack = function () {
+					var callback = dispatchActions.shift();
 					// Check if any responses are waiting to go out.
 					if (postRoom.length) {
 						postMsg(postRoom.shift());
-						// Update number of items sent out.
-						updateBotSent();
+						// Act on dispatch, if callback was provided.
+						if (typeof callback === "function") {
+							callback();
+						}
 					}
 				},
 				postInterval,
@@ -146,7 +151,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			}
-		})(sessionStats.updateBotSent),
+		})(),
 		
 		// What Beth should use to identify keys for the `lookfor` object.
 		// TODO: Work out way to systematise this.
@@ -781,7 +786,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					
 					if (responses[whichResponse].respond) {
 						// Send only first response (selection will be more varied in future versions).
-						postManager.sendWhenReady(responses[whichResponse].respond);
+						postManager.sendWhenReady(responses[whichResponse].respond, sessionStats.updateRspSent);
 					}
 					
 					// Record use of this object on the original database if possible.
@@ -840,7 +845,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			
 			if (mA.length) {
 				whichAction = utils.selectIndex(0, (mA.length - 1));
-				postManager.sendWhenReady(mA[whichAction].forward);
+				postManager.sendWhenReady(mA[whichAction].forward, sessionStats.updateFwdSent);
 				mA[whichAction].history = mA[whichAction].history || [];
 				mA[whichAction].history.unshift(datetime);
 			}

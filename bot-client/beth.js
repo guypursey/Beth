@@ -694,7 +694,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				ioregex,
 				i,
 				whichAction,
-				whichResponse;
+				whichResponse,
+				shards,
+				s;
 			
 			for (i in libraryData.inflect) {
 				ioarray.push(i);
@@ -764,14 +766,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							debugFunc("set flag " + responses[whichResponse].setflag[f]);
 						}
 					}
+					
+					// Split preprocessed input into anything that wasn't matched in process.
+					shards = input.split(input.substr(responses[whichResponse].indexof, responses[whichResponse].covered));
+					// Return these shards to the log stack for further processing.
+					for (s = 0; s < shards.length; s += 1) {
+						logManager.addUnprocessedMessage(shards[s]);
+					}
+					
 				}
 				
 				debugFunc("Current library data...");
 				debugFunc(libraryData);
 
 			}
-
-
 
 			// Proactive selection...
 			var m = libraryData.moveset.length,

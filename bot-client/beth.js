@@ -20,6 +20,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					fwdsent: 0,
 					rspsent: 0,
 					totsent: 0,
+					logsize: 0,
 					flagset: {}
 				},
 				updateUsrSent = function () {
@@ -41,6 +42,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				updateTotSent = function () {
 					sessionStatus.totsent += 1;
 				},
+				setLogSize = function (logsize) {
+					sessionStatus.logsize = logsize;
+				},
 				setFlag = function (flag) {
 					sessionStatus.flagset[flag] = true;
 				},
@@ -56,8 +60,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				getRspSent = function () {
 					return sessionStatus.rspsent;
 				},
-				getTotSent = function (){
+				getTotSent = function () {
 					return sessionStatus.totsent;
+				},
+				getLogSize = function () {
+					return sessionStatus.logsize;
 				},
 				getFlag = function (flag) {
 					return sessionStatus.flagset[flag] || false;
@@ -69,18 +76,20 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				updateFwdSent: updateFwdSent,
 				updateRspSent: updateRspSent,
 				updateTotSent: updateTotSent,
+				setLogSize: setLogSize,
 				setFlag: setFlag,
 				getUsrSent: getUsrSent,
 				getBotSent: getBotSent,
 				getFwdSent: getFwdSent,
 				getRspSent: getRspSent,
 				getTotSent: getTotSent,
+				getLogSize: getLogSize,
 				getFlag: getFlag
 			};
 			
 		})(),
 		
-		logManager = (function (updateUsrSent, debugFunc) {
+		logManager = (function (updateUsrSent, setLogSize, debugFunc) {
 		// Set up log for storing inputs, both process and unprocessed.
 			var logData = {
 					toprocess: [],
@@ -112,14 +121,19 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						debugFunc("Input not valid. Discarded:");
 						debugFunc(input);
 					}
+					
 					// Update number of items received from user in sessionStats.
 					updateUsrSent();
+					
+					// Record how many messages are waiting in the log to be processed.
+					setLogSize(logData.toprocess.length);
+					
 				};
 			return {
 				takeUnprocessedMessage: readlog,
 				addUnprocessedMessage: loginput
 			}
-		})(sessionStats.updateUsrSent, debugFunc),
+		})(sessionStats.updateUsrSent, sessionStats.setLogSize, debugFunc),
 		
 		postManager = (function () {
 			var postRoom = [],
@@ -513,7 +527,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			};
 		})(),
 		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFwdSent, getRspSent, getTotSent, getFlag, debugFunc) {
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFwdSent, getRspSent, getTotSent, getLogSize, getFlag, debugFunc) {
 			var agendaStack = [], // An array to store all the current agenda items.
 				redoSnapshot = function (agendaLevel, itemNum) {
 					
@@ -601,6 +615,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						fwd = agendaItem.dountil.fwdsent || 0,
 						rsp = agendaItem.dountil.rspsent || 0,
 						tot = agendaItem.dountil.totsent || 0,
+						log = agendaItem.dountil.logleft || 0,
 						edr = agendaItem.dountil.endured || "0",
 						itr = agendaItem.dountil.iterate || 0,
 						// if properties are on the agenda, check if conditions are met
@@ -618,6 +633,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							: false,
 						totComp = (agendaItem.dountil.hasOwnProperty('totsent'))
 							? (getTotSent() >= agendaSnapshot.agendaTotSent + tot)
+							: false,
+						logComp = (agendaItem.dountil.hasOwnProperty('logleft'))
+							? (getLogSize() <= log)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
 							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utils.convertBethTimeToMS(edr))
@@ -648,7 +666,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc("Flags completed?: " + flgComp);
 					debugFunc("Number of iterations completed?: " + itrComp);
 						
-					if (usrComp || botComp || fwdComp || rspComp || totComp || edrComp || flgComp || itrComp) {
+					if (usrComp || botComp || fwdComp || rspComp || totComp || logComp || edrComp || flgComp || itrComp) {
 						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
 						debugFunc(agendaSnapshot);
 						return true;
@@ -720,7 +738,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getFlag, function () {}),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getLogSize, sessionStats.getFlag, function () {}),
 		
 		timedcheck = function () {
 			

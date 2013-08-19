@@ -508,7 +508,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			};
 		})(),
 		
-		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFlag, debugFunc) {
+		agendaManager = (function (agendas, exitSession, getUsrSent, getBotSent, getFwdSent, getRspSent, getTotSent, getFlag, debugFunc) {
 			var agendaStack = [], // An array to store all the current agenda items.
 				redoSnapshot = function (agendaLevel, itemNum) {
 					
@@ -587,6 +587,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						agendaItem = agendaSnapshot.agendaItem,
 						usr = agendaItem.dountil.usrsent || 0,
 						bot = agendaItem.dountil.botsent || 0,
+						fwd = agendaItem.dountil.fwdsent || 0,
+						rsp = agendaItem.dountil.rspsent || 0,
+						tot = agendaItem.dountil.totsent || 0,
 						edr = agendaItem.dountil.endured || "0",
 						itr = agendaItem.dountil.iterate || 0,
 						// if properties are on the agenda, check if conditions are met
@@ -595,6 +598,15 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							: false,
 						botComp = (agendaItem.dountil.hasOwnProperty('botsent'))
 							? (getBotSent() >= agendaSnapshot.agendaBotSent + bot)
+							: false,
+						fwdComp = (agendaItem.dountil.hasOwnProperty('fwdsent'))
+							? (getFwdSent() >= agendaSnapshot.agendaFwdSent + fwd)
+							: false,
+						rspComp = (agendaItem.dountil.hasOwnProperty('rspsent'))
+							? (getRspSent() >= agendaSnapshot.agendaRspSent + rsp)
+							: false,
+						totComp = (agendaItem.dountil.hasOwnProperty('totsent'))
+							? (getTotSent() >= agendaSnapshot.agendaTotSent + tot)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
 							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utils.convertBethTimeToMS(edr))
@@ -697,7 +709,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFlag, function () {}),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getFlag, function () {}),
 		
 		timedcheck = function () {
 			

@@ -398,7 +398,6 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					
 					// Deal with results within matching object.
 					if (typeof rules[i].results === 'object') {
-						debugFunc((rules[i].results.length) ? "Results found." : "No direct results found.");
 						approved_responses = [];
 						
 						// Loop through all results.
@@ -413,11 +412,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							// Make sure response is still valid.
 							if (objcopy.respond) {
 								// Add extra properties based on match data.
-								objcopy.covered = match[0].length; // Add properties.
+								objcopy.pattern = regex;
+								objcopy.portion = match[0];
+								objcopy.covered = match[0].length;
 								objcopy.indexof = match.index;
 								objcopy.origobj = rules[i].results[j]; // Include a pointer to the original object.
 								objcopy.nesting = order;
-								debugFunc("Response currently being processed.");
 							
 								if (objcopy.deferto && objcopy.deferto.length) {
 									// Set up the deferral for later.
@@ -435,10 +435,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										}
 									} else {
 										debugFunc("Error: number of parentheses exceeds number of defers.");
+										debugFunc(objcopy);
 									}
 								}
 							} else {
-								debugFunc("Warning: object `respond` property nullified.");
+								debugFunc("Warning: object `respond` property nullified, most likely by `fillTemplate`.");
 								debugFunc(objcopy);
 							}
 						}

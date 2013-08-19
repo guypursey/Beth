@@ -766,11 +766,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 
 				if (responses.length) {
 
-					// Sort responses by nesting, so highest nesting comes first (i.e, closer to zero), then deference, then historical usage.
+					// Sort responses by nesting, so highest nesting comes first (i.e., closer to zero), then deference, then historical usage.
 					responses.sort(function (a, b) {
 						var rtn = 0,
-							a_date = (a.history) ? (a.history[0] || 0) : 0,
-							b_date = (b.history) ? (b.history[0] || 0) : 0;
+							a_date = (a.origobj.history) ? (a.origobj.history[0] || 0) : 0,
+							b_date = (b.origobj.history) ? (b.origobj.history[0] || 0) : 0;
 						if (b.nesting > a.nesting) {
 							rtn = 1;
 						} else if (b.nesting < a.nesting) {

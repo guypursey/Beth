@@ -22,9 +22,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				updateUsrSent = function () {
 					sessionStatus.usrsent += 1;
+					updateTotSent();
 				},
 				updateBotSent = function () {
 					sessionStatus.botsent += 1;
+					updateTotSent();
 				},
 				updateTotSent = function () {
 					sessionStatus.totsent += 1;
@@ -32,10 +34,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				setFlag = function (flag) {
 					sessionStatus.flagset[flag] = true;
 				},
-				getUsrSent = function (){
+				getUsrSent = function () {
 					return sessionStatus.usrsent;
 				},
-				getBotSent = function (){
+				getBotSent = function () {
 					return sessionStatus.botsent;
 				},
 				getTotSent = function (){

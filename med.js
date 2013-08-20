@@ -66,6 +66,12 @@ io.sockets.on('connection', function (socket) {
 			filename = __dirname + pathname + username + "_anon_" + (new Date()).toISOString().replace(/\W+/g, "").replace(/\d{5}Z$/, "") + ".txt";
 		}
 
+		if (filename) {
+			fs.appendFile(filename, date_time() + " *** " + username + " connected! ***" + line_break, function (err) {
+			if (err) throw err;
+				console.log('Saved message to ' + filename + ' successfully.', 'Ready to be read now.');
+			});
+		}
 	});
 
 	// when the user disconnects.. perform this
@@ -76,5 +82,12 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.emit('updateusers', usernames);
 		// echo globally that this client has left
 		socket.broadcast.emit('updatedisplay', 'SERVER', socket.username + ' has disconnected', new Date());
+
+		if (filename) {
+			fs.appendFile(filename, date_time() + " *** " + socket.username + " disconnected. ***" + line_break, function (err) {
+			if (err) throw err;
+				console.log('Saved message to ' + filename + ' successfully.', 'Ready to be read now.');
+			});
+		}
 	});
 });

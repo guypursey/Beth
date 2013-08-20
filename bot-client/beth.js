@@ -668,8 +668,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				getAgendaLevel = function (address) {
 					var a = agendaStack.length,
 						rtn = agendas;
+					debugFunc("whole agenda Stack");
+					debugFunc(agendaStack);
 					while (a && a > (address) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
 						a -= 1;
+						debugFunc("agendaStack element:");
+						debugFunc(agendaStack[a]);
 						rtn = rtn[agendaStack[a].agendaItemNum].agendas;
 					}
 					debugFunc("Agenda Level returned...");
@@ -713,6 +717,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						}
 					}
 
+					debugFunc("*** getCurrentItem function finished this time round. ***");
 					return agendaStack[0].agendaItem;
 				},
 				agendaInterval,
@@ -730,7 +735,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getLogSize, sessionStats.getFlag, function () {}),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getLogSize, sessionStats.getFlag, debugFunc),
 		
 		timedcheck = function () {
 			

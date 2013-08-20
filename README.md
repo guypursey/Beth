@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.4##
+##v0.4.5##
 
-LATEST: Beth now processes shards of input left uncovered by the first round of processing, by putting them back on the log stack. Issues-wise, this closes #28. Enabled callbacks through the `postManager`. Also, corrected error in historical sorting.
+LATEST: Corrected a problem in the `agendaManager`, whereby deeply nested agendas were being skipped over or processed badly in the stack.
 
 This is all very much a work in progress.
 

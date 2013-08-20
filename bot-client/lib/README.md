@@ -41,6 +41,22 @@ Number. When the user has sent this number of messages during this item on the a
 
 Number. When Beth has sent this number of messages during this item on the agenda, the item is considered complete.
 
+#####`fwdsent`#####
+
+*Number.* When Beth has proactively forwarded this number of messages during this item on the agenda, the item is considered complete.
+
+#####`rspsent`#####
+
+*Number.* When Beth has sent this number of messages in response to user input during this item on the agenda, the item is considered complete.
+
+#####`totsent`#####
+
+*Number.* When the conversation reaches this number of messages total during this item on the agenda, the item is considered complete.
+
+#####`logleft`#####
+
+*Number* When Beth has sent this number of messages left on the log, or under, during this item on the agenda, the item is considered complete.
+
 #####`flagset`#####
  
 String. When the flag named has been set to true by a certain of Beth's responses, the item is considered complete.

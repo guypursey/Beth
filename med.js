@@ -5,6 +5,11 @@ var express = require('express'),
 	pathname = '/dat/',
 	filename,
 	line_break = '\r\n',
+	date_time = function () {
+		var d = new Date(),
+			dt = "[" + d.toLocaleDateString() + " " + d.toTimeString().replace(/\s.*$/, "") + "]";
+		return dt;
+	},
     io = require('socket.io').listen(server);
 
 server.listen(8374); // 8374 === BETH || BETA
@@ -28,9 +33,7 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.emit('updatedisplay', socket.username, data, new Date());
 
 		// Set up new date in parseable format.
-		var d = new Date(),
-			dt = "[" + d.toLocaleDateString() + " " + d.toTimeString().replace(/\s.*$/, "") + "]",
-			save_msg = dt + " " + socket.username + ": " + data + line_break;
+		var save_msg = date_time() + " " + socket.username + ": " + data + line_break;
 
 		// Save the latest message to the file.
 		if (filename) {

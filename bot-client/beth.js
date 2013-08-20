@@ -690,7 +690,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						if (isComplete(agendaStack[a])) {
 							itemNum = agendaStack[a].agendaItemNum + 1;
 							agendaStack = agendaStack.slice(a);
-							agendaLevel = getAgendaLevel(a);
+							agendaLevel = getAgendaLevel(0);
 							if (agendaLevel.hasOwnProperty(itemNum)) {
 								redoSnapshot(agendaLevel, itemNum);
 								a = 0;

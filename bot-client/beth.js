@@ -670,7 +670,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						rtn = agendas;
 					debugFunc("whole agenda Stack");
 					debugFunc(agendaStack);
-					while (a && a > (address) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
+					while (a && a > (address + 1) && rtn[agendaStack[a - 1].agendaItemNum].hasOwnProperty("agendas")) {
 						a -= 1;
 						debugFunc("agendaStack element:");
 						debugFunc(agendaStack[a]);

@@ -62,7 +62,8 @@ io.sockets.on('connection', function (socket) {
 
 		// If bot has logged in, create file...
 		if (username !== "user") {
-			filename = __dirname + pathname + username + "_anon_" + (new Date()).toISOString().replace(/\W+/g, "").replace(/T\d+Z$/, "") + ".txt";
+			// Create filename based on bot-name and a modified date string (showing YYYYMMDDhhmm)
+			filename = __dirname + pathname + username + "_anon_" + (new Date()).toISOString().replace(/\W+/g, "").replace(/\d{5}Z$/, "") + ".txt";
 		}
 
 	});

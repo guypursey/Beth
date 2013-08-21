@@ -172,7 +172,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		// What Beth should use to identify keys for the `lookfor` object.
 		// TODO: Work out way to systematise this.
 		lookforMarker = '@',
-		lookforPattern = /@(\S+)/,
+		lookforPattern = /@(\w+)/,
 		
 		preparePattern = function (rule_key) {
 		// Takes a rule string and prepares it as a pattern.

@@ -96,7 +96,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					processed: [],
 				},
 				readlog = function () {
-					return (logData.toprocess.length) ? logData.toprocess.shift() : '';
+					var rtn = (logData.toprocess.length) ? logData.toprocess.shift() : '';
+					setLogSize(logData.toprocess.length);
+					return rtn;
 				},
 				loginput = function (input) {
 					var input_parts,
@@ -738,7 +740,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getLogSize, sessionStats.getFlag, function () {}),
 		
 		timedcheck = function () {
-			
+			debugFunc("Log reading before taking of input off stack...");
+			debugFunc(sessionStats.getLogSize());
 			// Check if the user has said anything recently and process it. [REACTIVE]
 			var input = logManager.takeUnprocessedMessage(),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
@@ -861,7 +864,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				return a_date - b_date;
 			});
 
-			debugFunc("filtered moveSet array");
+			debugFunc("Filtered moveSet array");
 			debugFunc(mA);
 			
 			if (mA.length) {

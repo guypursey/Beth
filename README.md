@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.5##
+##v0.4.6##
 
-LATEST: Corrected a problem in the `agendaManager`, whereby deeply nested agendas were being skipped over or processed badly in the stack.
+LATEST: Fixed an omission with the `logManager`, which meant stats weren't being updated properly, and a problem with the `lookfor` pattern (which now only looks for word characters following a `@` sign).
 
 This is all very much a work in progress.
 

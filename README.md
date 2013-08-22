@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.6##
+##v0.4.7##
 
-LATEST: Fixed an omission with the `logManager`, which meant stats weren't being updated properly, and a problem with the `lookfor` pattern (which now only looks for word characters following a `@` sign).
+LATEST: `med.js` now saves a transcript of each conversation to a `dat` folder.
 
 This is all very much a work in progress.
 

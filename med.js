@@ -7,7 +7,7 @@ var express = require('express'),
 	line_break = '\r\n',
 	date_time = function () {
 		var d = new Date(),
-			dt = "[" + d.toLocaleDateString() + " " + d.toTimeString().replace(/\s.*$/, "") + "]";
+			dt = "[" + d.toISOString().replace(/(\d{4})-(\d{2})-(\d{2})/, function (pttrn, yyyy, mm, dd) { return dd + "/" + mm + "/" + yyyy; }).replace(/T/, " ").replace(/\.\d{3}Z$/, "") + "]";
 		return dt;
 	},
     io = require('socket.io').listen(server);

@@ -129,7 +129,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					
 					// Record how many messages are waiting in the log to be processed.
 					setLogSize(logData.toprocess.length);
-					
+					return false;
 				};
 			return {
 				takeUnprocessedMessage: readlog,

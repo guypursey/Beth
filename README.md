@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.7##
+##v0.4.8##
 
-LATEST: `med.js` now saves a transcript of each conversation to a `dat` folder.
+LATEST: `bot.js` now allows for testing of bots like Eliza too by allowing for immediate responses rather than Beth's interval pattern.
 
 This is all very much a work in progress.
 

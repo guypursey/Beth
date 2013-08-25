@@ -1,6 +1,6 @@
 #BETH#
 
-##CODE DOCUMENTATION for v0.4.8##
+##CODE DOCUMENTATION for v0.4.9##
 
 ###NODE JS COMPATIBILITY###
 
@@ -153,11 +153,11 @@ Maybe more to come.
 
 *IIFE closure.* Currently the closure returns an object whose only property is an exposed function for getting the current filter. The current filter is composed within the closure based on the particular agenda item Beth is on and the conditions set therein.
 
-Has interval timer which checks what the current item should be. If any current agenda item is complete (including any parent items), it finds the next one. In the event that the item is the last one on the agenda, the parent item is iterated and checked for completion.
+Has interval timer which checks what the current item should be. If any current agenda item is complete (including any parent items), it finds the next one and checks if that is complete, until the most up to date incomplete item is found. In the event that the item is the last one on the agenda, the parent item is iterated and checked for completion.
 
 ###`timedcheck`###
 
-*Function.* Currently the main function. Reads the log, gets the current filter from the `agendaManager`. If there is an input from the log to process, then it will be sent first to `preprocess` and then with other appropriate parameters to `process`. One of the parameters is `ioregex` which is created here based on `libraryData.inflect`.
+*Function.* Currently the main function. Gets the current filter from the `agendaManager`, then reads the log. If there is an input from the log to process, then it will be sent first to `preprocess` and then with other appropriate parameters to `process`. One of the parameters is `ioregex` which is created here based on `libraryData.inflect`.
 
 Results returned by `process` feature `responses` and `deferrals`. `Deferrals` are looped through and each object is placed back in the listed place of `libraryData`.
 

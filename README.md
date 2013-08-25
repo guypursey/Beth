@@ -1,8 +1,10 @@
 #BETH#
 
-##v0.4.8##
+##v0.4.9##
 
-LATEST: `bot.js` now allows for testing of bots like Eliza too by allowing for immediate responses rather than Beth's interval pattern.
+LATEST: Some of the logics in Beth have changed since the last patch. When an item is considered complete, rather than simply moving onto the next one, the whole stack is checked again for completion so that the most up-to-date filters are provided. Also, the fetching of the reactive filter now precedes the fetching of the input of the log, to prevent any confusion as to which item Beth should be on. 
+
+Also CSS provided for Eliza testing to differentiate two bots at a glance.
 
 This is all very much a work in progress.
 

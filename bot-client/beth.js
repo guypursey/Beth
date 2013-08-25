@@ -743,9 +743,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc("Log reading before taking of input off stack...");
 			debugFunc(sessionStats.getLogSize());
 			// Check if the user has said anything recently and process it. [REACTIVE]
-			var input = logManager.takeUnprocessedMessage(),
+			var filterCallback = agendaManager.getCurrentFilter("reactive"),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
-				filterCallback = agendaManager.getCurrentFilter("reactive"),
+				input = (filterCallback) ? logManager.takeUnprocessedMessage() : '',
 				results,
 				responses,
 				deferrals,

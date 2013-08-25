@@ -564,7 +564,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					var agendaItem = agendaStack[0].agendaItem, // get most childish item
 						mode = agendaItem[whichMode],
 						rtn = (mode)
-							? function(tagging) {
+							? function (tagging) {
 									var	has = mode.filters.HAS || [],
 										not = mode.filters.NOT || [],
 										h = has.length,
@@ -573,8 +573,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										r = false;
 									while (h && !r) {
 										h -= 1;
-										t = tagging.length;
-										debugFunc("filtering for has " + has[h]);
+										t = (tagging) ? tagging.length || 0 : 0;
+										//debugFunc("filtering for has " + has[h]);
 										while (t) {
 											t -= 1;
 											if (tagging[t] === has[h]) {
@@ -585,8 +585,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									}
 									while (n && r) {
 										n -= 1;
-										t = tagging.length;
-										debugFunc("filtering for not " + not[h]);
+										t = (tagging) ? tagging.length || 0 : 0;
+										//debugFunc("filtering for not " + not[h]);
 										while (t) {
 											t -= 1;
 											if (tagging[t] === not[h]) {
@@ -695,7 +695,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							agendaLevel = getAgendaLevel(0);
 							if (agendaLevel.hasOwnProperty(itemNum)) {
 								redoSnapshot(agendaLevel, itemNum);
-								a = 0;
+								a = agendaStack.length;
 							} else {
 								if (agendaStack.length > 1) {
 									agendaStack[1].agendaIterate += 1;
@@ -743,9 +743,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc("Log reading before taking of input off stack...");
 			debugFunc(sessionStats.getLogSize());
 			// Check if the user has said anything recently and process it. [REACTIVE]
-			var input = logManager.takeUnprocessedMessage(),
+			var filterCallback = agendaManager.getCurrentFilter("reactive"),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
-				filterCallback = agendaManager.getCurrentFilter("reactive"),
+				input = (filterCallback) ? logManager.takeUnprocessedMessage() : '',
 				results,
 				responses,
 				deferrals,

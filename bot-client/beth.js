@@ -564,7 +564,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					var agendaItem = agendaStack[0].agendaItem, // get most childish item
 						mode = agendaItem[whichMode],
 						rtn = (mode)
-							? function(tagging) {
+							? function (tagging) {
 									var	has = mode.filters.HAS || [],
 										not = mode.filters.NOT || [],
 										h = has.length,
@@ -573,8 +573,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										r = false;
 									while (h && !r) {
 										h -= 1;
-										t = tagging.length;
-										debugFunc("filtering for has " + has[h]);
+										t = (tagging) ? tagging.length || 0 : 0;
+										//debugFunc("filtering for has " + has[h]);
 										while (t) {
 											t -= 1;
 											if (tagging[t] === has[h]) {
@@ -585,8 +585,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									}
 									while (n && r) {
 										n -= 1;
-										t = tagging.length;
-										debugFunc("filtering for not " + not[h]);
+										t = (tagging) ? tagging.length || 0 : 0;
+										//debugFunc("filtering for not " + not[h]);
 										while (t) {
 											t -= 1;
 											if (tagging[t] === not[h]) {

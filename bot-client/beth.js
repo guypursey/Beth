@@ -695,7 +695,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							agendaLevel = getAgendaLevel(0);
 							if (agendaLevel.hasOwnProperty(itemNum)) {
 								redoSnapshot(agendaLevel, itemNum);
-								a = 0;
+								a = agendaStack.length;
 							} else {
 								if (agendaStack.length > 1) {
 									agendaStack[1].agendaIterate += 1;

@@ -561,7 +561,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
-					var agendaItem = agendaStack[0].agendaItem, // get most childish item
+					var agendaItem = getCurrentItem(), // get most childish item
 						mode = agendaItem[whichMode],
 						rtn = (mode)
 							? function (tagging) {

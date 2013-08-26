@@ -1,10 +1,8 @@
 #BETH#
 
-##v0.4.9##
+##v0.4.10##
 
-LATEST: Some of the logics in Beth have changed since the last patch. When an item is considered complete, rather than simply moving onto the next one, the whole stack is checked again for completion so that the most up-to-date filters are provided. Also, the fetching of the reactive filter now precedes the fetching of the input of the log, to prevent any confusion as to which item Beth should be on. 
-
-Also CSS provided for Eliza testing to differentiate two bots at a glance.
+LATEST: Following the change in logics in the last patch, the timer for `agendaManager` has been deactivated and the agenda items are kept up to date by a call to the `getCurrentItem` method from the exposed `getCurrentFilter` method instead.
 
 This is all very much a work in progress.
 

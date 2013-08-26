@@ -561,7 +561,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
-					var agendaItem = agendaStack[0].agendaItem, // get most childish item
+					var agendaItem = getCurrentItem(), // get most childish item
 						mode = agendaItem[whichMode],
 						rtn = (mode)
 							? function (tagging) {
@@ -875,12 +875,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		},
 		interval,
-		agendaInterval = agendaManager.activate(1000),
+		//agendaInterval = agendaManager.activate(1000),
 		postInterval = postManager.activate(1000),
 		deactivate = function () {
 			clearInterval(interval);
 			clearInterval(postInterval);
-			clearInterval(agendaInterval);
+			//clearInterval(agendaInterval);
 		}; //eof variable declarations
 
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.

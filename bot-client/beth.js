@@ -609,7 +609,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						fwd = agendaItem.dountil.fwdsent || 0,
 						rsp = agendaItem.dountil.rspsent || 0,
 						tot = agendaItem.dountil.totsent || 0,
-						log = agendaItem.dountil.logleft || 0,
+						lgl = agendaItem.dountil.logleft || 0,
+						lgs = agendaItem.dountil.logsize || 0,
 						edr = agendaItem.dountil.endured || "0",
 						itr = agendaItem.dountil.iterate || 0,
 						// if properties are on the agenda, check if conditions are met
@@ -628,8 +629,11 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 						totComp = (agendaItem.dountil.hasOwnProperty('totsent'))
 							? (getTotSent() >= agendaSnapshot.agendaTotSent + tot)
 							: false,
-						logComp = (agendaItem.dountil.hasOwnProperty('logleft'))
-							? (getLogSize() <= log)
+						logLeft = (agendaItem.dountil.hasOwnProperty('logleft'))
+							? (getLogSize() <= lgl)
+							: false,
+						logSize = (agendaItem.dountil.hasOwnProperty('logsize'))
+							? (getLogSize() >= lgs)
 							: false,
 						edrComp = (agendaItem.dountil.hasOwnProperty('endured'))
 							? (new Date().getTime() >= agendaSnapshot.agendaTimeStarted + utils.convertBethTimeToMS(edr))
@@ -660,7 +664,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					debugFunc("Flags completed?: " + flgComp);
 					debugFunc("Number of iterations completed?: " + itrComp);
 						
-					if (usrComp || botComp || fwdComp || rspComp || totComp || logComp || edrComp || flgComp || itrComp) {
+					if (usrComp || botComp || fwdComp || rspComp || totComp || logLeft || logSize || edrComp || flgComp || itrComp) {
 						debugFunc("Agenda item " + agendaSnapshot.agendaItemNum + " complete! Snapshot of completed item below:");
 						debugFunc(agendaSnapshot);
 						return true;
@@ -683,6 +687,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					return rtn;
 				},
 				getCurrentItem = function () {
+					debugFunc("Current agenda item:");
+					debugFunc(agendaStack[0].agendaItem);
 					var a = agendaStack.length,
 						agendaLevel = agendas,
 						itemNum,
@@ -737,7 +743,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				activate: activate,
 				deactivate: deactivate
 			};
-		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getLogSize, sessionStats.getFlag, function () {}),
+		})(libraryData.agendas, severFn, sessionStats.getUsrSent, sessionStats.getBotSent, sessionStats.getFwdSent, sessionStats.getRspSent, sessionStats.getTotSent, sessionStats.getLogSize, sessionStats.getFlag, debugFunc),
 		
 		timedcheck = function () {
 			debugFunc("Log reading before taking of input off stack...");

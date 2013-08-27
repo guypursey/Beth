@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.10##
+##v0.5.0##
 
-LATEST: Following the change in logics in the last patch, the timer for `agendaManager` has been deactivated and the agenda items are kept up to date by a call to the `getCurrentItem` method from the exposed `getCurrentFilter` method instead.
+LATEST: Introduced a number of new `dountil` conditions to the library conventions.
 
 This is all very much a work in progress.
 

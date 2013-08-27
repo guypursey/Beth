@@ -55,7 +55,11 @@ Number. When Beth has sent this number of messages during this item on the agend
 
 #####`logleft`#####
 
-*Number* When Beth has sent this number of messages left on the log, or under, during this item on the agenda, the item is considered complete.
+*Number.* When Beth has this number of messages left on the log, or under, during this item of the agenda, the item is considered complete.
+
+#####`logsize`#####
+
+*Number.* When Beth has this number of messages saved on the log, or over, during this item of the agenda, the item is considered complete.
 
 #####`flagset`#####
  

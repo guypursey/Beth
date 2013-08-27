@@ -103,18 +103,17 @@ Array. Contains objects for when Beth is being proactive. Each object has a `for
 
 Object. Contains objects, the key for each being a plain-string version of what should be searched for. Each of these objects contains the following properties (although those marked with an asterisk are optional):
 
- - `pattern`*
- - `comment`*
+ - `comment` (optional)
  - `results`
  - `ruleset` 
  
-Details below. 
+Details below.
+
+####KEY####
  
-####`pattern`####
+The key for each object is used to form the regular expression pattern that guides Beth in input decomposition. This is initialised when Beth begins. Wildcards take the form of asterisks `*`. A `*` surrounded by space, or at the beginning or end of the string with no words proximal to it, will match any number of words until it matches the proximal parts of the string. A `*` directly joined to a word, or in the middle of it, will match only letters adjoining to that word. For example, `"I am so *"` will match `"I am so tired."` whereas `"I am so*"` where the asterisk adjoins a word directly will match `"I am soaked"` (and, as it happens, `"I am so"` in the first sentence but not the `tired` bit). 
 
-String. The string used to form the regular expression. This is initialised when Beth begins. Before initialisation it should be the same as the key of the parent object, to prevent confusion, but it is not required as the property will be overwritten at this stage anyway.
-
-Wildcards take the form of asterisks `*`. A `*` surrounded by space, or at the beginning or end of the string with no words proximal to it, will match any number of words until it matches the proximal parts of the string. A `*` directly joined to a word, or in the middle of it, will match only letters adjoining to that word. For example, `"I am so *"` will match `"I am so tired."` whereas `"I am so*"` where the asterisk adjoins a word directly will match `"I am soaked"` (and, as it happens, `"I am so"` in the first sentence but not the `tired` bit). 
+####OBJECT PROPERTIES####
 
 ####`comment`####
 

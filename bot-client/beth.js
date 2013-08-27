@@ -129,7 +129,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 					
 					// Record how many messages are waiting in the log to be processed.
 					setLogSize(logData.toprocess.length);
-					
+					return false;
 				};
 			return {
 				takeUnprocessedMessage: readlog,
@@ -561,10 +561,10 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 				},
 				getCurrentFilter = function (whichMode) {
 					// Takes one argument to determine whether the filter should be in proactive or reactive mode.
-					var agendaItem = agendaStack[0].agendaItem, // get most childish item
+					var agendaItem = getCurrentItem(), // get most childish item
 						mode = agendaItem[whichMode],
 						rtn = (mode)
-							? function(tagging) {
+							? function (tagging) {
 									var	has = mode.filters.HAS || [],
 										not = mode.filters.NOT || [],
 										h = has.length,
@@ -573,8 +573,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 										r = false;
 									while (h && !r) {
 										h -= 1;
-										t = tagging.length;
-										debugFunc("filtering for has " + has[h]);
+										t = (tagging) ? tagging.length || 0 : 0;
+										//debugFunc("filtering for has " + has[h]);
 										while (t) {
 											t -= 1;
 											if (tagging[t] === has[h]) {
@@ -585,8 +585,8 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 									}
 									while (n && r) {
 										n -= 1;
-										t = tagging.length;
-										debugFunc("filtering for not " + not[h]);
+										t = (tagging) ? tagging.length || 0 : 0;
+										//debugFunc("filtering for not " + not[h]);
 										while (t) {
 											t -= 1;
 											if (tagging[t] === not[h]) {
@@ -695,7 +695,7 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 							agendaLevel = getAgendaLevel(0);
 							if (agendaLevel.hasOwnProperty(itemNum)) {
 								redoSnapshot(agendaLevel, itemNum);
-								a = 0;
+								a = agendaStack.length;
 							} else {
 								if (agendaStack.length > 1) {
 									agendaStack[1].agendaIterate += 1;
@@ -743,9 +743,9 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			debugFunc("Log reading before taking of input off stack...");
 			debugFunc(sessionStats.getLogSize());
 			// Check if the user has said anything recently and process it. [REACTIVE]
-			var input = logManager.takeUnprocessedMessage(),
+			var filterCallback = agendaManager.getCurrentFilter("reactive"),
 				// Get filter to pass to process() as callback to prevent duplication of loops.
-				filterCallback = agendaManager.getCurrentFilter("reactive"),
+				input = (filterCallback) ? logManager.takeUnprocessedMessage() : '',
 				results,
 				responses,
 				deferrals,
@@ -875,12 +875,12 @@ var Beth = function (noRandomFlag, libraryData, postMsg, severFn, debugFn) {
 			}
 		},
 		interval,
-		agendaInterval = agendaManager.activate(1000),
+		//agendaInterval = agendaManager.activate(1000),
 		postInterval = postManager.activate(1000),
 		deactivate = function () {
 			clearInterval(interval);
 			clearInterval(postInterval);
-			clearInterval(agendaInterval);
+			//clearInterval(agendaInterval);
 		}; //eof variable declarations
 
 	// Ruleset needs to be parsed, checked and amended before anything else can happen.

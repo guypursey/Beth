@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.4.6##
+##v0.4.10##
 
-LATEST: Fixed an omission with the `logManager`, which meant stats weren't being updated properly, and a problem with the `lookfor` pattern (which now only looks for word characters following a `@` sign).
+LATEST: Following the change in logics in the last patch, the timer for `agendaManager` has been deactivated and the agenda items are kept up to date by a call to the `getCurrentItem` method from the exposed `getCurrentFilter` method instead.
 
 This is all very much a work in progress.
 

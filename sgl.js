@@ -23,8 +23,8 @@ var usernames = {};
 
 io.sockets.on('connection', function (socket) {
 	
-	var bot = require('./bot-client/beth.js'), // load Beth file
-		lib = require('./bot-client/lib/beth-agendas-test03.json'), // load the library
+	var bot, // load Beth file
+		lib, // load the library
 		nme = 'Beth', // name of Beth in chat
 		lgi = false, // a flag to say whether or not Beth is logged in
 		debugFn = function (msg) {
@@ -77,6 +77,8 @@ io.sockets.on('connection', function (socket) {
 				usernames[nme] = nme;
 				socket.broadcast.emit('updatedisplay', 'SERVER', nme + ' has connected', datetimeStr);
 				io.sockets.emit('updateusers', usernames);
+				bot = require('./bot-client/beth.js');
+				lib = require('./bot-client/lib/beth-agenda-imcdv5.json');
 				botobj = new bot.BotObj(true, lib.data, postMsg, severFn, debugFn);
 				lgi = true;
 		}

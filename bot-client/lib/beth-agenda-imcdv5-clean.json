@@ -1,0 +1,2493 @@
+{
+	"data": {
+		"agendas": [
+			{
+				"comment": "root",
+				"dountil": {
+					"iterate": 1
+				},
+				"agendas": [
+					{
+						"comment": "Introduce.",
+						"dountil": {
+							"fwdsent": 5
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["initial", "instruction"]
+							}
+						},
+						"reactive": {
+							"filters": {
+								"HAS": ["initial", "instruction"]
+							}
+						}
+					},
+					{
+						"comment": "Continue until quit.",
+						"dountil": {
+							"flagset": ["quit"]
+						},
+						"agendas": [
+							{
+								"comment": "Framework phase one",
+								"dountil": {
+									"usrsent": 5
+								},
+								"agendas": [
+									{
+										"comment": "To prod user, should they take too long.",
+										"dountil": {
+											"usrsent": 1
+										},
+										"agendas": [
+											{
+												"comment": "Wait a minute; do nothing.",
+												"dountil": {
+													"endured": "00:01:00"
+												}
+											},
+											{
+												"comment": "Send one prod.",
+												"dountil": {
+													"botsent": 1
+												},
+												"proactive": {
+													"filters": {
+														"HAS": [
+															"prod"
+														]
+													}
+												}
+											}
+										]
+									},
+									{	
+										"comment": "Bot should send apology as we're above five.",
+										"dountil": {
+											"logleft": 5,
+											"botsent": 1
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["excuse", "close"]
+											}
+										}
+									},
+									{	
+										"comment": "Mirror/attend until log has 1 left.",
+										"dountil": {
+											"logleft": 1
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["mirror", "attend", "close"]
+											}
+										}
+									},
+									
+									
+									{
+										"comment": "Ask a question.",
+										"dountil": {
+											"botsent": 1,
+											"logleft": 0
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["focus", "attend", "close"]
+											}
+										}
+									}
+								]
+							},
+							{
+								"comment": "Framework phase two",
+								"dountil": {
+									"usrsent": 5
+								},
+								"agendas": [
+									{
+										"comment": "Prod user if minute passes.",
+										"dountil": {
+											"usrsent": 1,
+											"logsize": 1
+										},
+										"agendas": [
+											{
+												"comment": "Wait a minute; do nothing.",
+												"dountil": {
+													"endured": "00:01:00"
+												}
+											},
+											{
+												"comment": "Send one prod.",
+												"dountil": {
+													"botsent": 1
+												},
+												"proactive": {
+													"filters": {
+														"HAS": [
+															"prod"
+														]
+													}
+												}
+											}
+										]
+									},
+									{	
+										"comment": "Apologise log contains more than five messages.",
+										"dountil": {
+											"logleft": 5,
+											"botsent": 1
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["excuse", "close"]
+											}
+										}
+									},
+									{	
+										"comment": "Mirror/attend or thematise until log has 1 left.",
+										"dountil": {
+											"logleft": 1
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["thematise", "mirror", "attend", "close"]
+											}
+										}
+									},
+									
+									
+									{
+										"comment": "Ask a question.",
+										"dountil": {
+											"botsent": 1,
+											"logleft": 0
+										},
+										"reactive": {
+											"filters": {
+												"HAS": ["focus", "attend", "close"]
+											}
+										}
+									}
+								]
+							}
+						]
+					},			
+					{
+						"comment": "Exit.",
+						"dountil": {
+							"botsent": 1
+						},
+						"proactive": {
+							"filters": {
+								"HAS": ["farewell"]
+							}
+						}
+					}
+				]
+			}
+		],
+
+		"convert": {
+			"yeah": "yes",
+			"yup": "yes",
+			"yea": "yes",
+			"yeh": "yes",
+			"dont": "do not",
+			"don't": "do not",
+			"cant": "cannot",
+			"wont": "won't",
+			"you're": "you are",
+			"i'm": "i am",
+			"i'll": "i will",
+			"you'll": "you will",
+			"he'll": "he will",
+			"she'll": "she will",
+			"they'll": "they will",
+			"that's": "that is",
+			"there's": "there is",
+			"can't": "cannot",
+			"couldn't": "could not",
+			"mustn't": "must not",
+			"won't": "will not",
+			"shan't": "shall not",
+			"shouldn't": "should not",
+			"i'd better": "i had better",
+			"i'd a": "i had a",
+			"i'd the": "i had the",
+			"i'd have": "i would have",
+			"aren't": "are not",
+			"isn't": "is not",
+			"wasn't": "was not",
+			"hadn't": "had not",
+			"haven't": "have not"
+		},
+
+		"inflect": {
+			"are": "am",
+			"am": "are",
+			"your": "my",
+			"me": "you",
+			"myself": "yourself",
+			"yourself": "myself",
+			"i": "you",
+			"you": "I",
+			"my": "your"
+		},
+
+		"lookfor": {
+			"un": [ "un", "dis", "anti" ],
+			"begin": [ "begin", "start", "commence" ],
+			"end": [ "end", "finish", "stop" ],
+			"whwords": [ "what", "where", "how", "who", "why", "when" ],
+			"art": [ "a", "an", "the" ],
+			"lots": [ "tonnes", "loads", "lots", "a whole lot", "wads" ],
+			"bye": [ "bye", "goodbye" ],
+			"thwords": [ "this", "that", "there", "it" ],
+			"conjunction": [ "and", "but", "or" ],
+			"prepositions": [ "to", "on", "at", "up", "down", "off", "for", "from" ]
+		},
+		
+		"moveset": [
+			{	
+				"forward": "Hello.",
+				"tagging": ["initial"]
+			},
+			{	
+				"forward": "My name is Beth.",
+				"tagging": [ "initial" ]
+			},
+			{	
+				"forward": "I'm here to help you with any problems you might have or any topics you might want to discuss.",
+				"tagging": [ "instruction" ]
+			},
+			{
+				"forward": "When you have had enough, say bye and we'll call it a day.",
+				"tagging": [ "instruction", "prod" ]
+			},
+			{	
+				"forward": "Is there anything particular you'd like to talk about?",
+				"tagging": ["initial"]
+			},
+			{
+				"forward": "Time for me to go. Goodbye!",
+				"tagging": ["farewell"]
+			},
+			{
+				"forward": "You can take as long as you need.",
+				"tagging": ["prod"]
+			},
+			{
+				"forward": "I can only guess I've made you think about something quite deeply!",
+				"tagging": ["prod"]
+			},
+			{
+				"forward": "I need to take some time to read over what you've written.",
+				"tagging": ["excuse"]
+			},
+			{
+				"forward": "There's a lot to take in here.",
+				"tagging": ["excuse"]
+			},
+			{
+				"forward": "I'm just going to take a moment to go through this.",
+				"tagging": ["excuse"]
+			},
+			{
+				"forward": "Ordinarily, I'd take a lot longer to formulate a response to this.",
+				"tagging": ["excuse"]
+			},
+			{
+				"forward": "There's potentially a lot to go into here.",
+				"tagging": ["excuse"]
+			}
+		],
+		
+		"ruleset": {
+			"*": {
+				"comment": "Top-level. Will match anything the user inputs.",
+				"results": [
+					{
+						"respond": "I'm not quite sure I understand that.",
+						"tagging": ["generic"]
+					},
+					{
+						"respond": "Could you elaborate?",
+						"tagging": ["focus"]
+					},
+					{
+						"respond": "What do you mean?",
+						"tagging": ["focus"]
+					},
+					{
+						"respond": "Can you say more?",
+						"tagging": ["focus"]
+					},
+					{
+						"respond": "Am I making sense so far?",
+						"tagging": ["verify"]
+					}
+				],
+				"ruleset": {
+					"you": {
+						"comment": "To brush off comments directed at Beth.",
+						"results": [
+							{
+								"respond": "I don't think we should talk about me.",
+								"tagging": [ "mirror", "attend"	]
+							},
+							{
+								"respond": "We're here to talk about you not me.",
+								"tagging": [ "mirror", "attend" ]
+							}
+						],
+						"ruleset": {
+							"you think": {
+								"results": [
+									{
+										"respond": "It's not what important what I think.",
+										"tagging": [ "mirror", "attend"	]
+									}
+								]
+							},
+							"you know": {
+								"results": [
+									{
+										"respond": "I should probably make it clear that I don't know anything really!",
+										"tagging": [ "mirror", "attend"	]
+									},
+									{
+										"respond": "I really couldn't claim to know about that.",
+										"tagging": [ "mirror", "attend" ]
+									}
+								]
+							}
+						}
+					},
+					"yes": {
+						"ruleset": {
+							"yes please": {
+								
+								"results": [
+									{
+										"respond": "You're very polite.",
+										"tagging": [ "attend" ]
+									},
+									{
+										"respond": "You can be more direct if you want.",
+										"tagging": [ "attend" ]
+									}
+								]
+							},
+							"there is *": {
+								"comment": "Should capture confirmation in some cases.",
+								"results": [
+									{
+										"respond": "You say there is (1)",
+										"tagging": [ "mirror" ]
+									}
+								]
+							},
+							"that is right": {
+								"comment": "Should capture confirmation in some cases.",
+								"results": [
+									{
+										"respond": "I think I'm starting to understand.",
+										"tagging": [ "attend", "mirror" ]
+									}
+								]
+							}
+						},
+						"results": [
+							{
+								"respond": "Perhaps we should move on with this then.",
+								"tagging": [ "attend" ]
+							},
+							{
+								"respond": "Well...",
+								"tagging": [ "attend" ]
+							},
+							{
+								"respond": "Okay.",
+								"tagging": [ "mirror" ]
+							},
+							{
+								"respond": "Can you expand on that?",
+								"tagging": [ "focus" ]
+							}
+						]
+					},
+					"would": {
+						"ruleset": {
+							"i would *": {
+								"results": [
+									{
+										"respond": "You say you would (1).",
+										"tagging": [ "mirror" ]
+									}
+								]
+							},
+							"i would have *": {
+								"results": [
+									{
+										"respond": "You say you would have (1).",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "It sounds like you seeing how things might have been different.",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "When you say you would have (1)... Are you talking about what used to happen all the time, or what you would have done under different circumstances?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i would have been *": {
+								
+								"results": [
+									{
+										"respond": "You say would have been. What does it mean to you now?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i would like some *": {
+								
+								"results": [
+									{
+										"respond": "How do you get it?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "(1). How do people usually get it?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "You say the word would. That implies you could only get it under certain circumstances.",
+										"tagging": [ "mirror", "infer" ]
+									}
+								]
+							},
+							"i would like the *": {
+								"results": [
+									{
+										"respond": "That sounds like a very definite thing to want! How would you get it?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "That sounds like a very definite thing to want! The (1)! How would you get it?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i would like a *": {
+								"results": [
+									{
+										"respond": "How do you think you can go about getting the (1) you mention?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i would like to *": {
+								
+								"results": [
+									{
+										"respond": "How might you bring that about?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i would say that *": {
+								
+								"results": [
+									{
+										"respond": "Is there anything else you would say about this?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i would describe * as *": {
+								
+								"results": [
+									{
+										"respond": "Let's say (1) is (2).",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "What do you think makes (1) (2)?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Earlier you said you would describe (1) as (2).",
+										"tagging": [ "thematise" ],
+										"deferto": [
+											[ "*", "(1)" ]
+										]
+									},
+									{
+										"respond": "You describe (1) as (2), or at least you did earlier.",
+										"tagging": [ "mirror", "thematise" ],
+										"deferto": [
+											[ "*", "(2)" ]
+										]
+									},
+									{
+										"respond": "There's that phrase again. (2). You described (1) as (2).",
+										"tagging": [ "thematise" ],
+										"deferto": [
+											[ "*", "(2)" ]
+										]
+									}
+								]
+							}
+						}
+					},
+					"will": {
+						"ruleset": {
+							"I will *": {
+								"results": [
+									{
+										"respond": "When will you (1)?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "When will you do that?",
+										"tagging": ["focus"]
+									}
+								],
+								"ruleset": {
+									"I will tell you": {
+										"results": [
+											{
+												"respond": "I'm glad you feel you can be open with me.",
+												"tagging": [ "mirror", "sympathise" ]
+											}
+										]
+									}
+								}
+							},
+							"will * be *": {
+								"results": [
+									{
+										"respond": "How do you feel about being (2)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"will * be *ing *": {
+								"results": [
+									{
+										"respond": "How do you feel about (2)ing (3)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"will * have *": {
+								"results": [
+									{
+										"respond": "What will (1) having (2) mean to you?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"will * have to *": {
+								"results": [
+									{
+										"respond": "I'm not sure what you mean. Why will you (1) have to (2)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"will have been *": {
+								"results": [
+									{
+										"respond": "Perhaps you can say more about how you think that will feel.",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i will have been *": {
+								"results": [
+									{
+										"respond": "How do you imagine it will feel looking back like that from that time, having been (1)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"will have the *": {
+								"results": [
+									{
+										"respond": "What will having the (1) then lead to?",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "Will it be difficult to get the (1)?",
+										
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"will have a *": {
+								"results": [
+									{
+										"respond": "What will having this (1) really mean to you?",
+										
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"to": {
+						"ruleset": {
+							"to @art *": {
+								"results": [
+									{
+										"respond": "Tell me more about this (1) you mention.",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"face to face": {
+								"results": [
+									{
+										"respond": "You mention interpersonal communication.",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "Is the situation you describe confrontational?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"to and fro": {
+								"results": [
+									{
+										"respond": "You imply a bit of going back and forth.",
+										"tagging": [ "infer", "mirror" ]
+									}
+								]
+							}
+						}
+					},
+					"should": {
+						
+						"ruleset": {
+							"i should *": {
+								"results": [
+									{
+										"respond": "You seem to feel a sense of obligation to (1).",
+										"tagging": [ "mirror", "infer" ]
+									}
+								]
+							},
+							"i should want *": {
+								"results": [
+									{
+										"respond": "What you say sounds almost hypothetical. You should want (1), if you were someone else.",
+										"tagging": [ "mirror", "infer" ]
+									}
+								]
+							}
+						}
+					},
+					"now": {
+						"ruleset": {
+							"from now on": {
+								"results": [
+									{
+										"respond": "You imply a change.",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "You sound resolved.",
+										"tagging": [ "attend", "infer" ]
+									}
+								]
+							},
+							"now what": {
+								"results": [
+									{
+										"respond": "You seem to impatient to have a solution.",
+										"tagging": [ "mirror", "infer" ]
+									}
+								]
+							}
+						}
+					},
+					"not": {
+						"ruleset": {
+							"not enough": {
+								"results": [
+									{
+										"respond": "What would be enough?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "You imply that there is a lack.",
+										"tagging": [ "mirror", "infer" ]
+									}
+								],
+								"ruleset": {
+									"not enough *": {
+										"results": [
+											{
+												"respond": "What would you do with more (1)?",
+												"tagging": [ "focus" ]
+											}
+										]
+									}
+								}
+							},
+							"* not a *": {
+								"results": [
+									{
+										"respond": "What would be a (2)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"not @un*": {
+								"results": [
+									{
+										"respond": "What do you mean by not (1)(2)? Doesn't that just mean (2)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"never": {
+						"ruleset": {
+							"never enough": {
+								"results": [
+									{
+										"respond": "What would having enough mean to you?",
+										"tagging": ["focus"]
+									}
+								]
+							}
+						}
+					},
+					"need": {
+						"ruleset": {
+							"I need *": {
+								"results": [
+									{
+										"respond": "You say you need (1).",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "What does need mean in this case?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"my": {
+						"ruleset": {
+							"my * own *": {
+								"comment": "Wildcard could be very or something else emphatic.",
+								"results": [
+									{
+										"respond": "You mention something of your (1) own.",
+										"tagging": ["mirror"]
+									}
+								]
+							},
+							"my *": {
+								"results": [
+									{
+										"respond": "You mention your (1).",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "Can you say more about your (1)?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "You have mentioned a lot of things in your life: your (1), your ((1)), your (((1))). What about what is not yours?",
+										"tagging": [ "thematise" ],
+										"deferto": [
+											[ "*", "my", "my *"	],
+											[ "*", "my", "my *"	]
+										]
+									},
+									{
+										"respond": "Earlier you mentioned your (1). Now you mention it again.",
+										"tagging": [ "mirror", "thematise" ],
+										"deferto": [
+											[ "*", "my", "my *", "my (1)" ]
+										]
+									},
+									{
+										"respond": "Earlier you mentioned your (1). Now you mention your ((1)). Are the two related?",
+										"tagging": [ "mirror" ],
+										"deferto": [
+											[ "*", "my", "my *" ]
+										]
+									}
+								],
+								"comment": "This contains some deferrals."
+							}
+						}
+					},
+					"must": {
+						"ruleset": {
+							"i must *": {
+								
+								"results": [
+									{
+										"respond": "You sound very certain. What steps will you take to make sure this will happen?",
+										"tagging": [ "mirror", "focus" ]
+									},
+									{
+										"respond": "You feel you must (1). Why is that?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Why must you (1)?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "What will happen if you don't (1)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"might": {
+						"ruleset": {
+							"i might": {
+								"results": [
+									{
+										"respond": "You don't sound a hundred percent.",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "You sound as though you haven't really decided.",
+										"tagging": [ "mirror", "infer" ]
+									}
+								]
+							}
+						}
+					},
+					"may": {
+						"ruleset": {
+							"may not": {
+								
+								"results": [
+									{
+										"respond": "This partly sounds like this an issue with permission! Is that the case or have I misunderstood you?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"it may be (1)": {
+								
+								"results": [
+									{
+										"respond": "You suggest a possible reason for what we've been discussing. Can you say more about that?",
+										"tagging": ["focus"]
+									}
+								]
+							}
+						}
+					},
+					"@lots": {
+						"results": [
+							{
+								"respond": "You say (1) but you don't say exactly how much.",
+								"tagging": [ "mirror" ]
+							},
+							{
+								"respond": "How much is (1) exactly?",
+								"tagging": [ "focus" ]
+							},
+							{
+								"respond": "Could you give a rough idea of how much (1) is?",
+								"tagging": [ "focus" ]
+							}
+						]
+					},
+					"know": {
+						"ruleset": {
+							"i do not know": {
+								"results": [
+									{
+										"respond": "What you could you do to find out?",
+										"tagging": [ "mirror", "focus" ]
+									}
+								],
+								"ruleset": {
+									"i do not know * about *": {
+										"results": [
+											{
+												"respond": "How could you find out about (1)?",
+												"tagging": [ "focus" ]
+											}
+										]
+									},
+									"i do not know @whwords to @begin": {
+										"results": [
+											{
+												"respond": "(1) do you think you should (2)?",
+												"tagging": [ "focus", "attend" ]
+											},
+											{
+												"respond": "Try (2)ing at the end and work backwards.",
+												"tagging": [ "focus", "attend" ]
+											},
+											{
+												"respond": "It can be confusing sometimes, knowing (1) to (2)",
+												"tagging": [ "mirror" ]
+											}
+										]
+									}
+								}
+							},
+							"i know": {
+								
+								"results": [
+									{
+										"respond": "You sound sure.",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "You say you know.",
+										"tagging": [ "mirror" ]
+									}
+								]
+							}
+						}
+					},
+					"keep": {
+						"ruleset": {
+							"it will keep": {
+								"results": [
+									{
+										"respond": "You suggest that this can wait until later.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"keep track": {
+								"results": [
+									{
+										"respond": "How do you stay up to date with information?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "There's a lot to deal with these days.",
+										"tagging": [ "infer", "attend" ]
+									}
+								]
+							}
+						}
+					},
+					"just": {
+						"ruleset": {
+							"just in time": {
+								"results": [
+									{
+										"respond": "It sounds like someone had luck on their side!",
+										"tagging": [ "mirror", "infer", "attend" ]
+									},
+									{
+										"respond": "Do you think punctuality is an issue here?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"just a minute": {
+								"results": [
+									{
+										"respond": "I get the sense you would like to slow this conversation down.",
+										"tagging": [ "mirror", "attend" ]
+									}
+								]
+							},
+							"just like that": {
+								"results": [
+									{
+										"respond": "Could you elaborate on this?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Why do you think it was just like that?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"it": {
+						"ruleset": {
+							"it is": {
+								
+								"results": [
+									{
+										"respond": "You say it's (1)",
+										"tagging": [ "mirror" ]
+									}
+								]
+							}
+						}
+					},
+					"in": {
+						"ruleset": {
+							"in fact": {
+								"results": [
+									{
+										"respond": "You sound certain here.",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "You sound confident that this is the case.",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "Tell me more about the facts of the situation.",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"is": {
+						"ruleset": {
+							"* is *": {
+								"ruleset": {
+									"the * is *": {
+										"results": [
+											{
+												"respond": "Tell me about the (1).",
+												"tagging": [ "focus" ]
+											}
+										]
+									},
+									"@thwords is *": {
+										"results": [
+											{
+												"respond": "You say (1) is (2).",
+												"pattern": [ "mirror" ]
+											},
+											{
+												"respond": "Sorry, I'm not sure what you mean by (1). Could you clarify?",
+												"tagging": [ "focus" ]
+											}
+										],
+										"ruleset": {
+											"@whwords @thwords is": {
+												"respond": "Tell me more about (1) (2) is.",
+												"tagging": [ "focus" ]
+											}
+										}
+									}
+								},
+								"results": [
+									{
+										"respond": "Tell me more about (1).",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Tell me more about what makes (1) (2).",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "What else is (1)?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "What else is (2)?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Is (1) really (2)?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "You say (1) is (2).",
+										"tagging": [ "mirror" ]
+									}
+								]
+							},
+							"@whwords is": {
+								"results": [
+									{
+										"respond": "(1) indeed.",
+										"tagging": [ "mirror", "attend" ]
+									}
+								]
+							},
+							"* is @art *": {
+								"results": [
+									{
+										"respond": "(1) (2) (3)...",
+										"tagging": [ "mirror" ]
+									}
+								]
+							}
+						},
+						"results": [
+							{
+								"respond": "You're asserting something here.",
+								"tagging": [ "attend" ]
+							},
+							{
+								"respond": "Can you support your assertion?",
+								"tagging": [ "focus" ]
+							}
+						]
+					},
+					"if": {
+						"ruleset": {
+							"if i were *": {
+								
+								"results": [
+									{
+										"respond": "You imply that being (1) is unlikely!",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "What would that change?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"i'd": {
+						"ruleset": {
+							"i'd like *": {
+								"ruleset": {
+									"if i'd like": {
+										"results": [
+											{
+												"respond": "You imply some uncertainty about what you'd like.",
+												"tagging": [ "infer", "mirror" ]
+											}
+										]
+									},
+									"@whwords i'd like *": {
+										"results": [
+											{
+												"respond": "Tell me more about (1) you'd like (2).",
+												"tagging": [ "focus" ]
+											}
+										],
+										"ruleset": {
+											"@whwords i'd like is *": {
+												"results": [
+													{
+														"respond": "You say (1) like is (2).",
+														"tagging": [ "mirror" ]
+													}
+												]
+											}
+										}
+									},
+									"i'd like to *": {
+										"results": [
+											{
+												"respond": "You say you'd like to (1).",
+												"tagging": ["mirror"]
+											}
+										],
+										"ruleset": {
+											"i'd like to * @prepositions *": {
+												"results": [
+													{
+														"respond": "What do you see as the barriers to (1)ing (2) (3)?",
+														"tagging": [ "focus" ]
+													},
+													{
+														"respond": "You say (1)ing (2) (3) is something you'd like to do.",
+														"tagging": [ "mirror" ]
+													}
+												]
+											}
+										}
+									}
+								},
+								"results": [
+									{
+										"respond": "You say you'd like (2)",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "What else would you like?",
+										"tagging": ["focus"]
+									}
+								]
+							}
+						}
+					},
+					"hello": {
+						"comment": "In case the user says it.",
+						"results": [
+							{
+								"respond": "Good, this seems to be working.",
+								"tagging": [ "initial" ]
+							},
+							{
+								"respond": "Oh hello. Did you go somewhere? No matter, let's get back to the conversation shall we?",
+								"tagging": [ "attend" ]
+							},
+							{
+								"respond": "Can hear you loud and clear!",
+								"tagging": [ "initial", "attend" ]
+							}
+						]
+					},
+					"has": {
+						"ruleset": {
+							"* has to *": {
+								
+								"results": [
+									{
+										"respond": "You think (1) should (2)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"have": {
+						"ruleset": {
+							"i have to *": {
+								"results": [
+									{
+										"respond": "You feel obliged to (1).",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "How do you feel about having to (1)?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Why (1)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"had": {
+						"ruleset": {
+							"have had it": {
+								"results": [
+									{
+										"respond": "I detect exasperation.",
+										"tagging": [ "mirror", "infer" ]
+									}
+								]
+							},
+							"if * had * would have *": {
+								"results": [
+									{
+										"respond": "Would you have liked that?",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"i have had it": {
+								"results": [
+									{
+										"respond": "It sounds like you've had enough.",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "Would you like to continue this discussion another time?",
+										"tagging": [ "focus", "attend", "mirror", "planning" ]
+									}
+								]
+							},
+							"* had better *": {
+								"results": [
+									{
+										"respond": "You seem to know what you think should happen next.",
+										"tagging": [ "mirror", "infer" ]
+									},
+									{
+										"respond": "You think (1) should (2).",
+										"tagging": [ "mirror" ]
+									},
+									{
+										"respond": "You think (1) should (2)?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"got": {
+						"ruleset": {
+							"what's got into *": {
+								"results": [
+									{
+										"respond": "You don't know what's the matter with (1).",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "What would you need to ask to find out?",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "Who would you need to ask to find out?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"got to *": {
+								"results": [
+									{
+										"respond": "Do you have any choice in the matter?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"not got to *": {
+								"results": [
+									{
+										"respond": "You imply that (1) isn't necessary.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"got any *": {
+								"results": [
+									{
+										"respond": "What would it mean to have at just one (1)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"got the *": {
+								"results": [
+									{
+										"respond": "What does it mean to have the (1)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"got a *": {
+								"results": [
+									{
+										"respond": "What does it mean to have a (1)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"got to be joking": {
+								"results": [
+									{
+										"respond": "You sound incredulous",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "You don't believe it?",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "Is it difficult to believe.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"got me there": {
+								"results": [
+									{
+										"respond": "If you don't know the answer now, perhaps you should think about it and we'll discuss it later.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"good": {
+						"ruleset": {
+							"make good": {
+								"results": [
+									{
+										"respond": "Bringing things back to an equilibrium can be satisfying.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"any good": {
+								"results": [
+									{
+										"respond": "That can mean so many things. It can imply value, interest... What do you mean by it?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"good for him": {
+								"results": [
+									{
+										"respond": "Unless you're being sarcastic (it's always hard to tell on these things, isn't it?), I'd say you feel please for someone else.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"for good": {
+								"results": [
+									{
+										"respond": "That sounds final!",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"do * good": {
+								"results": [
+									{
+										"respond": "You say something about doing (1) good. Is that what you want?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"going": {
+						"ruleset": {
+							"i am going to *": {
+								"results": [
+									{
+										"respond": "You say you are going to (1).",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"going on": {
+								"results": [
+									{
+										"respond": "Are you implying here that you want to move forward or that you want to know more about what's happening now?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"how is it going": {
+								"results": [
+									{
+										"respond": "Okay, I hope!",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"get going": {
+								"results": [
+									{
+										"respond": "It's good to make a start on things, when you've resolved to do them.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"keep going": {
+								"results": [
+									{
+										"respond": "You mention a continued effort here.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"tough going": {
+								"results": [
+									{
+										"respond": "You imply some challenges.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"good going": {
+								"results": [
+									{
+										"respond": "You sound positive here.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"go": {
+						"ruleset": {
+							"have a go": {
+								"results": [
+									{
+										"respond": "It's good to try things.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "That's the spirit.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"have a go at": {
+								"results": [
+									{
+										"respond": "You mention a confrontation here.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"give": {
+						
+						"ruleset": {
+							"give and take": {
+								"results": [
+									{
+										"respond": "You imply compromise of some kind.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "You imply a need for flexibility.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"give or take": {
+								"results": [
+									{
+										"respond": "You are quite vague here.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"I'd give anything to *": {
+								"results": [
+									{
+										"respond": "You sound keen. What would you need to do to (1)?",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "You say you want to (1).",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "How can you realise that dream?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"get": {
+						"ruleset": {
+							"not get it": {
+								"results": [
+									{
+										"respond": "You imply there's something to get.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "Get it? Is there a joke here?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"for": {
+						"ruleset": {
+							"i am all for *": {
+								"results": [
+									{
+										"respond": "You imply that you normally approve of (1).",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"if it wasn't for *": {
+								"results": [
+									{
+										"respond": "When it comes to this situation, you attribute responsibilty to one thing or person.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"for now": {
+								"results": [
+									{
+										"respond": "You suggest this is only temporary.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"* for ages": {
+								"results": [
+									{
+										"respond": "You say (1) for a long time.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"do": {
+						
+						"ruleset": {
+							"do not": {
+								"results": [
+									{
+										"respond": "That's pretty negative.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"do not mind": {
+								"results": [
+									{
+										"respond": "I sense indifference.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"* could do with *": {
+								"results": [
+									{
+										"respond": "You say that (1) needs more (2).",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"nothing to do with *": {
+								"results": [
+									{
+										"respond": "You're saying two things are unrelated here.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"nothing to do with me": {
+								"results": [
+									{
+										"respond": "You're saying you have responsibility or connection with that.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"* will do": {
+								"results": [
+									{
+										"respond": "You say (1) will be sufficient.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"did": {
+						"ruleset": {
+							"did not realise": {
+								"results": [
+									{
+										"respond": "Do you realise now?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"did not know": {
+								"results": [
+									{
+										"respond": "There's always a chance to learn.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "Well, now you know.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"i did not *": {
+								"results": [
+									{
+										"respond": "Do you think you will ever (1)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"sorry, i did not": {
+								"results": [
+									{
+										"respond": "There's no need to apologise.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"neither did *": {
+								"results": [
+									{
+										"respond": "You say (1) didn't either.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"so did *": {
+								"results": [
+									{
+										"respond": "You say (1) did too.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"did you *": {
+								"results": [
+									{
+										"respond": "I don't really do anything! I don't think I can (1)!",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "I don't have much experience with that. As you can probably tell.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"could": {
+						"ruleset": {
+							"i could *": {
+								"results": [
+									{
+										"respond": "You sound open to suggestion. What do you feel about the fact that you might (1)?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"i could * or": {
+								"results": [
+									{
+										"respond": "You are suggesting one or more potential options here. You could (1). Would you say that's correct?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"could not": {
+								"results": [
+									{
+										"respond": "So just to confirm--is this down to a lack of ability, an unwillingness, or some reservation you had?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"could not say": {
+								"results": [
+									{
+										"respond": "You don't feel like you're in a position to talk about this anymore.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"could not say anything": {
+								"results": [
+									{
+										"respond": "What was holding you back?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"come": {
+						"ruleset": {
+							"how come": {
+								
+								"results": [
+									{
+										"respond": "You want the reasoning behind this.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"may come as a *": {
+								"results": [
+									{
+										"respond": "This sounds like news!",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"come what may": {
+								"results": [
+									{
+										"respond": "You sound resolute, as though you it doesn't matter what difficulties pop up.",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"can": {
+						"ruleset": {
+							"i can *": {
+								"results": [
+									{
+										"respond": "You say you're able to (1). Weren't you able to do this before?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"if i can *": {
+								"results": [
+									{
+										"respond": "You say that if you're able to (1). Weren't you able to do this before?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"cannot *": {
+								"results": [
+									{
+										"respond": "You say that you're not able to (1).",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "You can't as in you're not able to or you're not willing?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"cannot believe": {
+								"results": [
+									{
+										"respond": "You sound fairly incredulous!",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"cannot tell you how * i *": {
+								"results": [
+									{
+										"respond": "You sound like you have quite strong feelings about being (1).",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"@bye": {
+						"results": [
+							{
+								"respond": "I guess this is the end of the conversation then!",
+								"tagging": [ "close" ],
+								"setflag": [ "quit" ]
+							}
+						]
+					},
+					"by": {
+						"ruleset": {
+							"by the way": {
+								"results": [
+									{
+										"respond": "I don't deal very well with digression.",
+										"tagging": ["attend"]
+									},
+									{
+										"respond": "Are you trying to change the subject?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"bit by bit": {
+								"results": [
+									{
+										"respond": "You imply that something is happening gradually here.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"by and large": {
+								"results": [
+									{
+										"respond": "You are talking quite generally now.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"by the time": {
+								"results": [
+									{
+										"respond": "Is that a coincidence?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"by *self": {
+								"results": [
+									{
+										"respond": "Without anyone else?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"but": {
+						"ruleset": {
+							"not only * but *": {
+								"results": [
+									{
+										"respond": "(1) and (2)?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"* anything but *": {
+								"results": [
+									{
+										"respond": "Anything but (1).",
+										"tagging": ["mirror"]
+									}
+								]
+							},
+							"but one": {
+								"results": [
+									{
+										"respond": "The penultimate.",
+										"tagging": ["mirror", "infer"]
+									}
+								]
+							},
+							"* but then *": {
+								"results": [
+									{
+										"respond": "You imply that the fact that (2) is not a surprise!",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "Even though (1), (2).",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"* all but *": {
+								"results": [
+									{
+										"respond": "You say that (1) almost completely (2).",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"but for *": {
+								"results": [
+									{
+										"respond": "You say that (1) is the one exception?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"yes but": {
+								"results": [
+									{
+										"respond": "There's a difference of opinion here.",
+										"tagging": ["mirror", "infer"]
+									}
+								]
+							}
+						},
+						"results": [
+							{
+								"respond": "There's always a but!",
+								"tagging": [ "mirror", "infer", "sympathise" ]
+							}
+						]
+					},
+					"been": {
+						"ruleset": {
+							"i have been *": {
+								"results": [
+									{
+										"respond": "Is this something you will continue to do?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"has been": {
+								"results": [
+									{
+										"respond": "And now it's really over?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "How do you feel now that that's finished with?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"been * since *": {
+								"results": [
+									{
+										"respond": "What has happened since (1)?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"been * for *": {
+								"results": [
+									{
+										"respond": "Can you say any more about what happened over that time?",
+										"tagging": ["focus"]
+									}
+								]
+							}
+						}
+					},
+					"be": {
+						
+						"ruleset": {
+							"to be fair": {
+								"results": [
+									{
+										"respond": "How do you feel about that?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "Can you say more about your own view on that?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "You seem to have a quite balanced view of the situation.",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"as * as can be": {
+								"results": [
+									{
+										"respond": "It sounds as though you couldn't be any more (1).",
+										"tagging": ["mirror", "infer"]
+									},
+									{
+										"respond": "Are you good at multitasking?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"let * be *": {
+								"results": [
+									{
+										"respond": "It sounds as though you think people should take a more peaceful stance.",
+										"tagging": ["mirror", "infer"]
+									},
+									{
+										"respond": "Do you generally believe that things should be left to lie?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "You want to leave (1) for now.",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "Are you sure you're happy just to leave (1) well alone (2)?",
+										"tagging": ["focus"]
+									}
+								]
+							}
+						}
+					},
+					"back": {
+						"ruleset": {
+							"back me up": {
+								"results": [
+									{
+										"respond": "Is support something you usually seek out?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "Do you generally seek a boost in morale?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"behind my back": {
+								"results": [
+									{
+										"respond": "It sounds as though something devious is going on.",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "You imply you expect something underhand.",
+										"tagging": ["mirror", "infer"]
+									}
+								]
+							}
+						}
+					},
+					"at": {
+						"ruleset": {
+							"while I'm at it": {
+								"results": [
+									{
+										"respond": "Can you cope with doing that at the same time?",
+										"tagging": ["focus"]
+									},
+									{
+										"respond": "Are you good at multitasking?",
+										"tagging": ["focus"]
+									}
+								]
+							}
+						}
+					},
+					"ask": {
+						"ruleset": {
+							"don't ask me": {
+								
+								"results": [
+									{
+										"respond": "I'm not sure we'll get anywhere with that unless I can ask you!",
+										"tagging": ["mirror"]
+									}
+								]
+							},
+							"if you ask me": {
+								
+								"results": [
+									{
+										"respond": "You sound very opinionated.",
+										"tagging": ["mirror"]
+									}
+								]
+							}
+						}
+					},
+					"as": {
+						"ruleset": {
+							"as yet": {
+								"results": [
+									{
+										"respond": "It seems like we'll have to wait and see about that then.",
+										"tagging": ["mirror", "infer"]
+									}
+								]
+							},
+							"as for *": {
+								"results": [
+									{
+										"respond": "You change the subject to discuss (1)",
+										"tagging": ["mirror"]
+									}
+								]
+							}
+						}
+					},
+					"any": {
+						"ruleset": {
+							"by any chance": {
+								
+								"results": [
+									{
+										"respond": "How can you find out?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"in any case *": {
+								
+								"results": [
+									{
+										"respond": "It sounds like whatever the situation is, (1).",
+										"tagging": ["mirror"]
+									}
+								]
+							},
+							"at any rate": {
+								"results": [
+									{
+										"respond": "You sound quite positive.",
+										"tagging": ["mirror", "infer"]
+									}
+								]
+							}
+						}
+					},
+					"and": {
+						"ruleset": {
+							"on and on": {
+								"results": [
+									{
+										"respond": "You make the situation sound almost tedious!",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "Do you feel the situation is tedious.",
+										"tagging": [ "focus" ]
+									}
+								]
+							},
+							"and so on": {
+								"results": [
+									{
+										"respond": "Could you elaborate on that?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"wait and see": {
+								"results": [
+									{
+										"respond": "They do say patience is a virtue.",
+										"tagging": [ "mirror", "platitude" ]
+									}
+								]
+							},
+							"come and *": {
+								"results": [
+									{
+										"respond": "I wish I could come and (1). But I can't so it's beside the point!",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"try and *": {
+								"results": [
+									{
+										"respond": "When will you (1)?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"am": {
+						"ruleset": {
+							"am *": {
+								"results": [
+									{
+										"respond": "You say you are (1).",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "Can you say more about yourself?",
+										"tagging": [ "focus" ]
+									},
+									{
+										"respond": "Tell me more about yourself.",
+										"tagging": [ "focus" ]
+									}
+								],
+								"ruleset": {
+									"am I *": {
+										"results": [
+											{
+												"respond": "I'm afraid I couldn't say if you are (1).",
+												"tagging": ["mirror"]
+											},
+											{
+												"respond": "Do you feel you are (1)?",
+												"tagging": [ "focus" ]
+											}
+										]
+									},
+									"am *ing": {
+										"results": [
+											{
+												"respond": "How do you feel about (1)ing?",
+												"tagging": [ "focus" ]
+											},
+											{
+												"respond": "Tell me more about how you (1).",
+												"tagging": ["focus"]
+											},
+											{
+												"respond": "You mention (1)ing.",
+												"tagging": ["mirror"]
+											}
+										],
+										"ruleset": {
+											"am going to *": {
+												"results": [
+													{
+														"respond": "You mention (1)ing, if I can say that.",
+														"tagging": ["mirror"]
+													}
+												],
+												"ruleset": {
+													"am going to @art *": {
+														"results": [
+															{
+																"respond": "Tell me more about this (2) you mention.",
+																"tagging": [ "focus" ]
+															},
+															{
+																"respond": "You mention attending (1) (2).",
+																"tagging": [ "mirror" ]
+															},
+															{
+																"respond": "That's at least twice you've mentioned (1) (2) now.",
+																"tagging": [ "thematise" ],
+																"deferto": [
+																	[ "*", "(1)", "(1) (2)" ]
+																]
+															},
+															{
+																"respond": "Perhaps you feel you've said enough about it, but can you tell me more about this (2)?",
+																"tagging": [ "thematise", "focus" ],
+																"deferto": [
+																	[ "*", "(1)", "(1) (2)" ]
+																]
+															},
+															{
+																"respond": "Can you tell me a bit about this (2)?",
+																"tagging": [ "focus" ]
+															}
+														]
+													}
+												}
+											}
+										}
+									},
+									"am *ed": {
+										"results": [
+											{
+												"respond": "You say you are (2).",
+												"tagging": [ "mirror" ]
+											},
+											{
+												"respond": "What makes you (1)?",
+												"tagging": ["focus"]
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"all": {
+						"ruleset": {
+							"all in all": {
+								"results": [
+									{
+										"respond": "You have summed up a bit here.",
+										"tagging": ["mirror", "thematise"]
+									},
+									{
+										"respond": "You are beginning to summarise the situation.",
+										"tagging": ["mirror", "thematise"]
+									}
+								]
+							},
+							"by all means": {
+								"results": [
+									{
+										"respond": "You seem to be in a sort of generous mood.",
+										"tagging": [ "infer", "mirror" ]
+									}
+								]
+							},
+							"* at all": {
+								"results": [
+									{
+										"respond": "Not in any way?",
+										"tagging": [ "focus" ]
+									}
+								]
+							}
+						}
+					},
+					"a": {
+						
+						"ruleset": {
+							"such a *": {
+								"results": [
+									{
+										"respond": "You say that with some feeling.",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"if * such a *": {
+								"results": [
+									{
+										"respond": "You mention a possibility here. Can you elaborate on that?",
+										"tagging": ["focus"]
+									}
+								]
+							},
+							"a little *": {
+								"results": [
+									{
+										"respond": "You mention a little (1). How much is that exactly?",
+										"tagging": ["generic"]
+									}
+								]
+							},
+							"a few *": {
+								"results": [
+									{
+										"respond": "You mention a few (1). How many exactly?",
+										"tagging": ["generic"]
+									}
+								]
+							}
+						}
+					},
+					"\\?": {
+						"ruleset": {
+							"*": {
+								"results": [
+									{
+										"respond": "I'm not very good with questions so I can't answer that.",
+										"tagging": ["mirror"]
+									},
+									{
+										"respond": "Maybe you were asking a rhetorical question, but I'm not very good with questions in general.",
+										"tagging": ["infer"]
+									},
+									{
+										"respond": "I'm afraid asking me is useless. I don't know anything. I can only try and ask questions myself.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "I think you're really asking yourself this question.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "I'm pretty hopeless when it comes to giving advice, if that's what you're asking for.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "To answer your question... you might need to talk to an actualy person. I know nothing.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "I don't know if you're asking me a question but either way I can't answer.",
+										"tagging": ["generic"]
+									},
+									{
+										"respond": "The point of this conversation is for me to ask questions to try and understand you. I'm not very good at answering them.",
+										"tagging": ["instruction"]
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"test": [
+		{
+			"o": [
+				"Hello world!",
+				"My name is Beth."
+			]
+		},
+		{
+			"i": "hello",
+			"o": [
+				"You say hello"
+			]
+		}
+	]
+}
+

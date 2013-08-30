@@ -1,8 +1,8 @@
 #BETH#
 
-##v0.5.0##
+##v0.5.1##
 
-LATEST: Introduced a number of new `dountil` conditions to the library conventions.
+LATEST: Introduced `vis.js` which when run with Node, serves a plain-text file containing keys to the rulesets in any Beth script specified.
 
 This is all very much a work in progress.
 
